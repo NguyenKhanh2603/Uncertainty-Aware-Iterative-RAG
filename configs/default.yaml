@@ -1,0 +1,56 @@
+# ── Shared Hyperparameters ──────────────────────────────────────────────────────
+# This is the default configuration. Override with text_only.yaml or multimodal.yaml.
+
+sampling:
+  M: 10                          # Number of stochastic samples per iteration
+  temperature: 0.7               # Sampling temperature (τ > 0)
+  M_initial: 3                   # Initial M for adaptive sampling (U4)
+  M_max: 10                      # Maximum M for adaptive sampling (U4)
+  adaptive_M_enabled: false      # Enable two-phase adaptive M sampling (U4)
+  adaptive_M_se_threshold: 0.5   # SE_total threshold to trigger M escalation (U4)
+
+thresholds:
+  mode: "fixed"                  # "fixed" or "adaptive" (U2)
+  # Fixed thresholds
+  tau_noise: 0.5                 # Aleatoric uncertainty threshold for pruning
+  tau_missing: 0.3               # Epistemic uncertainty threshold for retrieval
+  # Adaptive threshold parameters (U2)
+  alpha: 0.5                     # Fraction of initial SE_aleatoric to use as tau_noise
+  beta: 0.5                      # Fraction of initial SE_epistemic to use as tau_missing
+  adaptive_min_tau: 0.05         # Minimum threshold floor (prevents premature stopping)
+
+pipeline:
+  max_iterations: 5              # Safety cap on iteration count
+  convergence_patience: 2        # Number of stagnant iterations before early abort
+  convergence_threshold: 0.05    # Minimum relative SE_total improvement (5%)
+
+pruning:
+  pre_filter_enabled: true       # Enable cheap NLI pre-filter before expensive LOO
+  contradiction_threshold: 0.8   # NLI contradiction score threshold
+  max_chunks_for_loo: 10         # Skip LOO if more chunks survive pre-filter (cost control)
+
+retrieval:
+  top_k: 5                       # Number of documents to retrieve per iteration
+  dedup_cosine_threshold: 0.95   # Cosine similarity threshold for deduplication
+
+model:
+  llm_name: "gpt-4o-mini"        # Primary LLM for text-only
+  vlm_name: "gpt-4o"             # Vision-Language Model for multimodal
+  nli_name: "cross-encoder/nli-deberta-v3-base"
+  embedding_name: "all-MiniLM-L6-v2"
+  claim_extractor_model: null    # null = use llm_name; set to override
+
+modality:
+  type: "text"                   # "text" | "table" | "multimodal"
+  image_detail: "high"           # OpenAI vision API detail level
+  table_format: "markdown"       # "markdown" | "html" | "linearized"
+
+calibration:                     # U3: Uncertainty Calibration
+  enabled: true
+  num_bins: 10                   # Number of bins for ECE calculation
+  plot_output_dir: "results/calibration"
+
+logging:
+  level: "INFO"
+  output_dir: "results/logs"
+  log_per_iteration: true        # Log detailed per-iteration metrics

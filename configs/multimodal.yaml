@@ -1,0 +1,16 @@
+# ── Multimodal Configuration Overrides ──────────────────────────────────────────
+# Inherits from default.yaml; only override what's different.
+
+model:
+  vlm_name: "gpt-4o"
+
+modality:
+  type: "multimodal"
+  image_detail: "high"
+  table_format: "markdown"
+
+sampling:
+  # Multimodal requires sequential calls (VLM n>1 limitation)
+  M: 10
+  adaptive_M_enabled: true       # Recommended for multimodal (cost savings)
+  M_initial: 3
