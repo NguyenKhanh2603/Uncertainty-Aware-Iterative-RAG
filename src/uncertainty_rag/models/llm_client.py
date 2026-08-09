@@ -286,6 +286,8 @@ class HuggingFaceLocalClient(BaseLLMClient):
                     # Calculate log probabilities
                     scores = outputs.scores
                     for j, token_id in enumerate(gen_tokens):
+                        if token_id in [self.tokenizer.eos_token_id, self.tokenizer.pad_token_id]:
+                            break
                         if j < len(scores):
                             log_probs = torch.nn.functional.log_softmax(scores[j][i], dim=-1)
                             token_prob = log_probs[token_id].item()

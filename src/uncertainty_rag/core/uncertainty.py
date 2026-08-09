@@ -69,7 +69,7 @@ class UncertaintyEstimator:
         per_sample_entropy = []
 
         for sample in samples:
-            key_logprobs = [t.logprob for t in sample.key_token_logprobs]
+            key_logprobs = [t.logprob for t in sample.key_token_logprobs if t.logprob > -100.0]
             if key_logprobs:
                 # Convert from natural log (ln) to log₂ for consistency with SE_semantic
                 # logprobs from API are ln, so we divide by ln(2) to get log₂
