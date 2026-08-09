@@ -295,7 +295,9 @@ class IterativeRAGPipeline:
                     for i, nc in enumerate(new_chunks):
                         self.logger.log_message(f"  + Retrieved Chunk {i+1}: ID={nc.id}\n{nc.content}\n")
                 else:
-                    self.logger.log_message("  + No new chunks found by retriever.")
+                    self.logger.log_message("  + No new chunks found by retriever. Stopping early to prevent infinite loop.")
+                    final_decision = "NO_NEW_KNOWLEDGE_STOP"
+                    break
                 
                 context.extend(new_chunks)
                 self.logger.log_message(
