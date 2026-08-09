@@ -18,8 +18,8 @@ class NLIModel:
 
     # Label indices for cross-encoder/nli-deberta-v3-base
     CONTRADICTION = 0
-    NEUTRAL = 1
-    ENTAILMENT = 2
+    ENTAILMENT = 1
+    NEUTRAL = 2
 
     def __init__(
         self,
