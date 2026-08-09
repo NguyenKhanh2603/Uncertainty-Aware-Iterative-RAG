@@ -41,9 +41,8 @@ class PipelineResult:
 
     answer: str
     confidence: float
-    se_total: float
-    se_aleatoric: float
-    se_epistemic: float
+    se_semantic: float
+    u_token: float
     iterations: int
     final_decision: str  # "CONFIDENT_STOP" | "MAX_ITER_REACHED" | "CONVERGENCE_ABORT"
     history: list[IterationLog] = field(default_factory=list)
@@ -52,8 +51,8 @@ class PipelineResult:
     final_concepts: list[Concept] = field(default_factory=list)
     final_context_count: int = 0
     # Adaptive info
-    effective_tau_noise: float = 0.0
-    effective_tau_missing: float = 0.0
+    effective_tau_token: float = 0.0
+    effective_tau_semantic: float = 0.0
     threshold_mode: str = "fixed"
     samples_used_per_iter: list[int] = field(default_factory=list)
 
@@ -93,10 +92,10 @@ class IterativeRAGPipeline:
         self.uncertainty = uncertainty_estimator
         self.router = router
         
-        self.nli_model = nli_model or NLIModel(model_name=self.config.models.nli_model_name)
+        self.nli_model = nli_model or NLIModel(model_name=self.config.model.nli_name)
         self.reranker_model = reranker_model
         if self.config.pruning.strategy == "gray_zone" and not self.reranker_model:
-            self.reranker_model = RerankerModel(model_name=self.config.models.reranker_name)
+            self.reranker_model = RerankerModel(model_name=self.config.model.reranker_name)
             
         self.pruner = pruner or PrunerFactory.create(
             config=self.config.pruning,
@@ -159,13 +158,13 @@ class IterativeRAGPipeline:
                     
                 self.logger.log_message(f"\n--- [STEP 2: SEMANTIC UNCERTAINTY PROFILING] ---")
                 probe_concepts = self.clusterer.cluster(samples)
-                probe_se = self.uncertainty.compute_se_total(probe_concepts)
-                self.logger.log_message(f"Probe Clustering: Found {len(probe_concepts)} concepts. Initial SE_total={probe_se:.4f}")
+                probe_se = self.uncertainty.compute_se_semantic(probe_concepts)
+                self.logger.log_message(f"Probe Clustering: Found {len(probe_concepts)} concepts. Initial SE_semantic={probe_se:.4f}")
 
                 if self.sampler.should_escalate_m(probe_se):
                     # Phase 2: Full sampling with M_max
                     self.logger.log_message(
-                        f"Adaptive M: SE_total={probe_se:.4f} > threshold="
+                        f"Adaptive M: SE_semantic={probe_se:.4f} > threshold="
                         f"{self.sampler.config.adaptive_M_se_threshold:.4f} → "
                         f"escalating from M={self.sampler.config.M_initial} to "
                         f"M={self.sampler.config.M_max}"
@@ -185,7 +184,7 @@ class IterativeRAGPipeline:
                     concepts = probe_concepts
                     samples_used_per_iter.append(self.sampler.config.M_initial)
                     self.logger.log_message(
-                        f"Adaptive M: SE_total={probe_se:.4f} ≤ threshold → "
+                        f"Adaptive M: SE_semantic={probe_se:.4f} ≤ threshold → "
                         f"using M={self.sampler.config.M_initial} (no escalation)"
                     )
             else:
@@ -217,9 +216,8 @@ class IterativeRAGPipeline:
             profile = self.uncertainty.compute(samples, concepts)
             self.logger.log_message(
                 f"Uncertainty Profile Calculated:\n"
-                f"  SE_total:     {profile.se_total:.4f}\n"
-                f"  SE_aleatoric: {profile.se_aleatoric:.4f} (Noise/Contradiction)\n"
-                f"  SE_epistemic: {profile.se_epistemic:.4f} (Missing Info)"
+                f"  SE_semantic:  {profile.se_semantic:.4f} (Ambiguity)\n"
+                f"  U_token:      {profile.u_token:.4f} (Noise/Contradiction)"
             )
 
             # ── U2: Adaptive Threshold Calibration (iteration 0 only) ────────
@@ -227,17 +225,16 @@ class IterativeRAGPipeline:
                 self.router.calibrate_adaptive(profile)
                 self.logger.log_message(
                     f"Adaptive thresholds calibrated: "
-                    f"τ_noise={self.router.tau_noise:.4f}, "
-                    f"τ_missing={self.router.tau_missing:.4f}"
+                    f"τ_token={self.router.tau_token:.4f}, "
+                    f"τ_semantic={self.router.tau_semantic:.4f}"
                 )
 
             # Log iteration
             iter_time = time.time() - iter_start
             log_entry = IterationLog(
                 iteration=iteration,
-                se_total=profile.se_total,
-                se_aleatoric=profile.se_aleatoric,
-                se_epistemic=profile.se_epistemic,
+                se_semantic=profile.se_semantic,
+                u_token=profile.u_token,
                 num_concepts=profile.num_concepts,
                 decision="",  # Will be set below
                 num_context_chunks=len(context),
@@ -245,8 +242,8 @@ class IterativeRAGPipeline:
                 samples_used=samples_used_per_iter[-1],
                 wall_time_s=iter_time,
                 cost_so_far_usd=self.cost_tracker.total_cost_usd,
-                effective_tau_noise=self.router.tau_noise,
-                effective_tau_missing=self.router.tau_missing,
+                effective_tau_token=self.router.tau_token,
+                effective_tau_semantic=self.router.tau_semantic,
             )
 
             # ── Step 2: Routing (dual-condition stopping) ────────────────────
@@ -263,8 +260,8 @@ class IterativeRAGPipeline:
             if decision == RoutingDecision.PRUNE:
                 self.logger.log_message(f"--- [PRUNING PHASE START] ---")
                 context, prune_report = self.pruner.prune(
-                    query, context, current_se_total=profile.se_total,
-                    eval_se_fn=lambda chunks: self.uncertainty.compute_se_total(
+                    query, context, current_se_semantic=profile.se_semantic,
+                    eval_se_fn=lambda chunks: self.uncertainty.compute_se_semantic(
                         self.clusterer.cluster(
                             self.claim_extractor.extract_all(
                                 self.sampler.generate_samples(query, chunks, self.handler, adaptive_phase="initial")
@@ -311,7 +308,7 @@ class IterativeRAGPipeline:
             if self._check_convergence(history):
                 final_decision = "CONVERGENCE_ABORT"
                 self.logger.log_message(
-                    "Convergence detected: SE_total not improving → aborting"
+                    "Convergence detected: SE_semantic not improving → aborting"
                 )
                 break
 
@@ -322,9 +319,8 @@ class IterativeRAGPipeline:
             return PipelineResult(
                 answer="",
                 confidence=0.0,
-                se_total=0.0,
-                se_aleatoric=0.0,
-                se_epistemic=0.0,
+                se_semantic=0.0,
+                u_token=0.0,
                 iterations=0,
                 final_decision="NO_ITERATIONS",
             )
@@ -334,18 +330,17 @@ class IterativeRAGPipeline:
 
         return PipelineResult(
             answer=answer,
-            confidence=max(0.0, 1.0 - profile.se_total),
-            se_total=profile.se_total,
-            se_aleatoric=profile.se_aleatoric,
-            se_epistemic=profile.se_epistemic,
+            confidence=max(0.0, 1.0 - profile.se_semantic),
+            se_semantic=profile.se_semantic,
+            u_token=profile.u_token,
             iterations=len(history),
             final_decision=final_decision,
             history=history,
             cost_summary=self.cost_tracker.summary(),
             final_concepts=concepts,
             final_context_count=len(context),
-            effective_tau_noise=self.router.tau_noise,
-            effective_tau_missing=self.router.tau_missing,
+            effective_tau_token=self.router.tau_token,
+            effective_tau_semantic=self.router.tau_semantic,
             threshold_mode=self.config.thresholds.mode,
             samples_used_per_iter=samples_used_per_iter,
         )
@@ -398,15 +393,15 @@ class IterativeRAGPipeline:
         return final_ans
 
     def _check_convergence(self, history: list[IterationLog]) -> bool:
-        """Check if SE_total hasn't improved in last `patience` iterations."""
+        """Check if SE_semantic hasn't improved in last `patience` iterations."""
         patience = self.config.pipeline.convergence_patience
         threshold = self.config.pipeline.convergence_threshold
 
         if len(history) < patience + 1:
             return False
 
-        recent = [h.se_total for h in history[-patience:]]
-        previous = history[-(patience + 1)].se_total
+        recent = [h.se_semantic for h in history[-patience:]]
+        previous = history[-(patience + 1)].se_semantic
 
         if previous == 0:
             return True  # Already at zero, no improvement possible

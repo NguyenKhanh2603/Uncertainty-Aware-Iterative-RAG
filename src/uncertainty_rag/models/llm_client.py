@@ -54,7 +54,7 @@ class BaseLLMClient(ABC):
         messages: list[dict[str, Any]],
         n: int = 1,
         temperature: float = 0.7,
-        max_tokens: int = 1024,
+        max_tokens: int = 2000,
         logprobs: bool = True,
         top_logprobs: int = 5,
         json_mode: bool = False,
@@ -122,7 +122,7 @@ class OpenAIClient(BaseLLMClient):
         messages: list[dict[str, Any]],
         n: int = 1,
         temperature: float = 0.7,
-        max_tokens: int = 1024,
+        max_tokens: int = 2000,
         logprobs: bool = True,
         top_logprobs: int = 5,
         json_mode: bool = False,
@@ -243,14 +243,23 @@ class HuggingFaceLocalClient(BaseLLMClient):
         messages: list[dict[str, Any]],
         n: int = 1,
         temperature: float = 0.7,
-        max_tokens: int = 1024,
+        max_tokens: int = 2000,
         logprobs: bool = True,
         top_logprobs: int = 5,
         json_mode: bool = False,
     ) -> list[SampleResult]:
         """Generate samples from local model."""
+        # Convert OpenAI-style list content to flat string for HF tokenizers
+        processed_messages = []
+        for msg in messages:
+            content = msg["content"]
+            if isinstance(content, list):
+                text_parts = [part.get("text", "") for part in content if part.get("type") == "text"]
+                content = "\n".join(text_parts)
+            processed_messages.append({"role": msg["role"], "content": content})
+
         # Convert messages to prompt string
-        prompt = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        prompt = self.tokenizer.apply_chat_template(processed_messages, tokenize=False, add_generation_prompt=True)
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
         
         # Generation config

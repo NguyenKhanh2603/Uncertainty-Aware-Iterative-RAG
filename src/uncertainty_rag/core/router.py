@@ -1,14 +1,12 @@
-"""Uncertainty-based routing: dual-condition stopping with adaptive thresholds (U2).
+"""Two-Signal Independent Routing for Iterative RAG.
 
 Routing decisions:
-  STOP     — both aleatoric AND epistemic below thresholds → confident answer
-  PRUNE    — aleatoric is high → noise in context → remove conflicting chunks
-  RETRIEVE — epistemic is high → knowledge gap → fetch new evidence
-
-Priority: PRUNE before RETRIEVE (noise must be resolved first).
+  RETRIEVE — semantic entropy is high → model is semantically confused, fetch new evidence
+  PRUNE    — semantic entropy is low BUT token uncertainty is high → noise in context
+  STOP     — both semantic entropy and token uncertainty below thresholds → confident answer
 
 Supports:
-  - Fixed thresholds: τ_noise and τ_missing are static hyperparameters.
+  - Fixed thresholds: τ_token and τ_semantic are static hyperparameters.
   - Adaptive thresholds (U2): τ computed as fraction of initial uncertainty profile.
 """
 
@@ -30,35 +28,35 @@ class RoutingDecision(str, Enum):
 
 
 class Router:
-    """Decide whether to stop, prune, or retrieve based on uncertainty profile.
+    """Decide whether to stop, prune, or retrieve based on independent signals.
 
-    Implements dual-condition stopping (W3 fix):
-    - STOP when both SE_aleatoric ≤ τ_noise AND SE_epistemic ≤ τ_missing
-    - PRUNE first if noise is high (priority over retrieval)
-    - RETRIEVE if knowledge gap is high (noise already handled)
+    Implements independent signal routing:
+    - RETRIEVE if SE_semantic > τ_semantic
+    - PRUNE if SE_semantic ≤ τ_semantic AND U_token > τ_token
+    - STOP if both are below their respective thresholds
 
     Supports adaptive thresholds (U2):
     - On the first iteration, record initial uncertainty as baseline
-    - τ_noise = alpha * SE_aleatoric_initial
-    - τ_missing = beta * SE_epistemic_initial
+    - τ_token = alpha * U_token_initial
+    - τ_semantic = beta * SE_semantic_initial
     """
 
     def __init__(self, config: ThresholdConfig) -> None:
         self.config = config
         # Effective thresholds (may be overridden by adaptive mode)
-        self._tau_noise: float = config.tau_noise
-        self._tau_missing: float = config.tau_missing
+        self._tau_token: float = config.tau_token
+        self._tau_semantic: float = config.tau_semantic
         self._is_calibrated: bool = (config.mode == "fixed")
         # Store initial profile for logging
         self._initial_profile: Optional[UncertaintyProfile] = None
 
     @property
-    def tau_noise(self) -> float:
-        return self._tau_noise
+    def tau_token(self) -> float:
+        return self._tau_token
 
     @property
-    def tau_missing(self) -> float:
-        return self._tau_missing
+    def tau_semantic(self) -> float:
+        return self._tau_semantic
 
     @property
     def is_calibrated(self) -> bool:
@@ -74,9 +72,9 @@ class Router:
             return
 
         self._initial_profile = initial_profile
-        self._tau_noise, self._tau_missing = self.config.compute_adaptive_thresholds(
-            initial_se_aleatoric=initial_profile.se_aleatoric,
-            initial_se_epistemic=initial_profile.se_epistemic,
+        self._tau_token, self._tau_semantic = self.config.compute_adaptive_thresholds(
+            initial_u_token=initial_profile.u_token,
+            initial_se_semantic=initial_profile.se_semantic,
         )
         self._is_calibrated = True
 
@@ -89,19 +87,16 @@ class Router:
         Returns:
             RoutingDecision: STOP, PRUNE, or RETRIEVE.
         """
-        # STOP: both noise and knowledge gap are below thresholds
-        if profile.se_aleatoric <= self._tau_noise and profile.se_epistemic <= self._tau_missing:
-            return RoutingDecision.STOP
+        # RETRIEVE: Semantic confusion is high -> fetch external knowledge
+        if profile.se_semantic > self._tau_semantic:
+            return RoutingDecision.RETRIEVE
 
-        # PRUNE first if noise is high (priority over retrieval)
-        # Information Theory: noise must be resolved before we can meaningfully
-        # evaluate whether knowledge is missing
-        if profile.se_aleatoric > self._tau_noise:
+        # PRUNE: Semantic confusion is low (agrees on meaning) BUT token uncertainty is high (noisy context)
+        if profile.u_token > self._tau_token:
             return RoutingDecision.PRUNE
 
-        # RETRIEVE if knowledge gap is high (noise already handled)
-        if profile.se_epistemic > self._tau_missing:
-            return RoutingDecision.RETRIEVE
+        # STOP: Both are low
+        return RoutingDecision.STOP
 
         # Fallback safety
         return RoutingDecision.STOP
@@ -111,11 +106,10 @@ class Router:
         decision = self.decide(profile)
         return {
             "decision": decision.value,
-            "se_aleatoric": round(profile.se_aleatoric, 4),
-            "se_epistemic": round(profile.se_epistemic, 4),
-            "se_total": round(profile.se_total, 4),
-            "tau_noise": round(self._tau_noise, 4),
-            "tau_missing": round(self._tau_missing, 4),
+            "se_semantic": round(profile.se_semantic, 4),
+            "u_token": round(profile.u_token, 4),
+            "tau_token": round(self._tau_token, 4),
+            "tau_semantic": round(self._tau_semantic, 4),
             "threshold_mode": self.config.mode,
             "reason": self._explain(decision, profile),
         }
@@ -123,19 +117,19 @@ class Router:
     def _explain(self, decision: RoutingDecision, profile: UncertaintyProfile) -> str:
         if decision == RoutingDecision.STOP:
             return (
-                f"Both aleatoric ({profile.se_aleatoric:.4f} ≤ {self._tau_noise:.4f}) "
-                f"and epistemic ({profile.se_epistemic:.4f} ≤ {self._tau_missing:.4f}) "
+                f"Both Semantic Entropy ({profile.se_semantic:.4f} ≤ {self._tau_semantic:.4f}) "
+                f"and Token Uncertainty ({profile.u_token:.4f} ≤ {self._tau_token:.4f}) "
                 f"are below thresholds → confident answer."
             )
         elif decision == RoutingDecision.PRUNE:
             return (
-                f"Aleatoric uncertainty ({profile.se_aleatoric:.4f}) exceeds "
-                f"τ_noise ({self._tau_noise:.4f}) → context has noise/conflicts, "
-                f"pruning required before evaluating knowledge gaps."
+                f"Semantic Entropy is low ({profile.se_semantic:.4f} ≤ {self._tau_semantic:.4f}) but "
+                f"Token Uncertainty ({profile.u_token:.4f}) exceeds τ_token ({self._tau_token:.4f}) "
+                f"→ context has noise/conflicts, pruning required."
             )
         else:
             return (
-                f"Epistemic uncertainty ({profile.se_epistemic:.4f}) exceeds "
-                f"τ_missing ({self._tau_missing:.4f}) → knowledge gap detected, "
+                f"Semantic Entropy ({profile.se_semantic:.4f}) exceeds "
+                f"τ_semantic ({self._tau_semantic:.4f}) → model is semantically confused, "
                 f"retrieving new evidence."
             )

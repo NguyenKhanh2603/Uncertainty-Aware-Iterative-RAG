@@ -12,11 +12,11 @@ sampling:
 thresholds:
   mode: "fixed"                  # "fixed" or "adaptive" (U2)
   # Fixed thresholds
-  tau_noise: 0.5                 # Aleatoric uncertainty threshold for pruning
-  tau_missing: 0.3               # Epistemic uncertainty threshold for retrieval
+  tau_token: 0.5                 # Token uncertainty threshold for pruning
+  tau_semantic: 0.3              # Semantic entropy threshold for retrieval
   # Adaptive threshold parameters (U2)
-  alpha: 0.5                     # Fraction of initial SE_aleatoric to use as tau_noise
-  beta: 0.5                      # Fraction of initial SE_epistemic to use as tau_missing
+  alpha: 0.5                     # Fraction of initial U_token to use as tau_token
+  beta: 0.5                      # Fraction of initial SE_semantic to use as tau_semantic
   adaptive_min_tau: 0.05         # Minimum threshold floor (prevents premature stopping)
 
 pipeline:

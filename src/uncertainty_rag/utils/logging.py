@@ -15,9 +15,8 @@ class IterationLog:
     """Snapshot of a single pipeline iteration."""
 
     iteration: int
-    se_total: float
-    se_aleatoric: float
-    se_epistemic: float
+    se_semantic: float
+    u_token: float
     num_concepts: int
     decision: str
     num_context_chunks: int
@@ -26,8 +25,8 @@ class IterationLog:
     wall_time_s: float
     cost_so_far_usd: float
     # Adaptive threshold info (U2)
-    effective_tau_noise: Optional[float] = None
-    effective_tau_missing: Optional[float] = None
+    effective_tau_token: Optional[float] = None
+    effective_tau_semantic: Optional[float] = None
 
     def to_dict(self) -> dict[str, Any]:
         return {k: round(v, 6) if isinstance(v, float) else v for k, v in asdict(self).items()}
@@ -50,8 +49,8 @@ class PipelineLogger:
     def log_iteration(self, entry: IterationLog) -> None:
         self._logs.append(entry)
         self._logger.info(
-            f"Iter {entry.iteration}: SE_total={entry.se_total:.4f} "
-            f"SE_a={entry.se_aleatoric:.4f} SE_e={entry.se_epistemic:.4f} "
+            f"Iter {entry.iteration}: SE_semantic={entry.se_semantic:.4f} "
+            f"U_token={entry.u_token:.4f} "
             f"concepts={entry.num_concepts} → {entry.decision} "
             f"(M={entry.samples_used}, chunks={entry.num_context_chunks})"
         )

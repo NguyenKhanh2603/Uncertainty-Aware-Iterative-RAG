@@ -39,7 +39,7 @@ class BasePruner(ABC):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:
@@ -58,7 +58,7 @@ class TwoPhasePruner(BasePruner):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:
@@ -102,13 +102,13 @@ class TwoPhasePruner(BasePruner):
             new_se = eval_se_fn(test_chunks)
             report.loo_evaluations += 1
 
-            if new_se <= current_se_total:
+            if new_se <= current_se_semantic:
                 # Removing it reduced or maintained uncertainty -> it's noise
-                logger.info(f"  [LOO] Pruned Chunk {chunk.id}: Removing it decreased/maintained uncertainty (SE: {current_se_total:.4f} -> {new_se:.4f})")
+                logger.info(f"  [LOO] Pruned Chunk {chunk.id}: Removing it decreased/maintained uncertainty (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
             else:
                 # Removing it increased uncertainty -> it's useful
                 final_chunks.append(chunk)
-                logger.info(f"  [LOO] Kept Chunk {chunk.id}: Removing it increased uncertainty (SE: {current_se_total:.4f} -> {new_se:.4f})")
+                logger.info(f"  [LOO] Kept Chunk {chunk.id}: Removing it increased uncertainty (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
 
         report.surviving_count = len(final_chunks)
         return final_chunks, report
@@ -125,7 +125,7 @@ class GrayZonePruner(BasePruner):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:
@@ -168,11 +168,11 @@ class GrayZonePruner(BasePruner):
             new_se = eval_se_fn(test_chunks)
             report.loo_evaluations += 1
 
-            if new_se <= current_se_total:
-                logger.info(f"  [LOO] Pruned Gray-Zone Chunk {chunk.id} (SE: {current_se_total:.4f} -> {new_se:.4f})")
+            if new_se <= current_se_semantic:
+                logger.info(f"  [LOO] Pruned Gray-Zone Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
             else:
                 final_gray.append(chunk)
-                logger.info(f"  [LOO] Kept Gray-Zone Chunk {chunk.id} (SE: {current_se_total:.4f} -> {new_se:.4f})")
+                logger.info(f"  [LOO] Kept Gray-Zone Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
 
         final_chunks = keep_chunks + final_gray
         report.surviving_count = len(final_chunks)
@@ -191,7 +191,7 @@ class PrefixCachingPruner(BasePruner):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:
@@ -212,11 +212,11 @@ class PrefixCachingPruner(BasePruner):
             new_se = eval_se_fn(test_chunks)
             report.loo_evaluations += 1
 
-            if new_se <= current_se_total:
-                logger.info(f"  [APC LOO] Pruned Chunk {chunk.id} (SE: {current_se_total:.4f} -> {new_se:.4f})")
+            if new_se <= current_se_semantic:
+                logger.info(f"  [APC LOO] Pruned Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
             else:
                 final_chunks.append(chunk)
-                logger.info(f"  [APC LOO] Kept Chunk {chunk.id} (SE: {current_se_total:.4f} -> {new_se:.4f})")
+                logger.info(f"  [APC LOO] Kept Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
 
         report.surviving_count = len(final_chunks)
         return final_chunks, report
@@ -229,7 +229,7 @@ class AttentionMaskingPruner(BasePruner):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:
@@ -253,7 +253,7 @@ class AttentionSaliencyPruner(BasePruner):
         self,
         query: str,
         current_chunks: list[ContextChunk],
-        current_se_total: float,
+        current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
     ) -> tuple[list[ContextChunk], PruningReport]:

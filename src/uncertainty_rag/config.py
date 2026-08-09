@@ -50,24 +50,24 @@ class ThresholdConfig(BaseModel):
 
     mode: Literal["fixed", "adaptive"] = "fixed"
     # Fixed thresholds
-    tau_noise: float = Field(default=0.5, ge=0.0, description="Aleatoric threshold for pruning")
-    tau_missing: float = Field(default=0.3, ge=0.0, description="Epistemic threshold for retrieval")
+    tau_token: float = Field(default=0.5, ge=0.0, description="Token uncertainty threshold for pruning")
+    tau_semantic: float = Field(default=0.3, ge=0.0, description="Semantic entropy threshold for retrieval")
     # Adaptive parameters (U2)
-    alpha: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial aleatoric")
-    beta: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial epistemic")
+    alpha: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial token uncertainty")
+    beta: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial semantic entropy")
     adaptive_min_tau: float = Field(default=0.05, ge=0.0, description="Minimum threshold floor")
 
     def compute_adaptive_thresholds(
-        self, initial_se_aleatoric: float, initial_se_epistemic: float
+        self, initial_u_token: float, initial_se_semantic: float
     ) -> tuple[float, float]:
         """Compute adaptive thresholds from initial uncertainty profile.
 
         Returns:
-            (tau_noise, tau_missing) calibrated from the first iteration.
+            (tau_token, tau_semantic) calibrated from the first iteration.
         """
-        tau_noise = max(self.alpha * initial_se_aleatoric, self.adaptive_min_tau)
-        tau_missing = max(self.beta * initial_se_epistemic, self.adaptive_min_tau)
-        return tau_noise, tau_missing
+        tau_token = max(self.alpha * initial_u_token, self.adaptive_min_tau)
+        tau_semantic = max(self.beta * initial_se_semantic, self.adaptive_min_tau)
+        return tau_token, tau_semantic
 
 
 class PipelineConfig(BaseModel):

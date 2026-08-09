@@ -27,46 +27,41 @@ Dù các chuỗi token hoàn toàn khác nhau, hai câu này chứa chung các m
 
 ---
 
-## Bước 2: Phân tích độ bất định ngữ nghĩa (Semantic Uncertainty Profiling)
-Hệ thống mổ xẻ sự "phân vân" thành 2 nguồn gốc: do nhiễu (Aleatoric) và do thiếu kiến thức (Epistemic).
+## Bước 2: Phân tích độ bất định ngữ nghĩa và nhiễu (Independent Signals)
+Hệ thống mổ xẻ sự "phân vân" thành 2 tín hiệu độc lập: Bất định Ngữ nghĩa (Semantic Entropy) và Bất định Token (Token Uncertainty).
 
 1. **Gom cụm ngữ nghĩa (Semantic Clustering)**: Dùng mô hình NLI kiểm tra sự kéo theo (entailment). Các mệnh đề đồng nghĩa được gom thành Cụm khái niệm (Concept $c$). Xác suất $P(c)$ xấp xỉ qua tần suất: $P(c | Q, C_t) = \frac{|s \in c|}{M}$.
 
-2. **Tính toán 3 chỉ số bất định**:
-   - **Bất định Tổng quát ($SE_{total}$)**: Entropy của phân phối các Cụm khái niệm. Thể hiện sự mơ hồ tổng thể.
-     $$SE_{total}(Y | Q, C_t) = - \sum_{c} P(c | Q, C_t) \log_2 P(c | Q, C_t)$$
+2. **Tính toán 2 tín hiệu bất định**:
+   - **Tín hiệu chính - Bất định Ngữ nghĩa ($SE_{semantic}$)**: Entropy của phân phối các Cụm khái niệm. Thể hiện sự mơ hồ về mặt ý nghĩa, mô hình đang phân vân giữa nhiều cách hiểu. Nếu chỉ số này cao, tức là mô hình thiếu kiến thức.
+     $$SE_{semantic}(Y | Q, C_t) = - \sum_{c} P(c | Q, C_t) \log_2 P(c | Q, C_t)$$
    
-   - **Bất định do Nhiễu dữ liệu ($SE_{aleatoric}$)**: Được xấp xỉ bằng trung bình log-xác suất (negative logprob) của các "từ khóa chính" ($K_i$) trong mỗi mẫu $s_i$. 
-     - **Cách xác định $K_i$**: Thay vì tính trên tất cả token (bao gồm cả các từ ngữ pháp như "the, is, in" có logprob gần 0 gây loãng kết quả), hệ thống dùng một công cụ xử lý ngôn ngữ nhẹ (như spaCy hoặc quy tắc POS Tagging) để loại bỏ stop words. $K_i$ chỉ giữ lại các Token mang nội dung thực tế: Danh từ (Nouns), Động từ (Verbs), Số liệu (Numbers). Bằng cách này, ta đo được chính xác sự "ngập ngừng" của LLM đối với các dữ kiện thực tế.
-     - **Sự khác biệt của xác suất**: Trong công thức dưới đây, $\log P(w | Q, C_t, \theta)$ là *Xác suất mức Token (Local)*, lấy trực tiếp từ trọng số $\theta$ của LLM, đại diện cho độ tự tin tại khoảnh khắc sinh ra từ đó. Ngược lại, $P(c | Q, C_t)$ ở trên là *Xác suất mức Khái niệm (Global)*, đo lường bằng tần suất thống kê Monte Carlo (số câu thuộc cụm $c$ chia cho $M$), đại diện cho độ đồng thuận tổng thể của câu trả lời.
-     $$SE_{aleatoric}(Y | Q, C_t) \approx \frac{1}{M} \sum_{i=1}^M \left( -\frac{1}{|K_i|} \sum_{w \in K_i} \log P(w | Q, C_t, \theta) \right)$$
-     *(Lưu ý: Giá trị này sau đó được chuẩn hóa - normalized - để đồng nhất thang đo với $SE_{total}$).*
-   
-   - **Bất định do Thiếu hụt kiến thức ($SE_{epistemic}$)**: Tính thông qua Thông tin tương hỗ (Mutual Information).
-     $$SE_{epistemic}(Y | Q, C_t) = SE_{total} - SE_{aleatoric}$$
+   - **Tín hiệu phụ - Bất định Token ($U_{token}$)**: Thể hiện độ nhiễu (noise) trong quá trình sinh từ, hay còn gọi là đa dạng từ vựng. Được xấp xỉ bằng trung bình log-xác suất (negative logprob) của các "từ khóa chính" ($K_i$) trong mỗi mẫu $s_i$. 
+     - **Cách xác định $K_i$**: Thay vì tính trên tất cả token (bao gồm cả các từ ngữ pháp như "the, is, in" có logprob gần 0 gây loãng kết quả), hệ thống chỉ giữ lại Danh từ (Nouns), Động từ (Verbs), Số liệu (Numbers). Bằng cách này, ta đo được chính xác sự "ngập ngừng" của LLM.
+     $$U_{token}(Y | Q, C_t) \approx \frac{1}{M} \sum_{i=1}^M \left( -\frac{1}{|K_i|} \sum_{w \in K_i} \log P(w | Q, C_t, \theta) \right)$$
+     *(Lưu ý: Hai tín hiệu $SE_{semantic}$ và $U_{token}$ nằm trên 2 thang đo khác nhau và được hệ thống đánh giá hoàn toàn độc lập).*
 
 ---
 
 ## Bước 3: Định tuyến hành động bằng Ngưỡng thích ứng (Adaptive Routing Decision)
 Thay vì dùng ngưỡng cố định tĩnh dễ gây ra sai sót trên các tập dữ liệu khác nhau, hệ thống tính toán **Ngưỡng thích ứng (Adaptive Thresholds)** dựa trên mức độ bất định đo được ở vòng lặp đầu tiên ($t=0$):
-- $\tau_{noise} = \alpha \times SE_{aleatoric}^{(0)}$ (ví dụ: $\alpha = 0.5$)
-- $\tau_{missing} = \beta \times SE_{epistemic}^{(0)}$ (ví dụ: $\beta = 0.5$)
+- $\tau_{token} = \alpha \times U_{token}^{(0)}$ (ví dụ: $\alpha = 0.5$)
+- $\tau_{semantic} = \beta \times SE_{semantic}^{(0)}$ (ví dụ: $\beta = 0.5$)
 
 **Tại sao gọi là Adaptive (Thích ứng)?**
-$\alpha$ và $\beta$ là các hệ số điều chỉnh (hyperparameters) được chọn cố định một lần bằng cách chạy thử (calibrate) trên tập Dev Set nhỏ (thường quanh mức 0.5 - tức yêu cầu giảm 50% độ bất định so với ban đầu). Khi vận hành thực tế:
-- Ngay khi nhận câu hỏi, hệ thống đo mức độ bất định "gốc" ở vòng lặp đầu ($t=0$), ví dụ $SE_{aleatoric}^{(0)} = 0.8$ và $SE_{epistemic}^{(0)} = 1.2$.
-- Dựa vào $\alpha, \beta$, hệ thống tự chốt vạch đích (ngưỡng dừng) riêng cho câu hỏi đó: $\tau_{noise} = 0.4$ và $\tau_{missing} = 0.6$. Từ vòng lặp thứ $1, 2, 3...$ trở đi, nó sẽ dùng đúng 2 con số này làm mốc quyết định.
-- Nhờ vậy, câu hỏi hóc búa (dữ liệu nhiễu thì $SE^{(0)}$ cao) sẽ có ngưỡng dừng được nới lỏng ra để tránh hệ thống lặp vô hạn. Ngược lại, câu hỏi dễ sẽ có ngưỡng khắt khe hơn để tối đa độ chính xác.
+$\alpha$ và $\beta$ là các hệ số điều chỉnh (hyperparameters) được chọn cố định một lần. Khi vận hành thực tế:
+- Ngay khi nhận câu hỏi, hệ thống đo mức độ bất định "gốc" ở vòng lặp đầu ($t=0$), ví dụ $U_{token}^{(0)} = 3.5$ và $SE_{semantic}^{(0)} = 1.2$.
+- Dựa vào $\alpha, \beta$, hệ thống tự chốt vạch đích (ngưỡng dừng) riêng cho câu hỏi đó: $\tau_{token} = 1.75$ và $\tau_{semantic} = 0.6$. Từ vòng lặp thứ $1, 2, 3...$ trở đi, nó sẽ dùng đúng 2 con số này làm mốc quyết định.
 
-Hệ thống áp dụng **Điều kiện dừng kép (Dual-condition stopping)**:
+Hệ thống áp dụng **Định tuyến Hai tín hiệu Độc lập (Two-Signal Independent Routing)**:
 
-- **DỪNG (STOP)**: Chỉ khi đã xử lý cả nhiễu và thiếu hụt thông tin: $SE_{aleatoric} \le \tau_{noise}$ VÀ $SE_{epistemic} \le \tau_{missing}$. 
+- **TRUY XUẤT (RETRIEVE)**: Nếu $SE_{semantic} > \tau_{semantic}$. Mô hình đang mơ hồ về mặt ý nghĩa, chứng tỏ nó bị thiếu kiến thức để trả lời. (Chuyển sang Bước 5).
+  
+- **CẮT TỈA (PRUNE)**: Nếu $SE_{semantic} \le \tau_{semantic}$ NHƯNG $U_{token} > \tau_{token}$. Mô hình đã chốt được một ý nghĩa chung, nhưng quá trình sinh từ lại rất ngập ngừng và nhiễu. Chứng tỏ ngữ cảnh chứa thông tin thừa/gây nhiễu cần loại bỏ. (Chuyển sang Bước 4).
+  
+- **DỪNG (STOP)**: Nếu $SE_{semantic} \le \tau_{semantic}$ VÀ $U_{token} \le \tau_{token}$. Cả 2 tín hiệu đều an toàn.
   - *An toàn (Safety)*: Giới hạn vòng lặp `MAX_ITERATIONS = 5` để tránh chạy vô hạn.
-  - *Hội tụ (Convergence)*: Nếu $SE_{total}$ không sụt giảm >5% trong `patience` vòng lặp liên tiếp, hệ thống dừng sớm.
-  
-- **CẮT TỈA (PRUNE)**: Ưu tiên làm trước nếu $SE_{aleatoric} > \tau_{noise}$. (Chuyển sang Bước 4).
-  
-- **TRUY XUẤT (RETRIEVE)**: Thực hiện khi $SE_{epistemic} > \tau_{missing}$ (và đã xử lý nhiễu). (Chuyển sang Bước 5).
+  - *Hội tụ (Convergence)*: Nếu $SE_{semantic}$ không sụt giảm >5% trong `patience` vòng lặp liên tiếp, hệ thống dừng sớm.
 
 ---
 
@@ -76,8 +71,8 @@ Kỹ thuật Leave-One-Out (LOO) truyền thống đòi hỏi chi phí tính to�
 ### Hướng 1: Cắt tỉa 2 giai đoạn (Two-phase Pruning) - Cách tiếp cận truyền thống
 Sử dụng các công cụ NLP cơ bản để lọc rác trước khi gọi LLM.
 1. **Lọc sơ bộ bằng NLI (Pre-filter)**: Nhanh chóng loại các đoạn tài liệu (chunk) gây mâu thuẫn (contradiction) bằng mô hình NLI với chi phí cực rẻ.
-2. **Phân tích Leave-One-Out song song (Batch-parallel)**: Với các chunk còn lại, chạy song song để tính độ biến thiên của $SE_{total}$ khi loại bỏ từng chunk $c_i$:
-   $$\Delta SE(c_i) = SE_{total}(Y | Q, C_t \setminus \{c_i\}) - SE_{total}(Y | Q, C_t)$$
+2. **Phân tích Leave-One-Out song song (Batch-parallel)**: Với các chunk còn lại, chạy song song để tính độ biến thiên của $SE_{semantic}$ khi loại bỏ từng chunk $c_i$:
+   $$\Delta SE(c_i) = SE_{semantic}(Y | Q, C_t \setminus \{c_i\}) - SE_{semantic}(Y | Q, C_t)$$
    - Nếu $\Delta SE(c_i) \le 0$: Rác/Nhiễu $\rightarrow$ Xóa bỏ $c_i$.
    - Nếu $\Delta SE(c_i) > 0$: Thông tin hữu ích $\rightarrow$ Giữ lại.
 - **Ưu điểm**: Dễ cài đặt, không cần can thiệp sâu vào cấu trúc phần cứng của LLM (chạy được qua các API đóng).
@@ -101,7 +96,7 @@ Giải quyết triệt để nút thắt cổ chai mà KHÔNG cần dùng bộ l
    - Mask 2: Che khuất chunk $c_2$
    - ... (đến Mask $N$).
 3. **Tính toán $\Delta SE$ song song**: GPU (thông qua vLLM/HuggingFace) chỉ tính KV-Cache đúng 1 lần cho toàn bộ phần văn bản dùng chung, sau đó sinh mẫu song song trên từng mask và tính $\Delta SE(c_i)$:
-   $$\Delta SE(c_i) = SE_{total}(Y | Q, C_t \text{ masked } c_i) - SE_{total}(Y | Q, C_t)$$
+   $$\Delta SE(c_i) = SE_{semantic}(Y | Q, C_t \text{ masked } c_i) - SE_{semantic}(Y | Q, C_t)$$
    - Nếu $\Delta SE(c_i) \le 0$: Bỏ chunk này đi giúp giảm hoặc giữ nguyên bất định $\rightarrow$ Nó là Rác/Nhiễu $\rightarrow$ Chốt xóa $c_i$.
    - Nếu $\Delta SE(c_i) > 0$: Chunk mang thông tin hữu ích $\rightarrow$ Giữ lại.
 - **Ưu điểm**: Chính xác tuyệt đối 100% (so với LOO gốc) vì không phải bỏ sót bất kỳ chunk nào cho mô hình lọc ngoài. Thông lượng cực cao do tính KV-Cache 1 lần duy nhất.
@@ -140,10 +135,10 @@ Giải quyết triệt để lỗi "tính toán vòng vo" (Circular EIG - dùng 
 
 ---
 **Tóm tắt vòng lặp (Iterative Loop)**:
-Tính $SE_{total}$, tách thành $SE_{aleatoric}$ và $SE_{epistemic}$ $\rightarrow$ Định tuyến qua Adaptive Thresholds $\rightarrow$ Cắt tỉa (đo $\Delta SE$ khi rút chunk) $\rightarrow$ Truy xuất (đo Implicit EIG qua $\Delta SE$ của vòng tiếp theo) $\rightarrow$ Lặp lại tới khi hội tụ hoặc hết số vòng an toàn.
+Tính $SE_{semantic}$ và $U_{token}$ độc lập $\rightarrow$ Định tuyến qua ma trận 2 tín hiệu (RETRIEVE/PRUNE/STOP) $\rightarrow$ Cắt tỉa (đo $\Delta SE$ khi rút chunk) $\rightarrow$ Truy xuất (đo Implicit EIG qua $\Delta SE$ của vòng tiếp theo) $\rightarrow$ Lặp lại tới khi hội tụ hoặc hết số vòng an toàn.
 
 ---
 ## Ghi chú Triển khai Thực tế (Local GPU Hosting)
 Phương pháp này đặc biệt tối ưu khi chạy trên các LLM mã nguồn mở được host trên GPU nội bộ (Local GPU) thông qua các framework như **vLLM** hay **HuggingFace Transformers** thay vì dùng Web API (như OpenAI). Việc host model local mang lại 2 lợi thế tuyệt đối cho thuật toán này:
-1. **Truy cập Logprobs đầy đủ**: Khác với API thương mại có thể bị giới hạn hoặc tính phí cao khi trả về logprobs, việc chạy local cho phép truy xuất trực tiếp, toàn quyền và miễn phí vào ma trận `logits` / `logprobs` từ trọng số $\theta$ của mô hình, giúp tính toán $SE_{aleatoric}$ chính xác tuyệt đối.
+1. **Truy cập Logprobs đầy đủ**: Khác với API thương mại có thể bị giới hạn hoặc tính phí cao khi trả về logprobs, việc chạy local cho phép truy xuất trực tiếp, toàn quyền và miễn phí vào ma trận `logits` / `logprobs` từ trọng số $\theta$ của mô hình, giúp tính toán $U_{token}$ chính xác tuyệt đối.
 2. **Cắt tỉa Zero-Cost qua Attention Masking**: Chạy LOO thông thường (Bước 4) đòi hỏi tính toán cực lớn, nhưng với Local GPU, ta có thể can thiệp thẳng vào hệ thống để đưa vào $N$ `attention_mask` khác nhau. Các framework (như vLLM hay HuggingFace) sẽ tính toán KV-Cache 1 lần duy nhất rồi xử lý song song các mẫu khuyết. Điều này giúp tăng thông lượng (throughput) lên hàng chục lần, biến thuật toán cắt tỉa LOO từ rào cản lý thuyết thành giải pháp thời gian thực hoàn hảo mà không làm rớt mất ngữ cảnh quan trọng.

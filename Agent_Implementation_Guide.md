@@ -12,7 +12,7 @@ You will need the following components:
 ## 2. Core Execution Loop
 
 ### Step 1: Semantic Uncertainty Profiling
-**Goal**: Calculate $SE_{total}$, $SE_{aleatoric}$, and $\mathcal{I}_{semantic}$ (Epistemic).
+**Goal**: Calculate independent signals: $SE_{semantic}$ (Semantic Entropy) and $U_{token}$ (Token Uncertainty).
 
 1. **Sampling**: 
    - Call the Primary LLM $M$ times (e.g., $M=10$) with `temperature=0.7`, providing Query $Q$ and current Context $C_t$.
@@ -26,31 +26,27 @@ You will need the following components:
    - Use the NLI model to compare the Core Claims of every pair of sequences.
    - If sequence $A$'s claims entail sequence $B$'s claims, and vice versa, group them into the same **Concept** ($c$).
    - Result: A set of distinct Concepts $\{c_1, c_2, ...\}$ and the counts of sequences belonging to each.
-4. **Calculate Total Uncertainty ($SE_{total}$)**:
+4. **Calculate Semantic Entropy ($SE_{semantic}$)**:
    - Calculate probability via frequency: $P(c_k) = \frac{\text{Count}(s \in c_k)}{M}$.
-   - Formula: $SE_{total} = - \sum (P(c_k) \times \log_2 P(c_k))$.
-5. **Calculate Aleatoric Uncertainty ($SE_{aleatoric}$)**:
+   - Formula: $SE_{semantic} = - \sum (P(c_k) \times \log_2 P(c_k))$.
+5. **Calculate Token Uncertainty ($U_{token}$)**:
    - For each sequence $s_i$, identify the **Key Tokens** within its Core Claims (ignore stop words; focus on nouns, verbs, numbers).
    - Calculate the average logprob of these Key Tokens for $s_i$. Let this be $AvgLogprob(s_i)$.
    - The token entropy for $s_i$ is approximated as $\mathcal{H}(s_i) = - AvgLogprob(s_i)$.
-   - Formula: $SE_{aleatoric} = \frac{1}{M} \sum_{i=1}^M \mathcal{H}(s_i)$.
-6. **Calculate Epistemic Uncertainty ($\mathcal{I}_{semantic}$)**:
-   - Formula: $\mathcal{I}_{semantic} = SE_{total} - SE_{aleatoric}$.
+   - Formula: $U_{token} = \frac{1}{M} \sum_{i=1}^M \mathcal{H}(s_i)$.
 
-### Step 2: Routing Logic
-Define hyperparameters: `TAU_STOP`, `TAU_NOISE`, `TAU_MISSING`.
-- **Condition A**: If $SE_{total} <$ `TAU_STOP` $\rightarrow$ System is confident. Return the concept with the highest probability. **EXIT LOOP**.
-- **Condition B**: If $SE_{total} \ge$ `TAU_STOP`:
-  - Check $SE_{aleatoric}$. If $SE_{aleatoric} >$ `TAU_NOISE` $\rightarrow$ Execute **Context Pruning** (Step 3).
-  - Else if $\mathcal{I}_{semantic} >$ `TAU_MISSING` $\rightarrow$ Execute **Active Retrieval** (Step 4).
-  - *Conflict Resolution*: Always prioritize Context Pruning over Active Retrieval if both thresholds are exceeded.
+### Step 2: Routing Logic (Two-Signal Independent Routing)
+Define thresholds, ideally calibrated via U2 adaptivity: `TAU_TOKEN`, `TAU_SEMANTIC`.
+- **RETRIEVE**: If $SE_{semantic} >$ `TAU_SEMANTIC` $\rightarrow$ Model is semantically confused (knowledge gap). Execute **Active Retrieval** (Step 4).
+- **PRUNE**: If $SE_{semantic} \le$ `TAU_SEMANTIC` BUT $U_{token} >$ `TAU_TOKEN` $\rightarrow$ Model agrees on meaning but output is noisy/conflicted. Execute **Context Pruning** (Step 3).
+- **STOP**: If $SE_{semantic} \le$ `TAU_SEMANTIC` AND $U_{token} \le$ `TAU_TOKEN` $\rightarrow$ System is confident. Return the best concept. **EXIT LOOP**.
 
 ### Step 3: Semantic Context Pruning (Noise Handling)
 **Goal**: Remove contradictory or noisy chunks from the context.
 1. Iterate over each chunk $c_i$ in the current context $C_t$.
 2. Temporarily remove $c_i$ to create a trial context: $C_{trial} = C_t \setminus \{c_i\}$.
 3. Re-run **Step 1** (Sampling & $SE_{total}$ calculation) using $C_{trial}$. Let this result be $SE_{trial}$.
-4. Calculate Marginal Information Gain: $\Delta SE = SE_{trial} - SE_{total\_original}$.
+4. Calculate Marginal Information Gain: $\Delta SE = SE_{trial} - SE_{semantic\_original}$.
 5. If $\Delta SE \le 0$: The chunk $c_i$ is noisy or unhelpful. Permanently drop it.
 6. If $\Delta SE > 0$: Keep chunk $c_i$.
 7. The remaining chunks form $C_{clean}$. 
@@ -60,7 +56,7 @@ Define hyperparameters: `TAU_STOP`, `TAU_NOISE`, `TAU_MISSING`.
 **Goal**: Fetch missing knowledge based on the most likely hypothesis.
 1. Take the Concept $c$ with the highest probability $P(c)$ from Step 1.
 2. Use this Concept's core claims to form a hypothetical document/query $d'$.
-3. Evaluate Expected Information Gain (EIG): (If strictly following the paper, check if $SE_{total}$ drops when adding $d'$ to $C_{clean}$).
+3. Evaluate Expected Information Gain (EIG): (Implicitly evaluated in the next loop by checking if $SE_{semantic}$ drops).
 4. Use $d'$ (the core claims) as the search query against the Vector Database.
 5. Retrieve the top-$k$ new document chunks ($d_{new}$).
 6. Update context: $C_{next} = C_{clean} \cup \{d_{new}\}$.
@@ -83,19 +79,18 @@ def run_iterative_rag(query: str, initial_context: list):
         claims = [extract_claims(s) for s in samples]
         concepts = cluster_with_nli(claims)
         
-        se_total = calculate_se_total(concepts)
-        se_aleatoric = calculate_se_aleatoric(samples, claims)
-        se_epistemic = se_total - se_aleatoric
+        se_semantic = calculate_se_semantic(concepts)
+        u_token = calculate_u_token(samples, claims)
         
         # 2. Routing
-        if se_total < TAU_STOP:
-            return get_best_answer(concepts)
-            
-        if se_aleatoric > TAU_NOISE:
-            context = prune_context(query, context)
-            
-        elif se_epistemic > TAU_MISSING:
+        if se_semantic > TAU_SEMANTIC:
             best_hypothesis = get_highest_prob_concept(concepts)
             new_docs = retrieve_from_vectordb(best_hypothesis)
             context.extend(new_docs)
+            
+        elif u_token > TAU_TOKEN:
+            context = prune_context(query, context)
+            
+        else: # se_semantic <= TAU_SEMANTIC and u_token <= TAU_TOKEN
+            return get_best_answer(concepts)
 ```

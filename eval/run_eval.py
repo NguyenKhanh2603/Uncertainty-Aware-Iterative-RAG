@@ -75,10 +75,13 @@ def build_pipeline(config: Config) -> IterativeRAGPipeline:
     cost_tracker = CostTracker()
 
     # LLM client
-    llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
-
-    # Claim extractor LLM (may be different)
-    claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
+    if config.pruning.strategy in [PruningStrategy.ATTENTION_MASKING, PruningStrategy.ATTENTION_SALIENCY]:
+        from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
+        llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
+        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+    else:
+        llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
+        claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
 
     # NLI model
     nli = NLIModel(model_name=config.model.nli_name)
@@ -132,8 +135,14 @@ def run_evaluation(
 
     # Build pipeline components
     cost_tracker = CostTracker()
-    llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
-    claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
+    if config.pruning.strategy in [PruningStrategy.ATTENTION_MASKING, PruningStrategy.ATTENTION_SALIENCY]:
+        from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
+        print(f"Loading HuggingFaceLocalClient for strategy: {config.pruning.strategy.value}...")
+        llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
+        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+    else:
+        llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
+        claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
     nli = NLIModel(model_name=config.model.nli_name)
 
     sampler = Sampler(llm_client=llm, config=config.sampling)

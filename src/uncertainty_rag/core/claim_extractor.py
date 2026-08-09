@@ -91,7 +91,7 @@ class ClaimExtractor:
             messages=[{"role": "user", "content": prompt}],
             n=1,
             temperature=0.0,
-            max_tokens=1024,
+            max_tokens=2000,
             logprobs=False,
             json_mode=True,
         )
