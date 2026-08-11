@@ -1,0 +1,14 @@
+# Configuration for the frozen RAGU WebQuestions 400-item seed-10 evaluation.
+# Model/server details are supplied on the command line to avoid committing credentials.
+sampling:
+  M: 10
+  temperature: 1.0
+  adaptive_M_enabled: false
+
+retrieval:
+  # The runner does no live retrieval. It uses the first five passages in each
+  # record from data/webq_ragu/webq-test-400-seed10.jsonl.
+  top_k: 5
+
+modality:
+  type: text

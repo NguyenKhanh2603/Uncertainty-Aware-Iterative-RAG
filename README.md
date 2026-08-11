@@ -72,6 +72,23 @@ python eval/run_eval.py --dataset tatqa --pruning_strategy gray_zone
 python eval/run_eval.py --dataset tatqa --pruning_strategy attention_masking
 ```
 
+## Frozen WebQuestions UQ evaluation
+
+The repository includes a frozen Contriever-MSMARCO retrieval artifact in
+`data/webq_ragu`, including the 400-item seed-10 WebQ evaluation set used for
+Passage Utility-aligned experiments. Run it against a remote OpenAI-compatible
+vLLM server with:
+
+```bash
+python eval/run_webq_remote.py \
+  --base-url http://SERVER:8000/v1 \
+  --model mistralai/Mistral-7B-Instruct-v0.3 \
+  --api-key "$VLLM_API_KEY"
+```
+
+See `docs/webq_remote_inference.md` for setup, resuming an interrupted run,
+and the evaluation caveat concerning the paper's Qwen correctness judge.
+
 ## Project Structure
 
 ```
