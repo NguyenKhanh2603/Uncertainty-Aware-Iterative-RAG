@@ -99,3 +99,52 @@ or credentials. Add `--private` if the repository should not be public yet.
 The local `p_true.py` contains the paper's p(True) prompt and probability
 normalization helper. It needs a separately generated 20-shot training prompt,
 so it is not mixed into the WebQ PPL/semantic runner.
+
+## Retrieval-posterior uncertainty
+
+`run_webq_retrieval_posterior.py` tests retrieval-posterior predictive UQ. It
+samples five plausible top-5 passage sets from each question's frozen top-20
+Contriever results and generates two answers per set. Its primary score is one
+minus the posterior mass that remains in the original greedy answer's semantic
+class. It also reports total answer entropy, within-context generation entropy,
+and retrieval mutual information.
+
+On a 24 GB L4, use two stages so vLLM and DeBERTa do not need to share memory.
+Start Mistral with a conservative memory reservation, for example:
+
+```bash
+vllm serve mistralai/Mistral-7B-Instruct-v0.3 \
+  --dtype half \
+  --gpu-memory-utilization 0.80 \
+  --max-model-len 4096
+```
+
+Generate the posterior answers per question. This standalone command also
+generates the greedy anchor answer and its correctness label:
+
+```bash
+python eval/UQ_Eval/run_webq_retrieval_posterior.py \
+  --stage generate \
+  --base-url http://127.0.0.1:8000/v1 \
+  --api-key EMPTY \
+  --model mistralai/Mistral-7B-Instruct-v0.3 \
+  --resume
+```
+
+If a completed baseline result file actually exists, add
+`--baseline-results PATH_TO_FILE` to reuse its exact greedy answers and include
+its scores in the summary. The file is optional and is not included in this
+repository.
+
+Then stop vLLM and score the cached answers with strict bidirectional NLI:
+
+```bash
+python eval/UQ_Eval/run_webq_retrieval_posterior.py \
+  --stage score \
+  --nli-device cuda \
+  --resume
+```
+
+Use `--max-examples 5` for a smoke test. If the xlarge NLI checkpoint is too
+large, `--nli-model cross-encoder/nli-deberta-v3-base` is supported, but it is
+an ablation rather than an exact RAGU semantic-clustering comparison.

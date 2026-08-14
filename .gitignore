@@ -1,3 +1,12 @@
 related_repos
 related_papers_md
 data
+
+# Local Python environments and caches (at any depth).
+**/.venv/
+**/.ruff_cache/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Locally built archives.
