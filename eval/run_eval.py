@@ -31,6 +31,11 @@ import time
 from pathlib import Path
 from typing import Optional
 
+# Remove the script's directory (eval) from sys.path to prevent eval/datasets
+# from shadowing the HuggingFace `datasets` package!
+script_dir = str(Path(__file__).parent.resolve())
+sys.path = [p for p in sys.path if not (p and Path(p).resolve() == Path(script_dir))]
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -57,6 +62,7 @@ from eval.datasets.loader import DatasetLoader, EvalExample
 from eval.datasets.text_datasets import TEXT_DATASETS
 from eval.datasets.tatqa_loader import TATQALoader
 from eval.datasets.webqa_loader import WebQALoader
+from eval.datasets.multimodalqa_loader import MultiModalQALoader
 from eval.metrics import MetricSuite
 from eval.analysis.calibration import UncertaintyCalibrator, CalibrationResult
 
@@ -67,6 +73,7 @@ DATASET_REGISTRY: dict[str, type[DatasetLoader]] = {
     **TEXT_DATASETS,
     "tatqa": TATQALoader,
     "webqa": WebQALoader,
+    "multimodalqa": MultiModalQALoader,
 }
 
 
@@ -78,7 +85,10 @@ def build_pipeline(config: Config) -> IterativeRAGPipeline:
     if config.pruning.strategy in [PruningStrategy.ATTENTION_MASKING, PruningStrategy.ATTENTION_SALIENCY]:
         from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
         llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
-        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+        if config.effective_llm_name == config.model.claim_model:
+            claim_llm = llm
+        else:
+            claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
     else:
         llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
         claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
@@ -113,6 +123,7 @@ def run_evaluation(
     config: Config,
     split: str = "validation",
     max_examples: Optional[int] = None,
+    start_index: int = 0,
     run_calibration: bool = False,
     output_dir: str = "results",
 ) -> dict:
@@ -123,6 +134,8 @@ def run_evaluation(
 
     loader = DATASET_REGISTRY[dataset_name]()
     examples = loader.load(split=split, max_examples=max_examples)
+    if start_index > 0:
+        examples = examples[start_index:]
     handler = loader.get_modality_handler()
     metrics_list = loader.get_metrics()
     metric_suite = MetricSuite(metrics=metrics_list)
@@ -139,7 +152,10 @@ def run_evaluation(
         from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
         print(f"Loading HuggingFaceLocalClient for strategy: {config.pruning.strategy.value}...")
         llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
-        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+        if config.effective_llm_name == config.model.claim_model:
+            claim_llm = llm
+        else:
+            claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
     else:
         llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
         claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
@@ -193,12 +209,22 @@ def run_evaluation(
     all_results: list[PipelineResult] = []
 
     for example in tqdm(examples, desc=f"Evaluating {dataset_name}"):
-        # Index context for retrieval
+        # BƯỚC 1: Index toàn bộ kho dữ liệu
         if example.context_chunks:
             dense_retriever.index(
                 example.context_chunks,
                 text_fn=lambda c: handler.get_chunk_text_repr(c),
             )
+            # BƯỚC 2: Chỉ Retrieve Top 10 đưa cho LLM ban đầu
+            initial_chunks = dense_retriever.retrieve(
+                query_text=example.query,
+                existing_chunk_ids=set(),
+                top_k=10
+            )
+            if not initial_chunks:
+                initial_chunks = example.context_chunks[:10]
+        else:
+            initial_chunks = []
 
         # Reset per-query state
         router = Router(config=config.thresholds)
@@ -207,7 +233,13 @@ def run_evaluation(
         logger.reset()
 
         # Run pipeline
-        result = pipeline.run(query=example.query, initial_context=example.context_chunks)
+        result = pipeline.run(query=example.query, initial_context=initial_chunks)
+
+        # Save logs for this query
+        if hasattr(example, 'query_id') and example.query_id:
+            logger.save(query_id=str(example.query_id))
+        else:
+            logger.save(query_id=f"query_{len(all_results)}")
 
         all_predictions.append(result.answer)
         all_gold_answers.append(example.gold_answers)
@@ -307,6 +339,7 @@ def main():
     parser.add_argument("--dataset", type=str, required=True, help="Dataset name")
     parser.add_argument("--split", type=str, default="validation")
     parser.add_argument("--max_examples", type=int, default=None)
+    parser.add_argument("--start_index", type=int, default=0, help="Index to start evaluation from")
     parser.add_argument("--config", type=str, default="configs/default.yaml")
     parser.add_argument("--config_override", type=str, default=None, help="Additional config YAML")
     parser.add_argument("--threshold_mode", type=str, choices=["fixed", "adaptive"], default=None)
@@ -336,6 +369,7 @@ def main():
         config=config,
         split=args.split,
         max_examples=args.max_examples,
+        start_index=args.start_index,
         run_calibration=args.calibrate,
         output_dir=args.output_dir,
     )

@@ -16,7 +16,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional
 
+import re
 import numpy as np
+from rank_bm25 import BM25Okapi
 from sentence_transformers import SentenceTransformer
 
 from uncertainty_rag.config import RetrievalConfig
@@ -38,97 +40,61 @@ class BaseRetriever(ABC):
 
 
 class DenseRetriever(BaseRetriever):
-    """Dense retriever using sentence-transformers embeddings and ChromaDB.
+    """Hybrid retriever using Dense (Sentence-Transformers) + Sparse (BM25) via RRF."""
 
-    For text-only: searches Wikipedia/corpus
-    For TAT-QA: searches within document tables/paragraphs
-    For WebQA: searches within candidate source pool
-    """
-
-    def __init__(
-        self,
-        embedding_model_name: str = "all-MiniLM-L6-v2",
-        config: Optional[RetrievalConfig] = None,
-    ) -> None:
-        self.config = config or RetrievalConfig()
+    def __init__(self, embedding_model_name: str = "all-MiniLM-L6-v2", config=None, alpha: float = 0.5) -> None:
+        self.config = config
         self.encoder = SentenceTransformer(embedding_model_name)
-        # In-memory document store (for simplicity; swap with ChromaDB for scale)
-        self._documents: list[ContextChunk] = []
-        self._embeddings: Optional[np.ndarray] = None
+        self.alpha = alpha
+        self._documents = []
+        self._embeddings = None
+        self.bm25 = None
 
     def index(self, documents: list[ContextChunk], text_fn=None) -> None:
-        """Index a set of documents for retrieval.
-
-        Args:
-            documents: Documents to index.
-            text_fn: Optional function to extract text from a chunk for embedding.
-                     Defaults to str(chunk.content).
-        """
         self._documents = documents
         texts = [text_fn(d) if text_fn else str(d.content) for d in documents]
+        # Vector Index
         self._embeddings = self.encoder.encode(texts, normalize_embeddings=True)
+        # BM25 Index
+        tokenized_corpus = [re.findall(r"\w+", doc.lower()) for doc in texts]
+        self.bm25 = BM25Okapi(tokenized_corpus)
 
-    def retrieve(
-        self,
-        query_text: str,
-        existing_chunk_ids: set[str],
-        top_k: int = 5,
-    ) -> list[ContextChunk]:
-        """Retrieve top-k documents most relevant to the query.
+    def retrieve(self, query_text: str, existing_chunk_ids: set[str], top_k: int = 5) -> list[ContextChunk]:
+        if not self._documents: return []
 
-        Args:
-            query_text: Search query (typically concatenated hypothesis claims).
-            existing_chunk_ids: IDs of chunks already in context (for dedup).
-            top_k: Number of documents to return.
-
-        Returns:
-            List of new ContextChunk objects to add to context.
-        """
-        if self._embeddings is None or len(self._documents) == 0:
-            return []
-
-        # Encode query
+        # 1. Vector Search
         query_emb = self.encoder.encode([query_text], normalize_embeddings=True)
-
-        # Compute cosine similarities
         similarities = (self._embeddings @ query_emb.T).squeeze()
+        # Handle single document case
+        if similarities.ndim == 0:
+            similarities = np.array([similarities])
+        vector_ranks = np.argsort(-similarities)
 
-        # Sort by similarity (descending)
-        sorted_indices = np.argsort(-similarities)
+        # 2. BM25 Search
+        tokenized_query = re.findall(r"\w+", query_text.lower())
+        bm25_scores = self.bm25.get_scores(tokenized_query)
+        bm25_ranks = np.argsort(-bm25_scores)
 
-        # Filter out existing chunks and deduplicate
-        results: list[ContextChunk] = []
+        # 3. RRF (Reciprocal Rank Fusion)
+        k_rrf = 60
+        hybrid_scores = np.zeros(len(self._documents))
+
+        for rank, doc_idx in enumerate(vector_ranks):
+            hybrid_scores[doc_idx] += self.alpha * (1.0 / (k_rrf + rank + 1))
+        for rank, doc_idx in enumerate(bm25_ranks):
+            hybrid_scores[doc_idx] += (1.0 - self.alpha) * (1.0 / (k_rrf + rank + 1))
+
+        sorted_indices = np.argsort(-hybrid_scores)
+
+        # 4. Tránh Vòng lặp Vô hạn (Memory-Aware Retrieval)
+        results = []
         for idx in sorted_indices:
-            if len(results) >= top_k:
-                break
-
+            if len(results) >= top_k: break
             doc = self._documents[int(idx)]
-
-            # Skip if already in context
             if doc.id in existing_chunk_ids:
-                continue
-
-            # Skip if too similar to an existing context chunk (cosine dedup)
-            if self._is_duplicate(int(idx), existing_chunk_ids):
-                continue
-
+                continue  # Bỏ qua các chunk đã thấy
             results.append(doc)
-
         return results
-
-    def _is_duplicate(self, candidate_idx: int, existing_ids: set[str]) -> bool:
-        """Check if candidate is too similar to any existing chunk."""
-        if self._embeddings is None:
-            return False
-
-        candidate_emb = self._embeddings[candidate_idx]
-        for i, doc in enumerate(self._documents):
-            if doc.id in existing_ids:
-                existing_emb = self._embeddings[i]
-                sim = float(np.dot(candidate_emb, existing_emb))
-                if sim >= self.config.dedup_cosine_threshold:
-                    return True
-        return False
 
 
 class ActiveRetriever:

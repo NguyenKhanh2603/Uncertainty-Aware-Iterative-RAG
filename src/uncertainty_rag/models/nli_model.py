@@ -25,7 +25,7 @@ class NLIModel:
         self,
         model_name: str = "cross-encoder/nli-deberta-v3-base",
         device: Optional[str] = None,
-        entailment_threshold: float = 0.5,
+        entailment_threshold: float = 0.75,
     ) -> None:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)

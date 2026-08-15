@@ -11,9 +11,10 @@ from uncertainty_rag.models.llm_client import BaseLLMClient, SampleResult, Token
 
 
 SYSTEM_PROMPT = (
-    "You are a precise and knowledgeable assistant. Answer the question based on the "
-    "provided context. If the context is insufficient, provide your best answer based "
-    "on your knowledge. Be concise and factual."
+    "You are an AI generating possible hypotheses based strictly on the provided context. "
+    "If the context is ambiguous, incomplete, or contains conflicting clues, generate a plausible "
+    "guess but explicitly state your uncertainty or provide an alternative interpretation.Do not forcefully link unrelated entities (e.g., confusing Person A with Person B) just because they appear in the same text "
+    "Do not blindly copy the exact same phrasing across multiple samples."
 )
 
 
