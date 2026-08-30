@@ -1,10 +1,10 @@
 """Semantic Uncertainty and Token Uncertainty Decomposition.
 
-Mathematical framework (from Methodology_Workflow.md):
+Mathematical framework:
   SE_semantic(Y|Q,C) = -Σ P(c) log₂ P(c)              [Predictive Entropy]
-  U_token(Y|Q,C)     = E_θ[-Σ P(y_j|θ) log₂ P(y_j|θ)] [Data Noise]
+  U_token(Y|Q,C)     = E_θ[-Σ P(y_j|θ) log₂ P(y_j|θ)] [Token-level variability]
 
-These are treated as independent signals for routing.
+Third signal: evidence_ratio (computed by EvidenceChecker).
 """
 
 from __future__ import annotations
@@ -28,11 +28,13 @@ class UncertaintyProfile:
     u_token: float
     num_concepts: int
     concept_distribution: list[tuple[int, float]] = field(default_factory=list)
+    # Signal B: Evidence Sufficiency
+    evidence_ratio: float = 1.0  # 0.0 = no evidence, 1.0 = fully supported
+    unsupported_claims: list[str] = field(default_factory=list)
 
 
 class UncertaintyEstimator:
-    """Compute Semantic Entropy and Token Uncertainty.
-    """
+    """Compute Semantic Entropy and Token Uncertainty."""
 
     def __init__(self) -> None:
         pass
@@ -42,9 +44,6 @@ class UncertaintyEstimator:
         """Compute Semantic Entropy over concept distribution.
 
         SE_semantic = H[C] = -Σ P(c) log₂ P(c)
-
-        This measures the system's overall ambiguity about the answer.
-        Range: [0, log₂(M)] where M is the number of samples.
         """
         if not concepts:
             return 0.0
@@ -60,21 +59,13 @@ class UncertaintyEstimator:
         """Compute raw token uncertainty from key-token log-probabilities.
 
         U_token = (1/M) Σᵢ H(key_tokens_i)
-
-        where H(key_tokens_i) = -(1/K) Σⱼ log₂ P(token_j)
-
-        This approximates the per-sample predictive entropy using only
-        content-bearing tokens (filtering stop words and structural tokens).
         """
         per_sample_entropy = []
 
         for sample in samples:
-            key_logprobs = [t.logprob for t in sample.key_token_logprobs if t.logprob > -100.0]
+            key_logprobs = [t.logprob for t in sample.key_token_logprobs]
             if key_logprobs:
-                # Convert from natural log (ln) to log₂ for consistency with SE_semantic
-                # logprobs from API are ln, so we divide by ln(2) to get log₂
                 h_i = -sum(lp / log2(2.718281828) for lp in key_logprobs) / len(key_logprobs)
-                # Note: lp is negative (log prob), so -lp is positive → h_i is positive
                 per_sample_entropy.append(h_i)
 
         if not per_sample_entropy:
@@ -82,8 +73,14 @@ class UncertaintyEstimator:
 
         return mean(per_sample_entropy)
 
-    def compute(self, samples: list[Sample], concepts: list[Concept]) -> UncertaintyProfile:
-        """Compute Semantic Entropy and Token Uncertainty independently."""
+    def compute(
+        self,
+        samples: list[Sample],
+        concepts: list[Concept],
+        evidence_ratio: float = 1.0,
+        unsupported_claims: Optional[list[str]] = None,
+    ) -> UncertaintyProfile:
+        """Compute all uncertainty signals."""
         se_semantic = self.compute_se_semantic(concepts)
         u_token = self.compute_u_token(samples)
 
@@ -94,4 +91,6 @@ class UncertaintyEstimator:
             u_token=u_token,
             num_concepts=len(concepts),
             concept_distribution=concept_dist,
+            evidence_ratio=evidence_ratio,
+            unsupported_claims=unsupported_claims or [],
         )

@@ -6,6 +6,7 @@ import json
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any, Optional
 
 try:
@@ -19,6 +20,29 @@ from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from uncertainty_rag.utils.cost_tracker import CostTracker
+
+class ChunkStatus(str, Enum):
+    FULL = "FULL"
+    PARTIAL = "PARTIAL"
+    FULLY_TRUNCATED = "FULLY_TRUNCATED"
+
+@dataclass
+class ChunkSpan:
+    chunk_idx: int
+    chunk_id: str
+    modality: str
+    start: Optional[int]
+    end: Optional[int]
+    status: ChunkStatus
+
+@dataclass
+class AlignmentResult:
+    inputs: Any
+    batch_chunk_spans: list[list[ChunkSpan]]
+    prompt_strings: list[str]
+
+class ChunkAlignmentError(Exception):
+    pass
 
 
 # ── Data Structures ─────────────────────────────────────────────────────────────
@@ -223,20 +247,95 @@ class HuggingFaceLocalClient(BaseLLMClient):
     - Attention Saliency (Strategy 5)
     """
 
-    def __init__(self, model_name: str, device: str = "cuda"):
+    def __init__(self, model_name: str, device: str = "cuda", load_in_4bit: bool = True):
         if not HF_AVAILABLE:
             raise ImportError("Please install torch and transformers to use HuggingFaceLocalClient.")
         
         self.model_name = model_name
         self.device = device
-        # Use bfloat16 for modern GPUs if available
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            torch_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
-            device_map="auto"
-        )
+        
+        model_kwargs = {"device_map": "auto"}
+        if load_in_4bit:
+            from transformers import BitsAndBytesConfig
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+            )
+        else:
+            model_kwargs["torch_dtype"] = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
+            
+        # [CRITICAL FIX]: Force eager attention to allow attention weight extraction (for Saliency Pruning)
+        model_kwargs["attn_implementation"] = "eager"
+        
+        # Check if Qwen2-VL
+        if "qwen2-vl" in model_name.lower():
+            from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
+            self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+                model_name,
+                **model_kwargs
+            )
+            self.processor = AutoProcessor.from_pretrained(model_name)
+            self.tokenizer = self.processor.tokenizer
+            self.is_qwen_vl = True
+            try:
+                from qwen_vl_utils import process_vision_info
+                self.process_vision_info = process_vision_info
+            except ImportError:
+                raise ImportError("Please install qwen-vl-utils for Qwen2-VL support.")
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                **model_kwargs
+            )
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+            self.processor = None
+            self.is_qwen_vl = False
+            
         self.model.eval()
+
+    def _prepare_inputs(self, messages: list[dict[str, Any]]) -> tuple[Any, str]:
+        if self.is_qwen_vl:
+            qwen_messages = []
+            for msg in messages:
+                content = msg.get("content", "")
+                if isinstance(content, list):
+                    new_content = []
+                    for part in content:
+                        if part.get("type") == "text":
+                            new_content.append({"type": "text", "text": part["text"]})
+                        elif part.get("type") == "image_url":
+                            # Translate OpenAI format to Qwen2-VL format
+                            url = part["image_url"]["url"]
+                            if url.startswith("file://"):
+                                url = url.replace("file://", "")
+                            # Giới hạn phân giải để cứu VRAM trên T4
+                            new_content.append({"type": "image", "image": url, "max_pixels": 256 * 256})
+                    qwen_messages.append({"role": msg["role"], "content": new_content})
+                else:
+                    qwen_messages.append(msg)
+            
+            text = self.processor.apply_chat_template(qwen_messages, tokenize=False, add_generation_prompt=True)
+            image_inputs, video_inputs = self.process_vision_info(qwen_messages)
+            inputs = self.processor(
+                text=[text],
+                images=image_inputs,
+                videos=video_inputs,
+                padding=True,
+                return_tensors="pt"
+            ).to(self.model.device)
+            return inputs, text
+        else:
+            processed_messages = []
+            for msg in messages:
+                content = msg.get("content", "")
+                if isinstance(content, list):
+                    text_parts = [part.get("text", "") for part in content if part.get("type") == "text"]
+                    content = "\n".join(text_parts)
+                processed_messages.append({"role": msg["role"], "content": content})
+
+            prompt = self.tokenizer.apply_chat_template(processed_messages, tokenize=False, add_generation_prompt=True)
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+            return inputs, prompt
 
     def generate(
         self,
@@ -249,47 +348,49 @@ class HuggingFaceLocalClient(BaseLLMClient):
         json_mode: bool = False,
     ) -> list[SampleResult]:
         """Generate samples from local model."""
-        # Convert OpenAI-style list content to flat string for HF tokenizers
-        processed_messages = []
-        for msg in messages:
-            content = msg["content"]
-            if isinstance(content, list):
-                text_parts = [part.get("text", "") for part in content if part.get("type") == "text"]
-                content = "\n".join(text_parts)
-            processed_messages.append({"role": msg["role"], "content": content})
-
-        # Convert messages to prompt string
-        prompt = self.tokenizer.apply_chat_template(processed_messages, tokenize=False, add_generation_prompt=True)
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.model.device)
+        inputs, _ = self._prepare_inputs(messages)
         
         # Generation config
         gen_kwargs = {
             "max_new_tokens": max_tokens,
             "temperature": temperature,
             "do_sample": temperature > 0,
-            "num_return_sequences": n,
+            "num_return_sequences": 1,  # CHỈ SINH 1 MẪU MỖI LẦN ĐỂ TIẾT KIỆM RAM
             "output_scores": True if logprobs else False,
             "return_dict_in_generate": True,
         }
         
+        # Ép LLM sinh đa dạng khi do_sample=True
+        if temperature > 0:
+            gen_kwargs["top_p"] = 0.85
+            gen_kwargs["top_k"] = 50
+            gen_kwargs["num_beams"] = 1
+            gen_kwargs["repetition_penalty"] = 1.1
+        
         results = []
-        with torch.no_grad():
-            outputs = self.model.generate(**inputs, **gen_kwargs)
+        if n > 1:
+            print(f"\n[DEBUG] Đang chạy Generate tuần tự M={n}, Temperature={temperature} (do_sample={temperature > 0})")
             
+        with torch.no_grad():
             for i in range(n):
+                outputs = self.model.generate(**inputs, **gen_kwargs)
+                
                 # Extract generated tokens (skip prompt)
-                gen_tokens = outputs.sequences[i][inputs.input_ids.shape[1]:]
+                gen_tokens = outputs.sequences[0][inputs.input_ids.shape[1]:]
                 text = self.tokenizer.decode(gen_tokens, skip_special_tokens=True)
+                
+                if n > 1:
+                    print(f"   [RAW SAMPLE {i+1}]: {text}")
                 
                 token_lps = []
                 if logprobs:
                     # Calculate log probabilities
                     scores = outputs.scores
                     for j, token_id in enumerate(gen_tokens):
-                        if token_id in [self.tokenizer.eos_token_id, self.tokenizer.pad_token_id]:
+                        if token_id in [self.tokenizer.eos_token_id, self.tokenizer.pad_token_id]: 
                             break
                         if j < len(scores):
-                            log_probs = torch.nn.functional.log_softmax(scores[j][i], dim=-1)
+                            log_probs = torch.nn.functional.log_softmax(scores[j][0], dim=-1)
                             token_prob = log_probs[token_id].item()
                             token_str = self.tokenizer.decode(token_id)
                             token_lps.append(TokenLogprob(token=token_str, logprob=token_prob))
@@ -304,27 +405,345 @@ class HuggingFaceLocalClient(BaseLLMClient):
                 
         return results
 
+    def align_and_prepare_inputs(self, query: str, chunks: list[Any]) -> AlignmentResult:
+        """
+        Token Alignment V2: Uses temporary markers and offset_mapping to perfectly
+        align text/table chunks, and vision tokens for image chunks.
+        """
+        messages_content = [{"type": "text", "text": query + "\n\nContext:\n"}]
+        markers_info = []
+        
+        for i, chunk in enumerate(chunks):
+            modality = getattr(chunk, "modality", "text")
+            chunk_id = getattr(chunk, "id", f"chunk_{i}")
+            
+            if modality == "image":
+                if self.is_qwen_vl:
+                    # Qwen2-VL expects url or base64
+                    from pathlib import Path
+                    image_path = chunk.content
+                    if image_path.startswith("file://"):
+                        image_path = image_path[7:]
+                    
+                    # Fallback cho trường hợp giải nén trên Colab làm mất thư mục cha
+                    if not Path(image_path).exists():
+                        alt_path = image_path.replace("final_dataset_images/", "")
+                        if Path(alt_path).exists():
+                            image_path = alt_path
+                            
+                    if Path(image_path).exists() or image_path.startswith("http"):
+                        messages_content.append({"type": "image", "image": image_path, "max_pixels": 256 * 256})
+                    else:
+                        messages_content.append({"type": "text", "text": f"[Image {i+1} Missing]"})
+                markers_info.append({
+                    "chunk_idx": i,
+                    "chunk_id": chunk_id,
+                    "modality": modality,
+                })
+            else:
+                # Use Unicode Private Use Area (PUA) starting at U+E000
+                start_marker = chr(0xE000 + i * 2)
+                end_marker = chr(0xE000 + i * 2 + 1)
+                
+                if ord(end_marker) > 0xF8FF:
+                    raise ChunkAlignmentError("Ran out of safe PUA markers.")
+                    
+                marked_text = f"{start_marker}{chunk.content}{end_marker}"
+                messages_content.append({"type": "text", "text": marked_text + "\n"})
+                markers_info.append({
+                    "chunk_idx": i,
+                    "chunk_id": chunk_id,
+                    "modality": modality,
+                    "start_marker": start_marker,
+                    "end_marker": end_marker
+                })
+                
+        messages = [{"role": "user", "content": messages_content}]
+        
+        # Apply chat template with markers
+        prompt_with_markers = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        
+        # Locate markers and remove them to create a clean prompt
+        marker_positions = []
+        for info in markers_info:
+            if info["modality"] == "image":
+                continue
+            s_idx = prompt_with_markers.find(info["start_marker"])
+            e_idx = prompt_with_markers.find(info["end_marker"])
+            
+            if s_idx == -1 or e_idx == -1:
+                raise ChunkAlignmentError(f"Marker not found in rendered prompt for chunk {info['chunk_idx']}")
+                
+            marker_positions.append((s_idx, "start", info))
+            marker_positions.append((e_idx, "end", info))
+            
+        marker_positions.sort(key=lambda x: x[0])
+        
+        clean_prompt = ""
+        last_idx = 0
+        char_spans = {} 
+        
+        for idx, m_type, info in marker_positions:
+            clean_prompt += prompt_with_markers[last_idx:idx]
+            if m_type == "start":
+                char_spans[info["chunk_idx"]] = {"start": len(clean_prompt)}
+            else:
+                char_spans[info["chunk_idx"]]["end"] = len(clean_prompt)
+            
+            # Skip the marker character itself
+            last_idx = idx + 1
+            
+        clean_prompt += prompt_with_markers[last_idx:]
+        
+        # Pass the clean prompt to the processor to get offset_mapping
+        if self.is_qwen_vl:
+            image_inputs, video_inputs = self.process_vision_info(messages)
+            inputs = self.processor(
+                text=[clean_prompt],
+                images=image_inputs,
+                videos=video_inputs,
+                padding=True,
+                return_tensors="pt",
+                return_offsets_mapping=True
+            ).to(self.model.device)
+        else:
+            inputs = self.tokenizer(
+                [clean_prompt],
+                return_tensors="pt",
+                return_offsets_mapping=True
+            ).to(self.model.device)
+            
+        if "offset_mapping" not in inputs:
+            raise ChunkAlignmentError("Processor did not return offset_mapping. Make sure you are using a Fast tokenizer.")
+            
+        offset_mapping = inputs["offset_mapping"][0].tolist()
+        input_ids_list = inputs.input_ids[0].tolist()
+        
+        # Foolproof Vision marker detection: find blocks of repeated tokens (image pads)
+        # This works universally across Qwen2-VL, LLaVA, etc. without relying on exact <|vision_start|> IDs
+        image_blocks = []
+        if any(m["modality"] == "image" for m in markers_info):
+            in_block = False
+            start_idx = 0
+            for i in range(1, len(input_ids_list)):
+                if input_ids_list[i] == input_ids_list[i-1]:
+                    if not in_block:
+                        in_block = True
+                        start_idx = i - 1
+                else:
+                    if in_block:
+                        if (i - start_idx) > 10:  # Image patches are usually hundreds of tokens long
+                            image_blocks.append((start_idx, i))
+                        in_block = False
+            if in_block and (len(input_ids_list) - start_idx) > 10:
+                image_blocks.append((start_idx, len(input_ids_list)))
+                
+        chunk_spans = []
+        image_occurrence = 0
+        
+        for info in markers_info:
+            chunk_idx = info["chunk_idx"]
+            chunk_id = info["chunk_id"]
+            modality = info["modality"]
+            
+            if modality == "image":
+                if not self.is_qwen_vl and not image_blocks:
+                    # Ignore image if no image blocks found
+                    chunk_spans.append(ChunkSpan(chunk_idx, chunk_id, modality, None, None, ChunkStatus.FULLY_TRUNCATED))
+                elif image_occurrence < len(image_blocks):
+                    token_start, token_end = image_blocks[image_occurrence]
+                    status = ChunkStatus.FULL
+                    image_occurrence += 1
+                    chunk_spans.append(ChunkSpan(chunk_idx, chunk_id, modality, token_start, token_end, status))
+                else:
+                    chunk_spans.append(ChunkSpan(chunk_idx, chunk_id, modality, None, None, ChunkStatus.FULLY_TRUNCATED))
+                    
+            else:
+                char_start = char_spans[chunk_idx]["start"]
+                char_end = char_spans[chunk_idx]["end"]
+                
+                token_start = None
+                token_end = None
+                
+                for i, (tok_start, tok_end) in enumerate(offset_mapping):
+                    if tok_start == tok_end:
+                        continue
+                    if tok_start < char_end and tok_end > char_start:
+                        if token_start is None:
+                            token_start = i
+                        token_end = i + 1
+                        
+                if token_start is None:
+                    status = ChunkStatus.FULLY_TRUNCATED
+                else:
+                    last_tok_end = offset_mapping[token_end - 1][1]
+                    if last_tok_end < char_end:
+                        status = ChunkStatus.PARTIAL
+                    else:
+                        status = ChunkStatus.FULL
+                        
+                chunk_spans.append(ChunkSpan(
+                    chunk_idx=chunk_idx,
+                    chunk_id=chunk_id,
+                    modality=modality,
+                    start=token_start,
+                    end=token_end,
+                    status=status
+                ))
+                
+        # Remove offset_mapping from inputs because model.generate doesn't expect it
+        del inputs["offset_mapping"]
+        
+        return AlignmentResult(
+            inputs=inputs,
+            batch_chunk_spans=[chunk_spans],
+            prompt_strings=[clean_prompt]
+        )
+
     def generate_with_custom_mask(
         self,
-        base_prompt: str,
-        chunks: list[str],
-        mask_indices: list[int]
-    ) -> list[SampleResult]:
+        query: str,
+        chunks: list[Any],
+        max_tokens: int = 2000,
+        temperature: float = 0.7,
+        n: int = 3,
+    ) -> list[list[SampleResult]]:
         """
-        Specialized method for Strategy 3: Attention Masking (Zero-Cost LOO).
-        This executes a single forward pass with a custom attention mask where
-        specific chunks are zeroed out.
+        Strategy 3: Zero-Cost LOO via Attention Masking.
+        Generates `n` samples for each masked chunk safely to avoid VRAM OOM.
         """
-        raise NotImplementedError("Custom attention masking requires overriding the transformers attention layers or using FlashAttention directly. Detailed implementation omitted for safety, but interface is established.")
+        alignment = self.align_and_prepare_inputs(query, chunks)
+        inputs = alignment.inputs
+        chunk_spans = alignment.batch_chunk_spans[0]
+        
+        K = len(chunk_spans)
+        if K == 0:
+            return []
+            
+        gen_kwargs = {
+            "max_new_tokens": max_tokens,
+            "temperature": temperature,
+            "do_sample": temperature > 0,
+            "output_scores": True,
+            "return_dict_in_generate": True,
+        }
+        
+        all_results = []
+        with torch.no_grad():
+            for i, span in enumerate(chunk_spans):
+                # Duplicate inputs `n` times for generating `n` samples for THIS specific chunk masking
+                input_ids = inputs.input_ids.repeat(n, 1)
+                if hasattr(inputs, "attention_mask") and inputs.attention_mask is not None:
+                    attention_mask = inputs.attention_mask.repeat(n, 1)
+                else:
+                    attention_mask = torch.ones_like(input_ids)
+                
+                # Copy images n times
+                if "pixel_values" in inputs:
+                    gen_kwargs["pixel_values"] = inputs.pixel_values.repeat(n, 1) if len(inputs.pixel_values.shape) > 1 else inputs.pixel_values
+                    gen_kwargs["image_grid_thw"] = inputs.image_grid_thw.repeat(n, 1) if len(inputs.image_grid_thw.shape) > 1 else inputs.image_grid_thw
+                
+                # Apply masking for this chunk across all `n` rows
+                if span.status != ChunkStatus.FULLY_TRUNCATED and span.start is not None and span.end is not None:
+                    start_idx = max(0, span.start)
+                    end_idx = min(attention_mask.shape[1], span.end)
+                    attention_mask[:, start_idx:end_idx] = 0
+                    
+                outputs = self.model.generate(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    **gen_kwargs
+                )
+                
+                chunk_samples = []
+                for j in range(n):
+                    gen_tokens = outputs.sequences[j][input_ids.shape[1]:]
+                    text = self.tokenizer.decode(gen_tokens, skip_special_tokens=True)
+                    chunk_samples.append(SampleResult(text=text, finish_reason="stop"))
+                    
+                all_results.append(chunk_samples)
+                
+        return all_results
 
     def extract_attention_saliency(
         self,
-        messages: list[dict[str, Any]],
-        target_tokens: list[str]
-    ) -> dict[int, float]:
+        query: str,
+        chunks: list[Any],
+        max_tokens: int = 50,
+    ) -> list[float]:
         """
-        Specialized method for Strategy 5: Attention Saliency.
-        Extracts attention weights from the cross-attention or self-attention layers
-        to see which context chunks caused the generation of the target (uncertain) tokens.
+        Strategy 5: Attention Saliency.
+        (Phiên bản Mini-batch để chống tràn VRAM - OOM trên GPU yếu)
         """
-        raise NotImplementedError("Attention extraction requires output_attentions=True and mapping token indices to chunk boundaries. Detailed implementation omitted for safety, but interface is established.")
+        import torch
+        batch_size = 4
+        all_scores = []
+        
+        # Thêm Prompt Directive để tránh sinh từ mào đầu ("Dựa vào...", "Theo như...")
+        saliency_query = query 
+        
+        for i in range(0, len(chunks), batch_size):
+            batch_chunks = chunks[i:i+batch_size]
+            alignment = self.align_and_prepare_inputs(saliency_query, batch_chunks)
+            inputs = alignment.inputs
+            chunk_spans = alignment.batch_chunk_spans[0]
+            
+            gen_kwargs = {
+                "max_new_tokens": max_tokens,
+                "output_attentions": True,
+                "return_dict_in_generate": True,
+                "do_sample": False
+            }
+            if "pixel_values" in inputs:
+                gen_kwargs["pixel_values"] = inputs.pixel_values
+                gen_kwargs["image_grid_thw"] = inputs.image_grid_thw
+                
+            with torch.no_grad():
+                outputs = self.model.generate(
+                    input_ids=inputs.input_ids,
+                    attention_mask=inputs.attention_mask,
+                    **gen_kwargs
+                )
+                
+            if not outputs.attentions:
+                raise ValueError("Model did not return attentions. Ensure output_attentions=True works for this model architecture.")
+                
+            for span in chunk_spans:
+                if span.status == ChunkStatus.FULLY_TRUNCATED or span.start is None or span.end is None:
+                    all_scores.append(0.0)
+                    continue
+                    
+                start_idx = max(0, span.start)
+                end_idx = min(inputs.input_ids.shape[1], span.end)
+                chunk_len = max(1, end_idx - start_idx) # Tránh chia cho 0
+                
+                chunk_attention_sum = 0.0
+                for token_attentions in outputs.attentions:
+                    if not token_attentions:
+                        raise ValueError("Token attentions is empty. Model likely uses SDPA/FlashAttention which doesn't support attention weight extraction.")
+                    last_layer_attention = token_attentions[-1]
+                    
+                    # last_layer_attention shape: (1, num_heads, q_len, kv_len)
+                    avg_heads = last_layer_attention[0].mean(dim=0) # shape: (q_len, kv_len)
+                    token_saliency = avg_heads[-1] # shape: (kv_len,)
+                    
+                    if start_idx < len(token_saliency):
+                        actual_end = min(len(token_saliency), end_idx)
+                        chunk_attention_sum += token_saliency[start_idx:actual_end].sum().item()
+                        
+                # Tính Mật độ Attention (Density) bằng cách chia cho chiều dài chunk
+                if outputs.attentions:
+                    chunk_attention_sum /= len(outputs.attentions)
+                chunk_attention_density = chunk_attention_sum / chunk_len
+                
+                all_scores.append(chunk_attention_density)
+                
+            # Giải phóng VRAM sau mỗi batch
+            torch.cuda.empty_cache()
+            
+        # Re-scale toàn bộ điểm số để tổng bằng 1.0 (Giữ nguyên được Threshold 0.02)
+        total_density = sum(all_scores)
+        if total_density > 0:
+            all_scores = [score / total_density for score in all_scores]
+            
+        return all_scores

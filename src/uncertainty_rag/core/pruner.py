@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Optional
 
 from uncertainty_rag.config import PruningConfig, PruningStrategy
 from uncertainty_rag.core.sampler import Sample
@@ -42,6 +42,7 @@ class BasePruner(ABC):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         """Execute pruning and return surviving chunks and a report."""
         pass
@@ -61,6 +62,7 @@ class TwoPhasePruner(BasePruner):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         
         report = PruningReport(
@@ -128,6 +130,7 @@ class GrayZonePruner(BasePruner):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         
         report = PruningReport(
@@ -194,6 +197,7 @@ class PrefixCachingPruner(BasePruner):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         
         report = PruningReport(
@@ -225,6 +229,10 @@ class PrefixCachingPruner(BasePruner):
 class AttentionMaskingPruner(BasePruner):
     """Strategy 3: Zero-Cost LOO via Attention Masking."""
 
+    def __init__(self, config: PruningConfig, llm_client=None):
+        super().__init__(config)
+        self.llm_client = llm_client
+
     def prune(
         self,
         query: str,
@@ -232,23 +240,75 @@ class AttentionMaskingPruner(BasePruner):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         
-        logger.warning("AttentionMaskingPruner invoked. This requires a HuggingFaceLocalClient.")
-        # In a real implementation, eval_se_fn would be replaced by a single call to 
-        # llm_client.generate_with_custom_mask() for all chunks simultaneously.
-        # Here we simulate the result.
-        
-        return current_chunks, PruningReport(
+        report = PruningReport(
             original_count=len(current_chunks),
-            surviving_count=len(current_chunks),
+            surviving_count=0,
             strategy_used="ATTENTION_MASKING"
         )
+
+        if not self.llm_client or not hasattr(self.llm_client, "generate_with_custom_mask"):
+            logger.warning("AttentionMaskingPruner requires HuggingFaceLocalClient. Falling back to keeping all chunks.")
+            report.surviving_count = len(current_chunks)
+            return current_chunks, report
+
+        logger.info(f"  [Attention Masking Phase] Evaluating {len(current_chunks)} chunks simultaneously...")
+        
+        try:
+            results_per_chunk = self.llm_client.generate_with_custom_mask(
+                query=query,
+                chunks=current_chunks,
+                max_tokens=50,
+                n=3 # Generate 3 samples per chunk for real SE clustering
+            )
+            
+            final_chunks = []
+            for chunk, samples in zip(current_chunks, results_per_chunk):
+                logger.debug(f"  [Attention Masking] Output when Chunk {chunk.id} is masked (Sample 1): {samples[0].text[:50]}...")
+                
+                if eval_samples_fn:
+                    # Convert SampleResult to pipeline's Sample format
+                    mapped_samples = [
+                        Sample(
+                            id=f"mask_{chunk.id}_{i}",
+                            text=res.text,
+                            logprobs=0.0,
+                            token_logprobs=[],
+                            claims=[]
+                        ) for i, res in enumerate(samples)
+                    ]
+                    
+                    new_se = eval_samples_fn(mapped_samples)
+                    report.loo_evaluations += 1
+                    
+                    if new_se <= current_se_semantic:
+                        logger.info(f"  [Attention Masking] Pruned Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
+                    else:
+                        final_chunks.append(chunk)
+                        logger.info(f"  [Attention Masking] Kept Chunk {chunk.id} (SE: {current_se_semantic:.4f} -> {new_se:.4f})")
+                else:
+                    # Fallback (mock) if no pipeline evaluator provided
+                    final_chunks.append(chunk)
+                    logger.info(f"  [Attention Masking] Kept Chunk {chunk.id} (eval_samples_fn missing)")
+                    
+            report.surviving_count = len(final_chunks)
+            return final_chunks, report
+            
+        except NotImplementedError as e:
+            logger.warning(f"AttentionMaskingPruner not fully implemented in client: {e}")
+            report.surviving_count = len(current_chunks)
+            return current_chunks, report
 
 
 class AttentionSaliencyPruner(BasePruner):
     """Strategy 5: Attention-based Saliency Pruning."""
 
+    def __init__(self, config: PruningConfig, llm_client=None):
+        super().__init__(config)
+        self.llm_client = llm_client
+
     def prune(
         self,
         query: str,
@@ -256,16 +316,45 @@ class AttentionSaliencyPruner(BasePruner):
         current_se_semantic: float,
         eval_se_fn: Callable[[list[ContextChunk]], float],
         current_samples: list[Sample],
+        eval_samples_fn: Optional[Callable[[list[Sample]], float]] = None,
     ) -> tuple[list[ContextChunk], PruningReport]:
         
-        logger.warning("AttentionSaliencyPruner invoked. This requires a HuggingFaceLocalClient.")
-        # In a real implementation, we would extract attention weights mapped to chunks.
-        
-        return current_chunks, PruningReport(
+        report = PruningReport(
             original_count=len(current_chunks),
-            surviving_count=len(current_chunks),
+            surviving_count=0,
             strategy_used="ATTENTION_SALIENCY"
         )
+        
+        if not self.llm_client or not hasattr(self.llm_client, "extract_attention_saliency"):
+            logger.warning("AttentionSaliencyPruner requires HuggingFaceLocalClient. Falling back to keeping all chunks.")
+            report.surviving_count = len(current_chunks)
+            return current_chunks, report
+            
+        logger.info(f"  [Attention Saliency Phase] Evaluating {len(current_chunks)} chunks in 1 forward pass...")
+        
+        try:
+            scores = self.llm_client.extract_attention_saliency(
+                query=query,
+                chunks=current_chunks,
+            )
+            
+            # Prune based on a threshold (e.g., 0.02)
+            threshold = 0.02
+            final_chunks = []
+            for chunk, score in zip(current_chunks, scores):
+                if score >= threshold:
+                    final_chunks.append(chunk)
+                    logger.info(f"  [Saliency] Kept Chunk {chunk.id} (Score: {score:.4f} >= {threshold})")
+                else:
+                    logger.info(f"  [Saliency] Pruned Chunk {chunk.id} (Score: {score:.4f} < {threshold})")
+                    
+            report.surviving_count = len(final_chunks)
+            return final_chunks, report
+            
+        except (NotImplementedError, ValueError) as e:
+            logger.warning(f"AttentionSaliencyPruner not fully implemented/supported in client: {e}")
+            report.surviving_count = len(current_chunks)
+            return current_chunks, report
 
 
 class PrunerFactory:
@@ -276,6 +365,7 @@ class PrunerFactory:
         config: PruningConfig,
         nli_model: Optional[NLIModel] = None,
         reranker_model: Optional[RerankerModel] = None,
+        llm_client = None,
     ) -> BasePruner:
         if config.strategy == PruningStrategy.TWO_PHASE:
             if not nli_model:
@@ -291,9 +381,9 @@ class PrunerFactory:
             return PrefixCachingPruner(config)
             
         elif config.strategy == PruningStrategy.ATTENTION_MASKING:
-            return AttentionMaskingPruner(config)
+            return AttentionMaskingPruner(config, llm_client=llm_client)
             
         elif config.strategy == PruningStrategy.ATTENTION_SALIENCY:
-            return AttentionSaliencyPruner(config)
+            return AttentionSaliencyPruner(config, llm_client=llm_client)
             
         raise ValueError(f"Unknown pruning strategy: {config.strategy}")
