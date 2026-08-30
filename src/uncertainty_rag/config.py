@@ -56,6 +56,8 @@ class ThresholdConfig(BaseModel):
     alpha: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial token uncertainty")
     beta: float = Field(default=0.5, gt=0.0, le=1.0, description="Fraction of initial semantic entropy")
     adaptive_min_tau: float = Field(default=0.05, ge=0.0, description="Minimum threshold floor")
+    # Evidence Sufficiency threshold
+    tau_evidence: float = Field(default=0.7, ge=0.0, le=1.0, description="Minimum evidence ratio to STOP")
 
     def compute_adaptive_thresholds(
         self, initial_u_token: float, initial_se_semantic: float

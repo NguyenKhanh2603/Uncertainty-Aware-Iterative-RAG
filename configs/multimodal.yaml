@@ -1,16 +1,20 @@
-# ── Multimodal Configuration Overrides ──────────────────────────────────────────
-# Inherits from default.yaml; only override what's different.
-
-model:
-  vlm_name: "gpt-4o"
-
-modality:
-  type: "multimodal"
-  image_detail: "high"
-  table_format: "markdown"
-
-sampling:
-  # Multimodal requires sequential calls (VLM n>1 limitation)
-  M: 10
-  adaptive_M_enabled: true       # Recommended for multimodal (cost savings)
-  M_initial: 3
+    "model": {
+        "llm_name": "Qwen/Qwen2-VL-7B-Instruct",
+        "vlm_name": "Qwen/Qwen2-VL-7B-Instruct",
+        "claim_extractor_model": "Qwen/Qwen2-VL-7B-Instruct",  # Dùng chung 1 model cho đỡ tốn RAM
+        "nli_name": "cross-encoder/nli-deberta-v3-base",
+        "embedding_name": "all-MiniLM-L6-v2"
+    },
+    "sampling": {
+        "M": 10,
+        "temperature": 0.7
+    },
+    "pruning": {
+        "strategy": "attention_masking" # Bạn có thể đổi thành "attention_saliency"
+    },
+    "thresholds": {
+        "mode": "adaptive" # Chạy adaptive như bạn yêu cầu (hoặc đổi thành fixed)
+    },
+    "modality": {
+        "type": "multimodal"
+    }

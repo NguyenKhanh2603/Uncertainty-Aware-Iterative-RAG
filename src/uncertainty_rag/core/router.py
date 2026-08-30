@@ -1,13 +1,16 @@
-"""Two-Signal Independent Routing for Iterative RAG.
+"""Three-Signal Independent Routing for Iterative RAG.
 
-Routing decisions:
-  RETRIEVE — semantic entropy is high → model is semantically confused, fetch new evidence
-  PRUNE    — semantic entropy is low BUT token uncertainty is high → noise in context
-  STOP     — both semantic entropy and token uncertainty below thresholds → confident answer
+Routing logic:
+  S = Semantic Entropy       (answer disagreement)
+  U = Token Uncertainty      (token-level variability)
+  E = Evidence Ratio         (claim-context support)
 
-Supports:
-  - Fixed thresholds: τ_token and τ_semantic are static hyperparameters.
-  - Adaptive thresholds (U2): τ computed as fraction of initial uncertainty profile.
+  STOP     ← S ≤ τ_S AND U ≤ τ_U AND E ≥ τ_E
+  RETRIEVE ← S > τ_S OR E < τ_E
+  PRUNE    ← S ≤ τ_S AND U > τ_U AND E ≥ τ_E
+
+Key insight: SE=0 only means "all answers agree", NOT "answer is correct".
+Evidence Ratio checks whether context ACTUALLY SUPPORTS the claims.
 """
 
 from __future__ import annotations
@@ -28,26 +31,14 @@ class RoutingDecision(str, Enum):
 
 
 class Router:
-    """Decide whether to stop, prune, or retrieve based on independent signals.
-
-    Implements independent signal routing:
-    - RETRIEVE if SE_semantic > τ_semantic
-    - PRUNE if SE_semantic ≤ τ_semantic AND U_token > τ_token
-    - STOP if both are below their respective thresholds
-
-    Supports adaptive thresholds (U2):
-    - On the first iteration, record initial uncertainty as baseline
-    - τ_token = alpha * U_token_initial
-    - τ_semantic = beta * SE_semantic_initial
-    """
+    """Three-signal routing: SE + U_token + Evidence."""
 
     def __init__(self, config: ThresholdConfig) -> None:
         self.config = config
-        # Effective thresholds (may be overridden by adaptive mode)
         self._tau_token: float = config.tau_token
         self._tau_semantic: float = config.tau_semantic
+        self._tau_evidence: float = getattr(config, 'tau_evidence', 0.7)
         self._is_calibrated: bool = (config.mode == "fixed")
-        # Store initial profile for logging
         self._initial_profile: Optional[UncertaintyProfile] = None
 
     @property
@@ -59,18 +50,17 @@ class Router:
         return self._tau_semantic
 
     @property
+    def tau_evidence(self) -> float:
+        return self._tau_evidence
+
+    @property
     def is_calibrated(self) -> bool:
         return self._is_calibrated
 
     def calibrate_adaptive(self, initial_profile: UncertaintyProfile) -> None:
-        """U2: Calibrate adaptive thresholds from the first iteration's uncertainty profile.
-
-        Called once at iteration 0. After calibration, thresholds are fixed for the
-        remainder of the pipeline run.
-        """
+        """U2: Calibrate adaptive thresholds from the first iteration."""
         if self.config.mode != "adaptive":
             return
-
         self._initial_profile = initial_profile
         self._tau_token, self._tau_semantic = self.config.compute_adaptive_thresholds(
             initial_u_token=initial_profile.u_token,
@@ -79,57 +69,56 @@ class Router:
         self._is_calibrated = True
 
     def decide(self, profile: UncertaintyProfile) -> RoutingDecision:
-        """Make a routing decision based on the current uncertainty profile.
+        """Make routing decision based on 3 independent signals."""
+        S = profile.se_semantic
+        U = profile.u_token
+        E = profile.evidence_ratio
 
-        Args:
-            profile: Current iteration's UncertaintyProfile.
-
-        Returns:
-            RoutingDecision: STOP, PRUNE, or RETRIEVE.
-        """
-        # RETRIEVE: Semantic confusion is high -> fetch external knowledge
-        if profile.se_semantic > self._tau_semantic:
+        # RETRIEVE: semantic confusion OR evidence insufficient
+        if S > self._tau_semantic:
+            return RoutingDecision.RETRIEVE
+        if E < self._tau_evidence:
             return RoutingDecision.RETRIEVE
 
-        # PRUNE: Semantic confusion is low (agrees on meaning) BUT token uncertainty is high (noisy context)
-        if profile.u_token > self._tau_token:
+        # PRUNE: semantically agrees, evidence OK, but token noise high
+        if U > self._tau_token:
             return RoutingDecision.PRUNE
 
-        # STOP: Both are low
-        return RoutingDecision.STOP
-
-        # Fallback safety
+        # STOP: all three signals satisfactory
         return RoutingDecision.STOP
 
     def get_decision_rationale(self, profile: UncertaintyProfile) -> dict:
-        """Return a human-readable rationale for the routing decision."""
+        """Return human-readable rationale."""
         decision = self.decide(profile)
         return {
             "decision": decision.value,
             "se_semantic": round(profile.se_semantic, 4),
             "u_token": round(profile.u_token, 4),
+            "evidence_ratio": round(profile.evidence_ratio, 4),
             "tau_token": round(self._tau_token, 4),
             "tau_semantic": round(self._tau_semantic, 4),
+            "tau_evidence": round(self._tau_evidence, 4),
             "threshold_mode": self.config.mode,
             "reason": self._explain(decision, profile),
         }
 
     def _explain(self, decision: RoutingDecision, profile: UncertaintyProfile) -> str:
+        S, U, E = profile.se_semantic, profile.u_token, profile.evidence_ratio
         if decision == RoutingDecision.STOP:
             return (
-                f"Both Semantic Entropy ({profile.se_semantic:.4f} ≤ {self._tau_semantic:.4f}) "
-                f"and Token Uncertainty ({profile.u_token:.4f} ≤ {self._tau_token:.4f}) "
-                f"are below thresholds → confident answer."
+                f"All signals OK: SE({S:.4f}≤{self._tau_semantic:.4f}), "
+                f"U_token({U:.4f}≤{self._tau_token:.4f}), "
+                f"Evidence({E:.4f}≥{self._tau_evidence:.4f}) → STOP"
             )
         elif decision == RoutingDecision.PRUNE:
             return (
-                f"Semantic Entropy is low ({profile.se_semantic:.4f} ≤ {self._tau_semantic:.4f}) but "
-                f"Token Uncertainty ({profile.u_token:.4f}) exceeds τ_token ({self._tau_token:.4f}) "
-                f"→ context has noise/conflicts, pruning required."
+                f"SE low({S:.4f}), Evidence OK({E:.4f}), "
+                f"but U_token({U:.4f})>{self._tau_token:.4f} → PRUNE"
             )
         else:
-            return (
-                f"Semantic Entropy ({profile.se_semantic:.4f}) exceeds "
-                f"τ_semantic ({self._tau_semantic:.4f}) → model is semantically confused, "
-                f"retrieving new evidence."
-            )
+            reasons = []
+            if S > self._tau_semantic:
+                reasons.append(f"SE({S:.4f})>{self._tau_semantic:.4f}")
+            if E < self._tau_evidence:
+                reasons.append(f"Evidence({E:.4f})<{self._tau_evidence:.4f}")
+            return " AND ".join(reasons) + " → RETRIEVE"
