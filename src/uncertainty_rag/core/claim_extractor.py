@@ -14,16 +14,18 @@ from typing import Optional
 from uncertainty_rag.core.sampler import Sample
 from uncertainty_rag.models.llm_client import BaseLLMClient, TokenLogprob
 
-
 # ── Extraction Prompts (modality-aware) ─────────────────────────────────────────
 
 TEXT_CLAIM_PROMPT = """\
 Extract all distinct, atomic factual claims explicitly stated in the following Answer.
 
 CRITICAL RULES:
-1. Each claim MUST be a complete, self-contained factual sentence with SUBJECT + RELATIONSHIP + OBJECT/ATTRIBUTE.
-2. You MUST use the context from the Question to understand what the Answer refers to, especially if the Answer is short.
-3. DO NOT introduce external knowledge or unstated assumptions. Extract ONLY facts derived from combining the Question and the Answer.
+1. Each claim MUST be a complete, self-contained factual sentence with
+   SUBJECT + RELATIONSHIP + OBJECT/ATTRIBUTE.
+2. You MUST use the Question to understand what the Answer refers to,
+   especially if the Answer is short.
+3. DO NOT introduce external knowledge or unstated assumptions.
+   Extract ONLY facts derived from combining the Question and the Answer.
 4. DO NOT use pronouns such as "he", "she", "it", or "they". Use explicit entity names.
 5. If a statement contains multiple independent facts, decompose it into separate atomic claims.
 6. Return a JSON object with key "claims" containing an array of strings.
@@ -33,12 +35,15 @@ Answer: {text}
 """
 
 TABLE_CLAIM_PROMPT = """\
-Extract all distinct, atomic factual claims explicitly represented in the following Answer about tabular/numerical data.
+Extract all distinct, atomic factual claims explicitly represented in the
+following Answer about tabular/numerical data.
 
 CRITICAL RULES:
-1. Each claim MUST be a complete, self-contained factual sentence with SUBJECT + RELATIONSHIP + VALUE/OBJECT.
-2. You MUST use the context from the Question to understand what the numerical/tabular Answer refers to.
-3. DO NOT introduce external knowledge. Extract ONLY information explicitly represented in the Question and Answer.
+1. Each claim MUST be a complete, self-contained factual sentence with
+   SUBJECT + RELATIONSHIP + VALUE/OBJECT.
+2. You MUST use the Question to understand what the numerical/tabular Answer refers to.
+3. DO NOT introduce external knowledge. Extract ONLY information explicitly
+   represented in the Question and Answer.
 4. Preserve numerical information exactly, including values, units, and dates.
 5. Return a JSON object with key "claims" containing an array of strings.
 
@@ -47,12 +52,15 @@ Answer: {text}
 """
 
 IMAGE_CLAIM_PROMPT = """\
-Extract all distinct, atomic factual claims explicitly stated in the following Answer about visual content.
+Extract all distinct, atomic factual claims explicitly stated in the following
+Answer about visual content.
 
 CRITICAL RULES:
-1. Each claim MUST be a complete, self-contained factual sentence with SUBJECT + ATTRIBUTE/RELATIONSHIP + DESCRIPTION.
+1. Each claim MUST be a complete, self-contained factual sentence with
+   SUBJECT + ATTRIBUTE/RELATIONSHIP + DESCRIPTION.
 2. You MUST use the context from the Question to understand what the Answer refers to.
-3. DO NOT infer, speculate, or introduce visual information that is not explicitly stated in the Answer or Question.
+3. DO NOT infer, speculate, or introduce visual information that is not explicitly
+   stated in the Answer or Question.
 4. DO NOT use pronouns. Use explicit object names.
 5. Return a JSON object with key "claims" containing an array of strings.
 
@@ -63,21 +71,122 @@ Answer: {text}
 
 # ── Stop words for key-token filtering ──────────────────────────────────────────
 
-_STOP_WORDS = frozenset({
-    "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
-    "have", "has", "had", "do", "does", "did", "will", "would", "could",
-    "should", "may", "might", "shall", "can", "need", "dare", "ought",
-    "to", "of", "in", "for", "on", "with", "at", "by", "from", "as",
-    "into", "through", "during", "before", "after", "above", "below",
-    "between", "out", "off", "over", "under", "again", "further", "then",
-    "once", "here", "there", "when", "where", "why", "how", "all", "each",
-    "every", "both", "few", "more", "most", "other", "some", "such", "no",
-    "not", "only", "own", "same", "so", "than", "too", "very", "just",
-    "because", "but", "and", "or", "if", "while", "although", "this",
-    "that", "these", "those", "it", "its", "i", "me", "my", "we", "our",
-    "you", "your", "he", "him", "his", "she", "her", "they", "them",
-    "their", "what", "which", "who", "whom", "whose",
-})
+_STOP_WORDS = frozenset(
+    {
+        "the",
+        "a",
+        "an",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "could",
+        "should",
+        "may",
+        "might",
+        "shall",
+        "can",
+        "need",
+        "dare",
+        "ought",
+        "to",
+        "of",
+        "in",
+        "for",
+        "on",
+        "with",
+        "at",
+        "by",
+        "from",
+        "as",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "above",
+        "below",
+        "between",
+        "out",
+        "off",
+        "over",
+        "under",
+        "again",
+        "further",
+        "then",
+        "once",
+        "here",
+        "there",
+        "when",
+        "where",
+        "why",
+        "how",
+        "all",
+        "each",
+        "every",
+        "both",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "no",
+        "not",
+        "only",
+        "own",
+        "same",
+        "so",
+        "than",
+        "too",
+        "very",
+        "just",
+        "because",
+        "but",
+        "and",
+        "or",
+        "if",
+        "while",
+        "although",
+        "this",
+        "that",
+        "these",
+        "those",
+        "it",
+        "its",
+        "i",
+        "me",
+        "my",
+        "we",
+        "our",
+        "you",
+        "your",
+        "he",
+        "him",
+        "his",
+        "she",
+        "her",
+        "they",
+        "them",
+        "their",
+        "what",
+        "which",
+        "who",
+        "whom",
+        "whose",
+    }
+)
 
 
 class ClaimExtractor:
@@ -101,8 +210,16 @@ class ClaimExtractor:
             return IMAGE_CLAIM_PROMPT
         return TEXT_CLAIM_PROMPT
 
-    def extract_claims(self, query: str, text: str) -> list[str]:
-        """Extract atomic claims from a text using LLM with JSON mode."""
+    def extract_claims(self, query: str, text: Optional[str] = None) -> list[str]:
+        """Extract atomic claims, accepting both the new and legacy call forms.
+
+        ``extract_claims(query, answer)`` provides the question context added by
+        the improved pipeline. ``extract_claims(answer)`` remains supported for
+        existing callers and tests.
+        """
+        if text is None:
+            text = query
+            query = ""
         if not text.strip():
             return []
 
@@ -125,7 +242,7 @@ class ClaimExtractor:
                 claims = parsed
             else:
                 claims = parsed.get("claims", [])
-                
+
             if isinstance(claims, list) and all(isinstance(c, str) for c in claims):
                 return [c.strip() for c in claims if c.strip()]
         except (json.JSONDecodeError, KeyError, TypeError, AttributeError):
@@ -137,7 +254,7 @@ class ClaimExtractor:
     def _fallback_extract(self, text: str) -> list[str]:
         """Fallback extraction when JSON parsing fails."""
         # Try to find JSON array in the text
-        match = re.search(r'\[([^\]]+)\]', text, re.DOTALL)
+        match = re.search(r"\[([^\]]+)\]", text, re.DOTALL)
         if match:
             try:
                 claims = json.loads(f"[{match.group(1)}]")
@@ -146,13 +263,20 @@ class ClaimExtractor:
                 pass
 
         # Last resort: split by sentence
-        sentences = re.split(r'[.!?]+', text)
+        sentences = re.split(r"[.!?]+", text)
         return [s.strip() for s in sentences if len(s.strip()) > 10]
 
-    def extract_all(self, query: str, samples: list[Sample]) -> list[Sample]:
-        """Extract claims for all samples and identify key tokens."""
+    def extract_all(
+        self,
+        query: str | list[Sample],
+        samples: Optional[list[Sample]] = None,
+    ) -> list[Sample]:
+        """Extract all claims, retaining compatibility with ``extract_all(samples)``."""
+        if samples is None:
+            samples = query
+            query = ""
         for sample in samples:
-            sample.claims = self.extract_claims(query, sample.text)
+            sample.claims = self.extract_claims(str(query), sample.text)
             sample.key_token_logprobs = self.identify_key_tokens(
                 sample.claims, sample.token_logprobs
             )

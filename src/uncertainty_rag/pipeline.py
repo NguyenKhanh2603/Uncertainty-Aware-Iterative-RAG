@@ -22,14 +22,13 @@ from uncertainty_rag.config import Config
 from uncertainty_rag.core.claim_extractor import ClaimExtractor
 from uncertainty_rag.core.evidence_checker import EvidenceChecker
 from uncertainty_rag.core.pruner import BasePruner, PrunerFactory
-from uncertainty_rag.core.retriever import ActiveRetriever, BaseRetriever, DenseRetriever
+from uncertainty_rag.core.retriever import BaseRetriever, DenseRetriever
 from uncertainty_rag.core.router import Router, RoutingDecision
-from uncertainty_rag.core.sampler import Sample, Sampler
+from uncertainty_rag.core.sampler import Sampler
 from uncertainty_rag.core.semantic_cluster import Concept, SemanticClusterer
 from uncertainty_rag.core.uncertainty import UncertaintyEstimator, UncertaintyProfile
 from uncertainty_rag.modality.base import ContextChunk, ModalityHandler
 from uncertainty_rag.modality.text_handler import TextHandler
-from uncertainty_rag.models.llm_client import BaseLLMClient, OpenAIClient
 from uncertainty_rag.models.nli_model import NLIModel
 from uncertainty_rag.models.reranker import RerankerModel
 from uncertainty_rag.utils.cost_tracker import CostTracker
@@ -93,7 +92,7 @@ class IterativeRAGPipeline:
         self.clusterer = clusterer
         self.uncertainty = uncertainty_estimator
         self.router = router
-        
+
         self.nli_model = nli_model or NLIModel(model_name=self.config.model.nli_name)
         self.reranker_model = reranker_model
         if self.config.pruning.strategy == "gray_zone" and not self.reranker_model:
@@ -104,7 +103,7 @@ class IterativeRAGPipeline:
             modality_handler=modality_handler,
             support_threshold=0.5,
         )
-            
+
         self.pruner = pruner or PrunerFactory.create(
             config=self.config.pruning,
             nli_model=self.nli_model,
@@ -130,11 +129,11 @@ class IterativeRAGPipeline:
             PipelineResult with answer, confidence, and full execution trace.
         """
         context = list(initial_context)
-        
-        # [CRITICAL FIX]: Ghi nhớ VĨNH VIỄN tất cả các chunk đã từng chui vào hệ thống 
+
+        # [CRITICAL FIX]: Ghi nhớ VĨNH VIỄN tất cả các chunk đã từng chui vào hệ thống
         # (Kể cả sau này bị Prune/xóa đi) để ngăn Retriever lấy lại chúng ở vòng lặp sau!
         global_seen_chunk_ids = {c.id for c in context}
-        
+
         history: list[IterationLog] = []
         samples_used_per_iter: list[int] = []
         profile: Optional[UncertaintyProfile] = None
@@ -150,57 +149,38 @@ class IterativeRAGPipeline:
             iter_start = time.time()
 
             # ── Step 1: Semantic Uncertainty Profiling ────────────────────────
-            self.logger.log_message(f"\n=======================================================")
-            self.logger.log_message(f"--- [STEP 1: SAMPLING & CLAIM EXTRACTION] ---")
-            
+            self.logger.log_message("\n=======================================================")
+            self.logger.log_message("--- [STEP 1: SAMPLING & CLAIM EXTRACTION] ---")
+
             # Print all current chunks in full
             self.logger.log_message(f"Current Context ({len(context)} chunks):")
             for i, c in enumerate(context):
-                self.logger.log_message(f"  [Chunk {i+1} | ID: {c.id}]\n{c.content}\n")
-
-            # --- [NEW: BƯỚC LỌC THÔ BẰNG ATTENTION SALIENCY] ---
-            # Automatically apply if LLM supports it (e.g. HuggingFaceLocalClient)
-            if hasattr(self.sampler.llm, "extract_attention_saliency") and len(context) > 1:
-                self.logger.log_message(f"--- [COARSE FILTER: ATTENTION SALIENCY] ---")
-                try:
-                    # Generate a few tokens to measure attention
-                    saliencies = self.sampler.llm.extract_attention_saliency(query, context, max_tokens=10)
-                    new_context = []
-                    for idx, (chunk, score) in enumerate(zip(context, saliencies)):
-                        if score >= 0.1:
-                            new_context.append(chunk)
-                            self.logger.log_message(f"  [Chunk {idx+1} | ID: {chunk.id}] Kept (Saliency: {score:.4f})")
-                        else:
-                            self.logger.log_message(f"  [Chunk {idx+1} | ID: {chunk.id}] PRUNED (Saliency: {score:.4f} < 0.1)")
-                    
-                    if not new_context and context:
-                        best_idx = saliencies.index(max(saliencies))
-                        new_context = [context[best_idx]]
-                        self.logger.log_message(f"  [Fallback] All chunks < 0.1. Kept Chunk {best_idx+1} with highest saliency {saliencies[best_idx]:.4f}")
-                    
-                    context = new_context
-                    self.logger.log_message(f"Context reduced to {len(context)} chunks after Attention Saliency filter.")
-                except Exception as e:
-                    import traceback
-                    self.logger.log_message(f"Attention Saliency failed (skipping): {e}")
-                    self.logger.log_message(traceback.format_exc())
+                self.logger.log_message(f"  [Chunk {i + 1} | ID: {c.id}]\n{c.content}\n")
 
             # U4: Adaptive M — two-phase sampling
             if self.sampler.config.adaptive_M_enabled and iteration == 0:
-                self.logger.log_message(f"Adaptive M Enabled. Starting Phase 1 (Quick Probe) with M={self.sampler.config.M_initial}...")
+                self.logger.log_message(
+                    "Adaptive M Enabled. Starting Phase 1 (Quick Probe) "
+                    f"with M={self.sampler.config.M_initial}..."
+                )
                 # Phase 1: Quick probe with M_initial
                 samples = self.sampler.generate_samples(
                     query, context, self.handler, adaptive_phase="initial"
                 )
-                self.logger.log_message(f"Generated {len(samples)} initial samples. Extracting claims...")
+                self.logger.log_message(
+                    f"Generated {len(samples)} initial samples. Extracting claims..."
+                )
                 samples = self.claim_extractor.extract_all(query, samples)
                 for i, s in enumerate(samples):
-                    self.logger.log_message(f"  [Sample {i+1} Claims]: {s.claims}")
-                    
-                self.logger.log_message(f"\n--- [STEP 2: SEMANTIC UNCERTAINTY PROFILING] ---")
+                    self.logger.log_message(f"  [Sample {i + 1} Claims]: {s.claims}")
+
+                self.logger.log_message("\n--- [STEP 2: SEMANTIC UNCERTAINTY PROFILING] ---")
                 probe_concepts = self.clusterer.cluster(samples)
                 probe_se = self.uncertainty.compute_se_semantic(probe_concepts)
-                self.logger.log_message(f"Probe Clustering: Found {len(probe_concepts)} concepts. Initial SE_semantic={probe_se:.4f}")
+                self.logger.log_message(
+                    f"Probe Clustering: Found {len(probe_concepts)} concepts. "
+                    f"Initial SE_semantic={probe_se:.4f}"
+                )
 
                 if self.sampler.should_escalate_m(probe_se):
                     # Phase 2: Full sampling with M_max
@@ -210,14 +190,16 @@ class IterativeRAGPipeline:
                         f"escalating from M={self.sampler.config.M_initial} to "
                         f"M={self.sampler.config.M_max}"
                     )
-                    self.logger.log_message(f"Generating full samples with M={self.sampler.config.M_max}...")
+                    self.logger.log_message(
+                        f"Generating full samples with M={self.sampler.config.M_max}..."
+                    )
                     samples = self.sampler.generate_samples(
                         query, context, self.handler, adaptive_phase="full"
                     )
                     samples = self.claim_extractor.extract_all(query, samples)
                     for i, s in enumerate(samples):
-                        self.logger.log_message(f"  [Sample {i+1} Claims]: {s.claims}")
-                        
+                        self.logger.log_message(f"  [Sample {i + 1} Claims]: {s.claims}")
+
                     concepts = self.clusterer.cluster(samples)
                     samples_used_per_iter.append(self.sampler.config.M_max)
                 else:
@@ -242,23 +224,23 @@ class IterativeRAGPipeline:
                 )
                 samples = self.claim_extractor.extract_all(query, samples)
                 for i, s in enumerate(samples):
-                    self.logger.log_message(f"  [Sample {i+1} Claims]: {s.claims}")
-                    
-                self.logger.log_message(f"\n--- [STEP 2: SEMANTIC UNCERTAINTY PROFILING] ---")
+                    self.logger.log_message(f"  [Sample {i + 1} Claims]: {s.claims}")
+
+                self.logger.log_message("\n--- [STEP 2: SEMANTIC UNCERTAINTY PROFILING] ---")
                 concepts = self.clusterer.cluster(samples)
                 samples_used_per_iter.append(m_used)
 
             # Log grouped concepts
             self.logger.log_message(f"Clustering complete. Grouped into {len(concepts)} concepts:")
             for i, c in enumerate(concepts):
-                self.logger.log_message(f"  [Concept {i+1} | Prob: {c.probability:.4f}]: {c.representative_claims}")
+                self.logger.log_message(
+                    f"  [Concept {i + 1} | Prob: {c.probability:.4f}]: {c.representative_claims}"
+                )
 
             # --- [STEP 2.5: EVIDENCE SUFFICIENCY CHECK] --- (NEW)
             # Collect all unique claims from all samples
-            all_claims_for_evidence = list(set(
-                claim for s in samples for claim in s.claims
-            ))
-            self.logger.log_message(f"\n--- [STEP 2.5: EVIDENCE SUFFICIENCY CHECK] ---")
+            all_claims_for_evidence = list(set(claim for s in samples for claim in s.claims))
+            self.logger.log_message("\n--- [STEP 2.5: EVIDENCE SUFFICIENCY CHECK] ---")
             evidence_profile = self.evidence_checker.check(
                 claims=all_claims_for_evidence,
                 chunks=context,
@@ -266,7 +248,8 @@ class IterativeRAGPipeline:
 
             # Compute uncertainty profile (NOW with evidence_ratio)
             profile = self.uncertainty.compute(
-                samples, concepts,
+                samples,
+                concepts,
                 evidence_ratio=evidence_profile.evidence_ratio,
                 unsupported_claims=evidence_profile.unsupported_claims,
             )
@@ -316,79 +299,101 @@ class IterativeRAGPipeline:
 
             # ── Step 2a: Prune if noise is high ──────────────────────────────
             if decision == RoutingDecision.PRUNE:
-                self.logger.log_message(f"--- [PRUNING PHASE START] ---")
+                self.logger.log_message("--- [PRUNING PHASE START] ---")
                 context, prune_report = self.pruner.prune(
-                    query, context, current_se_semantic=profile.se_semantic,
+                    query,
+                    context,
+                    current_se_semantic=profile.se_semantic,
                     eval_se_fn=lambda chunks: self.uncertainty.compute_se_semantic(
                         self.clusterer.cluster(
                             self.claim_extractor.extract_all(
-                                query, self.sampler.generate_samples(query, chunks, self.handler, adaptive_phase="initial")
+                                query,
+                                self.sampler.generate_samples(
+                                    query, chunks, self.handler, adaptive_phase="initial"
+                                ),
                             )
                         )
                     ),
                     eval_samples_fn=lambda samples: self.uncertainty.compute_se_semantic(
-                        self.clusterer.cluster(
-                            self.claim_extractor.extract_all(query, samples)
-                        )
+                        self.clusterer.cluster(self.claim_extractor.extract_all(query, samples))
                     ),
-                    current_samples=samples
+                    current_samples=samples,
                 )
                 self.logger.log_message(
                     f"--- [PRUNING PHASE END] ---\n"
                     f"Result: removed {prune_report.original_count - prune_report.surviving_count} "
-                    f"chunks (Pre-filter: {prune_report.pre_filtered_count}, LOO Evals: {prune_report.loo_evaluations})"
+                    f"chunks (Pre-filter: {prune_report.pre_filtered_count}, "
+                    f"LOO Evals: {prune_report.loo_evaluations})"
                     f" → {prune_report.surviving_count} chunks remaining."
                 )
                 continue
 
             # ── Step 2b: Retrieve if knowledge gap is high ───────────────────
             if decision == RoutingDecision.RETRIEVE:
-                self.logger.log_message(f"--- [RETRIEVAL PHASE START] ---")
+                self.logger.log_message("--- [RETRIEVAL PHASE START] ---")
                 best_concept = max(concepts, key=lambda c: c.probability)
                 c_star = " ".join(best_concept.representative_claims).lower()
-            
+
                 # Bước 2.1: Phân loại Giả thuyết (Adaptive Query Formulation)
-                if any(k in c_star for k in ["not mention", "no text", "no information", "provided", "not found"]):
+                if any(
+                    k in c_star
+                    for k in ["not mention", "no text", "no information", "provided", "not found"]
+                ):
                     base_query = query
                     self.logger.log_message("Hypothesis is ignorant. Using Base Query.")
                 else:
                     base_query = f"{query} {c_star}"
                     self.logger.log_message("Hypothesis contains guesses. Appending to query.")
-            
+
                 # Bước 2.2: LLM Query Expansion (Sinh 3 biến thể)
-                expansion_prompt = f"Generate 3 short, keyword-based search queries to find the answer to this question. Output only the queries, separated by newlines: {base_query}"
+                expansion_prompt = (
+                    "Generate 3 short, keyword-based search queries to find the answer "
+                    "to this question. Output only the queries, separated by newlines: "
+                    f"{base_query}"
+                )
                 self.logger.log_message("Expanding query variants via LLM...")
-                exp_results = self.sampler.llm.generate([{"role": "user", "content": [{"type": "text", "text": expansion_prompt}]}], n=1, temperature=0.7, logprobs=False)
-            
+                exp_results = self.sampler.llm.generate(
+                    [{"role": "user", "content": [{"type": "text", "text": expansion_prompt}]}],
+                    n=1,
+                    temperature=0.7,
+                    logprobs=False,
+                )
+
                 queries_to_search = [base_query]
                 if exp_results and exp_results[0].text:
                     variants = [q.strip() for q in exp_results[0].text.splitlines() if q.strip()]
                     queries_to_search.extend(variants[:3])
-            
+
                 self.logger.log_message(f"Searching for variants: {queries_to_search}")
-            
+
                 # Bước 3: Đưa xuống Retriever (Với 3 biến thể)
                 all_new_chunks = []
-            
+
                 # Lấy class Retriever lõi (DenseRetriever)
                 actual_retriever = getattr(self.retriever, "retriever", self.retriever)
-            
+
                 for q in queries_to_search:
-                    q_chunks = actual_retriever.retrieve(query_text=q, existing_chunk_ids=global_seen_chunk_ids, top_k=self.config.retrieval.top_k)
+                    q_chunks = actual_retriever.retrieve(
+                        query_text=q,
+                        existing_chunk_ids=global_seen_chunk_ids,
+                        top_k=self.config.retrieval.top_k,
+                    )
                     for nc in q_chunks:
                         all_new_chunks.append(nc)
                         global_seen_chunk_ids.add(nc.id)
-            
+
                 if all_new_chunks:
                     for i, nc in enumerate(all_new_chunks):
-                        self.logger.log_message(f"  + Retrieved Chunk {i+1}: ID={nc.id}")
+                        self.logger.log_message(f"  + Retrieved Chunk {i + 1}: ID={nc.id}")
                 else:
                     self.logger.log_message("  + No new chunks found by retriever. Stopping early.")
                     final_decision = "NO_NEW_KNOWLEDGE_STOP"
                     break
-            
+
                 context.extend(all_new_chunks)
-                self.logger.log_message(f"--- [RETRIEVAL PHASE END] ---\nTotal Context Chunks now: {len(context)}")
+                self.logger.log_message(
+                    f"--- [RETRIEVAL PHASE END] ---\nTotal Context Chunks now: {len(context)}"
+                )
                 continue
 
             # ── Convergence check ────────────────────────────────────────────
@@ -450,15 +455,18 @@ class IterativeRAGPipeline:
             self.logger.log_message("No highly probable claims found to guide LLM.")
 
         system_msg = (
-            "You are an expert Question Answering system. Answer the user's question based STRICTLY "
+            "You are an expert Question Answering system. Answer the user's question "
+            "based STRICTLY "
             "on the provided context.\n\n"
             "CRITICAL RULES:\n"
             "1. Output ONLY the exact final answer string, number, or span.\n"
-            "2. DO NOT include any conversational filler (e.g., 'The answer is...', 'Based on the table...').\n"
+            "2. DO NOT include conversational filler such as 'The answer is...' or "
+            "'Based on the table...'.\n"
             "3. If the answer is a list of items, separate them with a comma.\n"
-            "4. For numerical answers, output exactly the number and its scale (e.g., '15.2 million', '10%')."
+            "4. For numerical answers, output exactly the number and its scale "
+            "(e.g., '15.2 million', '10%')."
         )
-        
+
         messages = self.handler.build_prompt_messages(
             query=query + guidance,
             chunks=context,
@@ -466,7 +474,7 @@ class IterativeRAGPipeline:
         )
 
         self.logger.log_message(f"Sending prompt to LLM (Context size: {len(context)} chunks)")
-        
+
         results = self.sampler.llm.generate(
             messages=messages,
             n=1,

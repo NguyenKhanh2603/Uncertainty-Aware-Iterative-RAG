@@ -27,7 +27,6 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import time
 from pathlib import Path
 from typing import Optional
 
@@ -37,11 +36,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tqdm import tqdm
 
-from uncertainty_rag.config import Config
+from eval.analysis.calibration import UncertaintyCalibrator
+from eval.datasets.loader import DatasetLoader
+from eval.datasets.multimodalqa_loader import MultiModalQALoader
+from eval.datasets.tatqa_loader import TATQALoader
+from eval.datasets.text_datasets import TEXT_DATASETS
+from eval.datasets.webqa_loader import WebQALoader
+from eval.metrics import MetricSuite
+from uncertainty_rag.config import Config, PruningStrategy
 from uncertainty_rag.core.claim_extractor import ClaimExtractor
+from uncertainty_rag.core.pruner import PrunerFactory
 from uncertainty_rag.core.retriever import ActiveRetriever, DenseRetriever
 from uncertainty_rag.core.router import Router
-from uncertainty_rag.core.pruner import PrunerFactory
 from uncertainty_rag.core.sampler import Sampler
 from uncertainty_rag.core.semantic_cluster import SemanticClusterer
 from uncertainty_rag.core.uncertainty import UncertaintyEstimator
@@ -49,17 +55,8 @@ from uncertainty_rag.models.llm_client import OpenAIClient
 from uncertainty_rag.models.nli_model import NLIModel
 from uncertainty_rag.models.reranker import RerankerModel
 from uncertainty_rag.pipeline import IterativeRAGPipeline, PipelineResult
-from uncertainty_rag.config import PruningStrategy
 from uncertainty_rag.utils.cost_tracker import CostTracker
 from uncertainty_rag.utils.logging import PipelineLogger
-
-from eval.datasets.loader import DatasetLoader, EvalExample
-from eval.datasets.text_datasets import TEXT_DATASETS
-from eval.datasets.tatqa_loader import TATQALoader
-from eval.datasets.webqa_loader import WebQALoader
-from eval.metrics import MetricSuite
-from eval.analysis.calibration import UncertaintyCalibrator, CalibrationResult
-
 
 # ── Dataset Registry ────────────────────────────────────────────────────────────
 
@@ -67,6 +64,7 @@ DATASET_REGISTRY: dict[str, type[DatasetLoader]] = {
     **TEXT_DATASETS,
     "tatqa": TATQALoader,
     "webqa": WebQALoader,
+    "multimodalqa": MultiModalQALoader,
 }
 
 
@@ -75,21 +73,24 @@ def build_pipeline(config: Config) -> IterativeRAGPipeline:
     cost_tracker = CostTracker()
 
     # LLM client
-    if config.pruning.strategy in [PruningStrategy.ATTENTION_MASKING, PruningStrategy.ATTENTION_SALIENCY]:
+    if config.pruning.strategy in [
+        PruningStrategy.ATTENTION_MASKING,
+        PruningStrategy.ATTENTION_SALIENCY,
+    ]:
         from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
+
         llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
-        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+        claim_llm = (
+            llm
+            if config.model.claim_model == config.effective_llm_name
+            else HuggingFaceLocalClient(model_name=config.model.claim_model)
+        )
     else:
         llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
         claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
 
     # NLI model
     nli = NLIModel(model_name=config.model.nli_name)
-
-    # Modality handler
-    dataset_name = ""  # Will be set per-dataset
-    loader_cls = DATASET_REGISTRY.get(dataset_name)
-    handler = None  # Will be set per-dataset
 
     # Core modules
     sampler = Sampler(llm_client=llm, config=config.sampling)
@@ -105,7 +106,18 @@ def build_pipeline(config: Config) -> IterativeRAGPipeline:
     )
 
     # These will be set per-dataset in the eval loop
-    return llm, claim_llm, nli, sampler, claim_extractor, clusterer, uncertainty, router, dense_retriever, cost_tracker
+    return (
+        llm,
+        claim_llm,
+        nli,
+        sampler,
+        claim_extractor,
+        clusterer,
+        uncertainty,
+        router,
+        dense_retriever,
+        cost_tracker,
+    )
 
 
 def run_evaluation(
@@ -127,19 +139,27 @@ def run_evaluation(
     metrics_list = loader.get_metrics()
     metric_suite = MetricSuite(metrics=metrics_list)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Dataset: {dataset_name} | Split: {split} | Examples: {len(examples)}")
     print(f"Modality: {config.modality.type} | Thresholds: {config.thresholds.mode}")
     print(f"Adaptive M: {config.sampling.adaptive_M_enabled} | M: {config.sampling.M}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     # Build pipeline components
     cost_tracker = CostTracker()
-    if config.pruning.strategy in [PruningStrategy.ATTENTION_MASKING, PruningStrategy.ATTENTION_SALIENCY]:
+    if config.pruning.strategy in [
+        PruningStrategy.ATTENTION_MASKING,
+        PruningStrategy.ATTENTION_SALIENCY,
+    ]:
         from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
+
         print(f"Loading HuggingFaceLocalClient for strategy: {config.pruning.strategy.value}...")
         llm = HuggingFaceLocalClient(model_name=config.effective_llm_name)
-        claim_llm = HuggingFaceLocalClient(model_name=config.model.claim_model)
+        claim_llm = (
+            llm
+            if config.model.claim_model == config.effective_llm_name
+            else HuggingFaceLocalClient(model_name=config.model.claim_model)
+        )
     else:
         llm = OpenAIClient(model=config.effective_llm_name, cost_tracker=cost_tracker)
         claim_llm = OpenAIClient(model=config.model.claim_model, cost_tracker=cost_tracker)
@@ -169,9 +189,12 @@ def run_evaluation(
         config=config.pruning,
         nli_model=nli,
         reranker_model=reranker,
+        llm_client=llm,
     )
 
-    logger = PipelineLogger(output_dir=f"{output_dir}/logs/{dataset_name}", level=config.logging.level)
+    logger = PipelineLogger(
+        output_dir=f"{output_dir}/logs/{dataset_name}", level=config.logging.level
+    )
 
     pipeline = IterativeRAGPipeline(
         config=config,
@@ -183,6 +206,7 @@ def run_evaluation(
         pruner=pruner,
         retriever=active_retriever,
         modality_handler=handler,
+        nli_model=nli,
         cost_tracker=cost_tracker,
         logger=logger,
     )
@@ -236,7 +260,9 @@ def run_evaluation(
         "pipeline_stats": {
             "avg_iterations": round(avg_iterations, 2),
             "avg_se_total": round(avg_se_total, 4),
-            "confident_stops_pct": round(stop_decisions / len(all_results) * 100, 1) if all_results else 0,
+            "confident_stops_pct": round(stop_decisions / len(all_results) * 100, 1)
+            if all_results
+            else 0,
         },
     }
 
@@ -281,14 +307,16 @@ def run_evaluation(
             # Format: { "uid": ["answer_string", "scale"] }
             # We assume scale is "" (baseline eval script handles parsing)
             tatqa_predictions[example.query_id] = [result.answer, ""]
-        
-        tatqa_pred_path = Path(output_dir) / f"{dataset_name}_{config.thresholds.mode}_predictions.json"
+
+        tatqa_pred_path = (
+            Path(output_dir) / f"{dataset_name}_{config.thresholds.mode}_predictions.json"
+        )
         with open(tatqa_pred_path, "w", encoding="utf-8") as f:
             json.dump(tatqa_predictions, f, indent=2, ensure_ascii=False)
         print(f"  TAT-QA Predictions saved to: {tatqa_pred_path}")
 
     # Print summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Results: {dataset_name}")
     for k, v in batch_metrics.items():
         print(f"  {k}: {v:.4f}")
@@ -297,7 +325,7 @@ def run_evaluation(
     if "calibration" in results_summary:
         print(f"  ECE: {results_summary['calibration']['ece']:.4f}")
     print(f"  Saved to: {output_path}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     return results_summary
 
@@ -310,7 +338,18 @@ def main():
     parser.add_argument("--config", type=str, default="configs/default.yaml")
     parser.add_argument("--config_override", type=str, default=None, help="Additional config YAML")
     parser.add_argument("--threshold_mode", type=str, choices=["fixed", "adaptive"], default=None)
-    parser.add_argument("--pruning_strategy", type=str, choices=["two_phase", "gray_zone", "prefix_caching", "attention_masking", "attention_saliency"], default=None)
+    parser.add_argument(
+        "--pruning_strategy",
+        type=str,
+        choices=[
+            "two_phase",
+            "gray_zone",
+            "prefix_caching",
+            "attention_masking",
+            "attention_saliency",
+        ],
+        default=None,
+    )
     parser.add_argument("--adaptive_m", action="store_true", default=None)
     parser.add_argument("--no-adaptive_m", dest="adaptive_m", action="store_false")
     parser.add_argument("--calibrate", action="store_true", help="Run U3 calibration analysis")
