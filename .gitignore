@@ -1,7 +1,9 @@
 related_repos
 related_papers_md
 data
-
+ĐATH.nd
+slide
+proposal
 # Local Python environments and caches (at any depth).
 **/.venv/
 **/.ruff_cache/
@@ -10,3 +12,4 @@ data
 *.egg-info/
 
 # Locally built archives.
+**/dist/
