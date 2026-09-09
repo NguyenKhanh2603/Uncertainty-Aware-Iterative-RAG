@@ -141,6 +141,22 @@ def test_reference_bank_rejects_incomplete_top_l_query():
         )
 
 
+def test_reference_bank_accepts_ragged_official_candidate_pool():
+    rows = [candidate(rank=1), candidate(rank=2)]
+    for row in rows:
+        row["retrieved_l"] = 2
+
+    artifact = build_reference_bank_artifact(
+        rows,
+        rank_bins=parse_rank_bins("1-3"),
+        condition_fields=("dataset", "modality"),
+        min_bank_size=1,
+    )
+
+    assert artifact["top_l"] == 3
+    assert artifact["summary"]["input_rows"] == 2
+
+
 def test_modality_conditioning_pools_ranks_without_a_rank_bin():
     rows = [
         candidate(qid="q1", rank=1, score=0.7),

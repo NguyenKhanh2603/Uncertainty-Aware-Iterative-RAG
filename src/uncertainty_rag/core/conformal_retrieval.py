@@ -65,6 +65,7 @@ class RetrievalCandidate:
     preprocess_hash: str
     query_type_rule_id: str
     source_doc_id: str | None = None
+    retrieved_l: int | None = None
 
     @classmethod
     def from_mapping(cls, row: Mapping[str, Any]) -> RetrievalCandidate:
@@ -110,6 +111,11 @@ class RetrievalCandidate:
             corpus_revision=str(row["corpus_revision"]).strip(),
             preprocess_hash=str(row["preprocess_hash"]).strip(),
             query_type_rule_id=str(row["query_type_rule_id"]).strip(),
+            retrieved_l=(
+                int(row["retrieved_l"])
+                if row.get("retrieved_l") is not None
+                else None
+            ),
         )
         candidate.validate()
         return candidate
@@ -136,14 +142,24 @@ class RetrievalCandidate:
             raise ConformalDataError(f"Invalid modality: {self.modality}")
         if self.top_l < 1:
             raise ConformalDataError("top_l must be positive")
-        if not 1 <= self.rank <= self.top_l:
+        if not 1 <= self.effective_retrieved_l <= self.top_l:
             raise ConformalDataError(
-                f"rank {self.rank} is outside the declared top_l={self.top_l}"
+                f"retrieved_l={self.effective_retrieved_l} must be within 1..top_l={self.top_l}"
+            )
+        if not 1 <= self.rank <= self.effective_retrieved_l:
+            raise ConformalDataError(
+                f"rank {self.rank} is outside the retrieved_l={self.effective_retrieved_l}"
             )
         if not isfinite(self.cosine_score) or not -1.0 <= self.cosine_score <= 1.0:
             raise ConformalDataError(
                 f"cosine_score must be in [-1, 1], got {self.cosine_score}"
             )
+
+    @property
+    def effective_retrieved_l(self) -> int:
+        """Actual rows returned for this query; legacy fixed-L logs omit it."""
+
+        return self.retrieved_l if self.retrieved_l is not None else self.top_l
 
     @property
     def pipeline_fingerprint(self) -> tuple[str, str, str, str, int]:
@@ -257,7 +273,7 @@ def build_reference_bank_artifact(
     seen_rank: set[tuple[str, str, int]] = set()
     seen_chunk: set[tuple[str, str, str]] = set()
     ranks_by_qid: dict[tuple[str, str], set[int]] = defaultdict(set)
-    query_signatures: dict[tuple[str, str], set[tuple[str, str, int]]] = defaultdict(set)
+    query_signatures: dict[tuple[str, str], set[tuple[str, str, int, int]]] = defaultdict(set)
     fingerprints: dict[str, set[tuple[str, str, str, str, int]]] = defaultdict(set)
     query_counts: dict[str, set[str]] = defaultdict(set)
     label_counts: dict[str, int] = defaultdict(int)
@@ -287,7 +303,12 @@ def build_reference_bank_artifact(
         seen_chunk.add(chunk_key)
         ranks_by_qid[qid_key].add(candidate.rank)
         query_signatures[qid_key].add(
-            (candidate.query_text, candidate.query_type, candidate.top_l)
+            (
+                candidate.query_text,
+                candidate.query_type,
+                candidate.top_l,
+                candidate.effective_retrieved_l,
+            )
         )
         fingerprints[candidate.dataset].add(candidate.pipeline_fingerprint)
         query_counts[candidate.split_role].add(f"{candidate.dataset}\0{candidate.qid}")
@@ -306,13 +327,14 @@ def build_reference_bank_artifact(
         )
 
     for qid_key, ranks in sorted(ranks_by_qid.items()):
-        query_top_l = next(iter(query_signatures[qid_key]))[2]
-        expected_ranks = set(range(1, query_top_l + 1))
+        query_retrieved_l = next(iter(query_signatures[qid_key]))[3]
+        expected_ranks = set(range(1, query_retrieved_l + 1))
         if ranks != expected_ranks:
             dataset, qid = qid_key
             missing = sorted(expected_ranks - ranks)
             raise ConformalDataError(
-                f"Incomplete top-L retrieval for {dataset}/{qid}; missing ranks={missing}"
+                f"Incomplete top-L retrieval for {dataset}/{qid}; "
+                f"retrieved_l={query_retrieved_l}, missing ranks={missing}"
             )
 
     top_l_values = {candidate.top_l for candidate in candidates}
