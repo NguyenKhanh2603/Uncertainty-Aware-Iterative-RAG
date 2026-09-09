@@ -104,9 +104,29 @@ def main() -> None:
         min_bank_size=args.min_bank_size,
         allow_small_banks=args.allow_small_banks,
     )
+    bank_size_gate_passed = bool(artifact["is_paper_ready"])
+    input_manifests = []
+    for path in args.input:
+        manifest_path = Path(f"{path}.manifest.json")
+        if manifest_path.is_file():
+            input_manifests.append(json.loads(manifest_path.read_text(encoding="utf-8")))
+    data_grade_gate_passed = bool(input_manifests) and all(
+        manifest.get("data_grade") == "paper" for manifest in input_manifests
+    )
+    artifact["bank_size_gate_passed"] = bank_size_gate_passed
+    artifact["data_grade_gate_passed"] = data_grade_gate_passed
+    artifact["is_paper_ready"] = bank_size_gate_passed and data_grade_gate_passed
     artifact["source"] = {
-        "files": [
-            {"path": path.name, "sha256": sha256(path)} for path in args.input
+        "files": [{"path": path.name, "sha256": sha256(path)} for path in args.input],
+        "manifests": [
+            {
+                "dataset": manifest.get("dataset"),
+                "data_grade": manifest.get("data_grade"),
+                "candidate_scope": manifest.get("candidate_scope"),
+                "corpus_revision": manifest.get("corpus_revision"),
+                "preprocess_hash": manifest.get("preprocess_hash"),
+            }
+            for manifest in input_manifests
         ],
     }
     write_artifact(args.output, artifact)

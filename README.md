@@ -4,13 +4,18 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/main/conformal_backfill_2_3_gpu_colab.ipynb)
 
-The notebook downloads the public 800-question bundle, embeds the four datasets with
-the frozen Jina CLIP v2 retriever, reserves candidates per available modality before
-global cosine fill, writes top-$L$ retrieval logs, builds modality-conditioned Section
-2.3 false-match reference banks, and downloads the artifacts as a ZIP.
-This is an embedding workload and does not use vLLM. The included 800Q data are for
-smoke/development validation; underpowered banks are explicitly marked as not
-paper-ready.
+The notebook downloads the publicly labelled official train+development data for
+MMQA, WebQA, HotpotQA, and TAT-QA. It preserves each benchmark's real candidate pool
+and gold provenance (no synthetic WebQA negatives), embeds the unique chunks with a
+frozen Jina CLIP v2 retriever, writes top-$L$ logs, builds modality-conditioned
+Section 2.3 false-match banks, and downloads the artifacts as a ZIP.
+
+Every long phase has elapsed-time/ETA progress and the result manifests record the
+actual GPU, VRAM, stage timings, and throughput. An L24 24 GB is sufficient for this
+embedding workload; full WebQA additionally needs a one-time ~39 GB image download
+and enough local disk. Set the notebook's per-dataset limit to 1,000 for a server
+timing trial or `0` for all labelled questions. vLLM is not used because this step
+does not generate answers.
 
 A modality-agnostic framework that decomposes semantic uncertainty into **aleatoric** (data noise) and **epistemic** (knowledge gap) components to drive differentiated corrective actions — **pruning** noisy context and **retrieving** missing evidence.
 

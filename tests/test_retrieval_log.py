@@ -5,6 +5,7 @@ import pytest
 import torch
 
 from scripts.generate_conformal_retrieval_log import (
+    candidate_pool_top_l,
     exact_top_l,
     modality_aware_top_l,
     resolve_dtype,
@@ -54,9 +55,7 @@ def test_bundle_loader_deduplicates_corpus_and_preserves_support(tmp_path):
         {
             "qid": "q1",
             "question": "Question one?",
-            "chunks": [
-                {"id": "shared", "modality": "text", "content": "same", "is_support": True}
-            ],
+            "chunks": [{"id": "shared", "modality": "text", "content": "same", "is_support": True}],
             "metadata": {"source_split": "train"},
         },
         {
@@ -80,6 +79,42 @@ def test_bundle_loader_deduplicates_corpus_and_preserves_support(tmp_path):
     assert len(corpus) == 1
     assert queries[0].support_ids == frozenset({"shared"})
     assert queries[1].support_ids == frozenset()
+    assert queries[0].candidate_ids == ("shared",)
+
+
+def test_normalized_official_bundle_uses_per_query_candidates(tmp_path):
+    dataset_dir = tmp_path / "webqa"
+    dataset_dir.mkdir()
+    (dataset_dir / "corpus.jsonl").write_text(
+        "\n".join(
+            json.dumps(row)
+            for row in [
+                {"id": "gold", "modality": "image", "content": "https://example/gold.jpg"},
+                {"id": "negative", "modality": "text", "content": "distractor"},
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (dataset_dir / "questions.jsonl").write_text(
+        json.dumps(
+            {
+                "qid": "q1",
+                "question": "What is shown?",
+                "candidate_ids": ["negative", "gold"],
+                "support_ids": ["gold"],
+                "metadata": {"source_split": "dev"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    corpus, queries = load_bundle_records(
+        dataset_dir / "questions.jsonl", bundle_root=tmp_path, dataset="webqa"
+    )
+
+    assert [record.chunk_id for record in corpus] == ["gold", "negative"]
+    assert queries[0].candidate_ids == ("negative", "gold")
+    assert queries[0].support_ids == frozenset({"gold"})
 
 
 def test_retrieval_row_uses_explicit_closed_world_label():
@@ -177,3 +212,24 @@ def test_modality_aware_top_l_rejects_an_impossible_quota():
             query_batch_size=1,
             corpus_block_size=2,
         )
+
+
+def test_candidate_pool_top_l_is_ragged_and_never_crosses_query_pool():
+    queries = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+    corpus = np.asarray([[1.0, 0.0], [0.8, 0.6], [0.0, 1.0], [0.6, 0.8]], dtype=np.float32)
+
+    scores, indices, stats = candidate_pool_top_l(
+        queries,
+        corpus,
+        [[0, 1], [2, 3]],
+        ["text", "text", "text", "text"],
+        top_l=3,
+        retrieval_mode="global",
+        min_per_modality=1,
+        device="cpu",
+        query_batch_size=2,
+    )
+
+    assert [values.tolist() for values in indices] == [[0, 1], [2, 3]]
+    assert [len(values) for values in scores] == [2, 2]
+    assert stats["candidate_pairs"] == 4

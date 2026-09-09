@@ -23,6 +23,7 @@ class CorpusRecord:
     modality: str
     content: str
     source_doc_id: str
+    caption: str = ""
 
 
 @dataclass(frozen=True)
@@ -32,6 +33,7 @@ class QueryRecord:
     question: str
     support_ids: frozenset[str]
     source_split: str
+    candidate_ids: tuple[str, ...] = ()
 
 
 def stable_json_hash(value: Any) -> str:
@@ -134,12 +136,46 @@ def load_bundle_records(
     bundle_root: Path,
     dataset: str,
 ) -> tuple[list[CorpusRecord], list[QueryRecord]]:
-    """Build a deduplicated corpus and query list from a benchmark bundle."""
+    """Load either the legacy inline bundle or normalized official-data schema.
+
+    Paper-scale bundles keep chunks once in ``corpus.jsonl`` and store only
+    ``candidate_ids``/``support_ids`` on each question.  The older smoke bundle
+    embeds ``chunks`` inside every question and remains supported for replay.
+    """
 
     if not questions_path.is_file():
         raise FileNotFoundError(f"Missing questions file: {questions_path}")
 
     corpus_by_id: dict[str, CorpusRecord] = {}
+    corpus_path = questions_path.with_name("corpus.jsonl")
+    if corpus_path.is_file():
+        with corpus_path.open(encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                row = json.loads(line)
+                chunk_id = str(row.get("id", "")).strip()
+                modality = str(row.get("modality", "text")).strip().lower()
+                content = str(row.get("content", ""))
+                if not chunk_id or not content:
+                    raise ConformalDataError(
+                        f"Missing chunk id/content at {corpus_path}:{line_number}"
+                    )
+                if modality == "image" and not content.startswith(("http://", "https://")):
+                    content = str((bundle_root / content).resolve())
+                record = CorpusRecord(
+                    chunk_id,
+                    modality,
+                    content,
+                    str(row.get("source_doc_id", chunk_id)),
+                    str(row.get("caption", "")),
+                )
+                previous = corpus_by_id.setdefault(chunk_id, record)
+                if previous != record:
+                    raise ConformalDataError(
+                        f"Conflicting definitions for chunk_id={chunk_id} in {dataset}"
+                    )
+
     queries: list[QueryRecord] = []
     seen_qids: set[str] = set()
     with questions_path.open(encoding="utf-8") as handle:
@@ -150,14 +186,13 @@ def load_bundle_records(
             qid = str(row.get("qid", "")).strip()
             question = str(row.get("question", "")).strip()
             if not qid or not question:
-                raise ConformalDataError(
-                    f"Missing qid/question at {questions_path}:{line_number}"
-                )
+                raise ConformalDataError(f"Missing qid/question at {questions_path}:{line_number}")
             if qid in seen_qids:
                 raise ConformalDataError(f"Duplicate qid in bundle: {dataset}/{qid}")
             seen_qids.add(qid)
 
-            support_ids: set[str] = set()
+            support_ids = {str(value) for value in row.get("support_ids", [])}
+            candidate_ids = [str(value) for value in row.get("candidate_ids", [])]
             for chunk in row.get("chunks", []):
                 chunk_id = str(chunk.get("id", "")).strip()
                 modality = str(chunk.get("modality", "text")).strip().lower()
@@ -169,7 +204,13 @@ def load_bundle_records(
                 if modality == "image" and not content.startswith(("http://", "https://")):
                     content = str((bundle_root / content).resolve())
                 source_doc_id = str(chunk.get("source_doc_id", chunk_id))
-                record = CorpusRecord(chunk_id, modality, content, source_doc_id)
+                record = CorpusRecord(
+                    chunk_id,
+                    modality,
+                    content,
+                    source_doc_id,
+                    str(chunk.get("caption", "")),
+                )
                 previous = corpus_by_id.setdefault(chunk_id, record)
                 if previous != record:
                     raise ConformalDataError(
@@ -177,6 +218,23 @@ def load_bundle_records(
                     )
                 if bool(chunk.get("is_support", False)):
                     support_ids.add(chunk_id)
+                candidate_ids.append(chunk_id)
+
+            candidate_ids = list(dict.fromkeys(candidate_ids))
+            missing_candidates = [
+                chunk_id for chunk_id in candidate_ids if chunk_id not in corpus_by_id
+            ]
+            if missing_candidates:
+                raise ConformalDataError(
+                    f"Query {dataset}/{qid} references missing candidate {missing_candidates[0]}"
+                )
+            if not candidate_ids:
+                raise ConformalDataError(f"Query {dataset}/{qid} has no candidates")
+            if not support_ids.issubset(candidate_ids):
+                missing_support = sorted(support_ids.difference(candidate_ids))[0]
+                raise ConformalDataError(
+                    f"Query {dataset}/{qid} support {missing_support} is not a candidate"
+                )
 
             metadata = row.get("metadata") or {}
             queries.append(
@@ -186,6 +244,7 @@ def load_bundle_records(
                     question=question,
                     support_ids=frozenset(support_ids),
                     source_split=str(metadata.get("source_split", "unknown")),
+                    candidate_ids=tuple(candidate_ids),
                 )
             )
 
@@ -193,7 +252,9 @@ def load_bundle_records(
     missing_images = [
         record.content
         for record in corpus
-        if record.modality == "image" and not Path(record.content).is_file()
+        if record.modality == "image"
+        and not record.content.startswith(("http://", "https://"))
+        and not Path(record.content).is_file()
     ]
     if missing_images:
         preview = ", ".join(missing_images[:3])
@@ -207,7 +268,9 @@ def corpus_revision(corpus: Iterable[CorpusRecord]) -> str:
     digest = hashlib.sha256()
     for record in corpus:
         digest.update(
-            f"{record.chunk_id}\0{record.source_doc_id}\0{record.modality}\0".encode("utf-8")
+            (
+                f"{record.chunk_id}\0{record.source_doc_id}\0{record.modality}\0{record.caption}\0"
+            ).encode("utf-8")
         )
         if record.modality == "image":
             digest.update(file_sha256(Path(record.content)).encode("ascii"))

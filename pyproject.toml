@@ -37,6 +37,9 @@ dependencies = [
 retrieval = [
     "einops>=0.8.0",
     "huggingface-hub>=0.24.0",
+    "pyarrow>=16.0.0",
+    "remotezip>=0.12.3",
+    "requests>=2.31.0",
     "timm>=1.0.0",
 ]
 dev = [
