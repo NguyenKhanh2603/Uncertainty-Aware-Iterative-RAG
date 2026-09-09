@@ -255,6 +255,90 @@ def exact_top_l(
     return np.concatenate(all_scores), np.concatenate(all_indices)
 
 
+def modality_aware_top_l(
+    query_vectors: np.ndarray,
+    corpus_vectors: np.ndarray,
+    corpus_modalities: Sequence[str],
+    *,
+    top_l: int,
+    min_per_modality: int,
+    device: str,
+    query_batch_size: int,
+    corpus_block_size: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return an exact top-L union with a frozen minimum from every modality.
+
+    The minimum candidates are selected independently inside each available
+    modality. Remaining positions are filled by the best unused candidates from
+    the global ranking. All selected candidates are finally ordered by their raw
+    cosine score. This preserves one shared embedding score while preventing text
+    from exhausting the reserve pool before image/table candidates are considered.
+    """
+
+    if min_per_modality < 1:
+        raise ValueError("min_per_modality must be positive")
+    if len(corpus_modalities) != len(corpus_vectors):
+        raise ValueError("corpus_modalities must align with corpus_vectors")
+
+    modality_indices = {
+        modality: np.flatnonzero(np.asarray(corpus_modalities) == modality)
+        for modality in sorted(set(corpus_modalities))
+    }
+    mandatory_count = sum(
+        min(min_per_modality, len(indices)) for indices in modality_indices.values()
+    )
+    if mandatory_count > top_l:
+        detail = ", ".join(
+            f"{modality}={min(min_per_modality, len(indices))}"
+            for modality, indices in modality_indices.items()
+        )
+        raise ValueError(
+            f"top_l={top_l} cannot hold the modality minima ({detail}; "
+            f"total={mandatory_count})"
+        )
+
+    global_scores, global_indices = exact_top_l(
+        query_vectors,
+        corpus_vectors,
+        top_l=top_l,
+        device=device,
+        query_batch_size=query_batch_size,
+        corpus_block_size=corpus_block_size,
+    )
+    per_modality: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    for modality, indices in modality_indices.items():
+        quota = min(min_per_modality, len(indices))
+        scores, local_indices = exact_top_l(
+            query_vectors,
+            corpus_vectors[indices],
+            top_l=quota,
+            device=device,
+            query_batch_size=query_batch_size,
+            corpus_block_size=corpus_block_size,
+        )
+        per_modality[modality] = (scores, indices[local_indices])
+
+    selected_scores = np.empty_like(global_scores)
+    selected_indices = np.empty_like(global_indices)
+    for query_index in range(len(query_vectors)):
+        selected: dict[int, float] = {}
+        for scores, indices in per_modality.values():
+            for score, index in zip(scores[query_index], indices[query_index]):
+                selected[int(index)] = float(score)
+        for score, index in zip(global_scores[query_index], global_indices[query_index]):
+            selected.setdefault(int(index), float(score))
+            if len(selected) == top_l:
+                break
+        if len(selected) != top_l:
+            raise RuntimeError(
+                f"Could only construct {len(selected)} distinct candidates for top_l={top_l}"
+            )
+        ordered = sorted(selected.items(), key=lambda item: (-item[1], item[0]))
+        selected_indices[query_index] = [item[0] for item in ordered]
+        selected_scores[query_index] = [item[1] for item in ordered]
+    return selected_scores, selected_indices
+
+
 def resolve_bundle(args: argparse.Namespace) -> Path:
     if args.bundle_dir is not None:
         return args.bundle_dir.resolve()
@@ -298,6 +382,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--truncate-dim", type=int, default=512)
     parser.add_argument("--top-l", type=int, default=20)
+    parser.add_argument(
+        "--retrieval-mode",
+        choices=("global", "modality_aware"),
+        default="global",
+    )
+    parser.add_argument("--min-per-modality", type=int, default=10)
     parser.add_argument("--text-batch-size", type=int, default=32)
     parser.add_argument("--image-batch-size", type=int, default=8)
     parser.add_argument("--query-batch-size", type=int, default=64)
@@ -315,8 +405,8 @@ def main() -> None:
     args = build_parser().parse_args()
     if args.device.startswith("cuda") and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but torch.cuda.is_available() is false")
-    if args.top_l < 1 or args.truncate_dim < 1:
-        raise ValueError("top_l and truncate_dim must be positive")
+    if args.top_l < 1 or args.truncate_dim < 1 or args.min_per_modality < 1:
+        raise ValueError("top_l, truncate_dim, and min_per_modality must be positive")
 
     bundle_root = resolve_bundle(args)
     questions_path = bundle_root / args.dataset / "questions.jsonl"
@@ -331,11 +421,24 @@ def main() -> None:
     retriever_id = (
         f"{args.model}@{args.model_revision}#dim={args.truncate_dim}#dtype={dtype_id}"
     )
-    preprocess_hash = f"sha256:{stable_json_hash({'version': PREPROCESS_VERSION})}"
+    available_modalities = sorted({chunk.modality for chunk in corpus})
+    retrieval_policy = {
+        "mode": args.retrieval_mode,
+        "top_l": args.top_l,
+        "min_per_modality": (
+            args.min_per_modality if args.retrieval_mode == "modality_aware" else None
+        ),
+        "available_modalities": available_modalities,
+    }
+    preprocess_identity = {
+        "version": PREPROCESS_VERSION,
+        "retrieval_policy": retrieval_policy,
+    }
+    preprocess_hash = f"sha256:{stable_json_hash(preprocess_identity)}"
     query_type_rule_id = QUERY_TYPE_RULE_IDS[args.query_type_mode]
     print(
         f"dataset={args.dataset} queries={len(queries)} corpus={len(corpus)} "
-        f"device={args.device} model={retriever_id}"
+        f"device={args.device} model={retriever_id} policy={retrieval_policy}"
     )
 
     cache_identity = stable_json_hash(
@@ -393,14 +496,26 @@ def main() -> None:
             query_vectors,
         )
 
-    scores, indices = exact_top_l(
-        np.asarray(query_vectors),
-        np.asarray(corpus_vectors),
-        top_l=args.top_l,
-        device=args.device,
-        query_batch_size=args.query_batch_size,
-        corpus_block_size=args.corpus_block_size,
-    )
+    retrieval_kwargs = {
+        "top_l": args.top_l,
+        "device": args.device,
+        "query_batch_size": args.query_batch_size,
+        "corpus_block_size": args.corpus_block_size,
+    }
+    if args.retrieval_mode == "modality_aware":
+        scores, indices = modality_aware_top_l(
+            np.asarray(query_vectors),
+            np.asarray(corpus_vectors),
+            [chunk.modality for chunk in corpus],
+            min_per_modality=args.min_per_modality,
+            **retrieval_kwargs,
+        )
+    else:
+        scores, indices = exact_top_l(
+            np.asarray(query_vectors),
+            np.asarray(corpus_vectors),
+            **retrieval_kwargs,
+        )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary, handle_context = output_context(args.output)
@@ -438,6 +553,9 @@ def main() -> None:
                     non_support_label=args.non_support_label,
                 )
                 support_hits += int(row["support_label"] == "support")
+                row = dict(row)
+                row["retrieval_mode"] = args.retrieval_mode
+                row["min_per_modality"] = retrieval_policy["min_per_modality"]
                 handle.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
     temporary.replace(args.output)
 
@@ -466,6 +584,7 @@ def main() -> None:
         "preprocess_hash": preprocess_hash,
         "query_type_rule_id": query_type_rule_id,
         "non_support_label": args.non_support_label,
+        "retrieval_policy": retrieval_policy,
         "device": args.device,
         "model_dtype": str(resolved_dtype),
         "output": args.output.name,

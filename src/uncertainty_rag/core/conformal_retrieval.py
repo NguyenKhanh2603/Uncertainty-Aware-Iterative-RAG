@@ -17,6 +17,8 @@ from typing import Any
 VALID_SPLIT_ROLES = frozenset({"development", "calibration", "test"})
 VALID_SUPPORT_LABELS = frozenset({"support", "false", "unknown"})
 VALID_MODALITIES = frozenset({"text", "image", "table", "audio", "video"})
+VALID_CONDITION_FIELDS = frozenset({"dataset", "query_type", "modality", "rank_bin"})
+DEFAULT_CONDITION_FIELDS = ("dataset", "query_type", "modality", "rank_bin")
 SCHEMA_VERSION = 1
 
 
@@ -177,6 +179,24 @@ def parse_rank_bins(specification: str) -> tuple[RankBin, ...]:
     return tuple(ordered)
 
 
+def parse_condition_fields(specification: str) -> tuple[str, ...]:
+    """Parse and validate the fields used to condition a reference bank."""
+
+    fields = tuple(part.strip() for part in specification.split(",") if part.strip())
+    if not fields:
+        raise ConformalDataError("At least one conditioning field is required")
+    if len(set(fields)) != len(fields):
+        raise ConformalDataError("Conditioning fields cannot be repeated")
+    unsupported = sorted(set(fields) - VALID_CONDITION_FIELDS)
+    if unsupported:
+        raise ConformalDataError(
+            f"Unsupported conditioning fields: {', '.join(unsupported)}"
+        )
+    if "dataset" not in fields:
+        raise ConformalDataError("dataset must remain a conditioning field")
+    return fields
+
+
 def validate_rank_bin_coverage(rank_bins: Sequence[RankBin], top_l: int) -> None:
     """Require rank bins to cover every rank from 1 through top_l exactly once."""
 
@@ -214,6 +234,7 @@ def build_reference_bank_artifact(
     rows: Iterable[Mapping[str, Any]],
     *,
     rank_bins: Sequence[RankBin],
+    condition_fields: Sequence[str] = DEFAULT_CONDITION_FIELDS,
     min_bank_size: int = 1000,
     allow_small_banks: bool = False,
 ) -> dict[str, Any]:
@@ -226,6 +247,7 @@ def build_reference_bank_artifact(
 
     if min_bank_size < 1:
         raise ConformalDataError("min_bank_size must be positive")
+    condition_fields = parse_condition_fields(",".join(condition_fields))
 
     candidates = [RetrievalCandidate.from_mapping(row) for row in rows]
     if not candidates:
@@ -297,14 +319,21 @@ def build_reference_bank_artifact(
     if len(top_l_values) != 1:
         raise ConformalDataError(f"All datasets must use the same top_l, got {top_l_values}")
     top_l = next(iter(top_l_values))
-    validate_rank_bin_coverage(rank_bins, top_l)
+    if "rank_bin" in condition_fields:
+        validate_rank_bin_coverage(rank_bins, top_l)
 
-    grouped: dict[tuple[str, str, str, str], list[RetrievalCandidate]] = defaultdict(list)
+    grouped: dict[tuple[str, ...], list[RetrievalCandidate]] = defaultdict(list)
     for candidate in candidates:
         if candidate.split_role != "calibration" or candidate.support_label != "false":
             continue
-        rank_bin = rank_bin_for(candidate.rank, rank_bins)
-        key = (candidate.dataset, candidate.query_type, candidate.modality, rank_bin.label)
+        values = {
+            "dataset": candidate.dataset,
+            "query_type": candidate.query_type,
+            "modality": candidate.modality,
+        }
+        if "rank_bin" in condition_fields:
+            values["rank_bin"] = rank_bin_for(candidate.rank, rank_bins).label
+        key = tuple(values[field] for field in condition_fields)
         grouped[key].append(candidate)
 
     if not grouped:
@@ -315,13 +344,9 @@ def build_reference_bank_artifact(
     for key in sorted(grouped):
         members = grouped[key]
         scores = sorted(candidate.cosine_score for candidate in members)
+        condition = dict(zip(condition_fields, key))
         bank = {
-            "condition": {
-                "dataset": key[0],
-                "query_type": key[1],
-                "modality": key[2],
-                "rank_bin": key[3],
-            },
+            "condition": condition,
             "n_false_scores": len(scores),
             "n_calibration_queries": len({candidate.qid for candidate in members}),
             "scores": scores,
@@ -338,18 +363,16 @@ def build_reference_bank_artifact(
         }
         banks.append(bank)
         if len(scores) < min_bank_size:
-            underpowered.append(
-                {
-                    **bank["condition"],
-                    "n_false_scores": len(scores),
-                    "required": min_bank_size,
-                }
-            )
+            underpowered.append({
+                **condition,
+                "n_false_scores": len(scores),
+                "required": min_bank_size,
+            })
 
     if underpowered and not allow_small_banks:
         description = "; ".join(
-            f"{item['dataset']}/{item['query_type']}/{item['modality']}/"
-            f"{item['rank_bin']}={item['n_false_scores']}"
+            "/".join(str(item[field]) for field in condition_fields)
+            + f"={item['n_false_scores']}"
             for item in underpowered
         )
         raise ConformalDataError(
@@ -359,7 +382,12 @@ def build_reference_bank_artifact(
     return {
         "schema_version": SCHEMA_VERSION,
         "top_l": top_l,
-        "rank_bins": [rank_bin.label for rank_bin in rank_bins],
+        "conditioning": list(condition_fields),
+        "rank_bins": (
+            [rank_bin.label for rank_bin in rank_bins]
+            if "rank_bin" in condition_fields
+            else []
+        ),
         "min_bank_size": min_bank_size,
         "is_paper_ready": not underpowered,
         "summary": {

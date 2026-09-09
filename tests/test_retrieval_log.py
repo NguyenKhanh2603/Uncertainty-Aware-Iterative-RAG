@@ -4,7 +4,11 @@ import numpy as np
 import pytest
 import torch
 
-from scripts.generate_conformal_retrieval_log import exact_top_l, resolve_dtype
+from scripts.generate_conformal_retrieval_log import (
+    exact_top_l,
+    modality_aware_top_l,
+    resolve_dtype,
+)
 from uncertainty_rag.core.conformal_retrieval import ConformalDataError
 from uncertainty_rag.core.retrieval_log import (
     CorpusRecord,
@@ -139,3 +143,37 @@ def test_exact_top_l_merges_multiple_corpus_blocks():
 def test_explicit_embedding_dtype_is_reproducible_without_a_gpu():
     assert resolve_dtype("cpu", "float16") == torch.float16
     assert resolve_dtype("cpu", "auto") == torch.float32
+
+
+def test_modality_aware_top_l_reserves_candidates_before_global_fill():
+    queries = np.asarray([[1.0, 0.0]], dtype=np.float32)
+    scores = np.asarray([1.0, 0.99, 0.98, 0.97, 0.5, 0.4], dtype=np.float32)
+    corpus = np.stack((scores, np.sqrt(1.0 - scores**2)), axis=1)
+
+    selected_scores, selected_indices = modality_aware_top_l(
+        queries,
+        corpus,
+        ["text", "text", "text", "text", "image", "image"],
+        top_l=3,
+        min_per_modality=1,
+        device="cpu",
+        query_batch_size=1,
+        corpus_block_size=2,
+    )
+
+    assert selected_indices.tolist() == [[0, 1, 4]]
+    assert np.allclose(selected_scores, [[1.0, 0.99, 0.5]])
+
+
+def test_modality_aware_top_l_rejects_an_impossible_quota():
+    with pytest.raises(ValueError, match="cannot hold the modality minima"):
+        modality_aware_top_l(
+            np.asarray([[1.0, 0.0]], dtype=np.float32),
+            np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32),
+            ["text", "image"],
+            top_l=1,
+            min_per_modality=1,
+            device="cpu",
+            query_batch_size=1,
+            corpus_block_size=2,
+        )

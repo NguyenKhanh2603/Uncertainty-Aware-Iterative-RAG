@@ -139,3 +139,26 @@ def test_reference_bank_rejects_incomplete_top_l_query():
             rank_bins=parse_rank_bins("1-3"),
             min_bank_size=1,
         )
+
+
+def test_modality_conditioning_pools_ranks_without_a_rank_bin():
+    rows = [
+        candidate(qid="q1", rank=1, score=0.7),
+        candidate(qid="q1", rank=2, score=0.6),
+        candidate(qid="q1", rank=3, score=0.5),
+    ]
+
+    artifact = build_reference_bank_artifact(
+        rows,
+        rank_bins=parse_rank_bins("1-3"),
+        condition_fields=("dataset", "modality"),
+        min_bank_size=1,
+    )
+
+    assert artifact["conditioning"] == ["dataset", "modality"]
+    assert artifact["rank_bins"] == []
+    assert artifact["banks"][0]["condition"] == {
+        "dataset": "mmqa",
+        "modality": "image",
+    }
+    assert artifact["banks"][0]["n_false_scores"] == 3

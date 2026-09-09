@@ -12,6 +12,7 @@ from typing import Any, Iterable
 from uncertainty_rag.core.conformal_retrieval import (
     ConformalDataError,
     build_reference_bank_artifact,
+    parse_condition_fields,
     parse_rank_bins,
 )
 
@@ -76,6 +77,14 @@ def main() -> None:
         help="Output JSON artifact; use a .gz suffix for compression",
     )
     parser.add_argument("--rank-bins", default="1-3,4-10,11-20")
+    parser.add_argument(
+        "--conditioning",
+        default="dataset,query_type,modality,rank_bin",
+        help=(
+            "Comma-separated bank fields. Use dataset,modality for the first "
+            "modality-aware smoke experiment."
+        ),
+    )
     parser.add_argument("--min-bank-size", type=int, default=1000)
     parser.add_argument(
         "--allow-small-banks",
@@ -91,6 +100,7 @@ def main() -> None:
     artifact = build_reference_bank_artifact(
         (row for path in args.input for row in read_jsonl(path)),
         rank_bins=parse_rank_bins(args.rank_bins),
+        condition_fields=parse_condition_fields(args.conditioning),
         min_bank_size=args.min_bank_size,
         allow_small_banks=args.allow_small_banks,
     )

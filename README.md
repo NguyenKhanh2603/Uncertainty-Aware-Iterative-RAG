@@ -5,8 +5,9 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/main/conformal_backfill_2_3_gpu_colab.ipynb)
 
 The notebook downloads the public 800-question bundle, embeds the four datasets with
-the frozen Jina CLIP v2 retriever, writes exact cosine top-$L$ retrieval logs, builds
-the Section 2.3 false-match reference banks, and downloads the artifacts as a ZIP.
+the frozen Jina CLIP v2 retriever, reserves candidates per available modality before
+global cosine fill, writes top-$L$ retrieval logs, builds modality-conditioned Section
+2.3 false-match reference banks, and downloads the artifacts as a ZIP.
 This is an embedding workload and does not use vLLM. The included 800Q data are for
 smoke/development validation; underpowered banks are explicitly marked as not
 paper-ready.
