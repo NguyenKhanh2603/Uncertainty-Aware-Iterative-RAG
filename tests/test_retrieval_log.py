@@ -1,0 +1,141 @@
+import json
+
+import numpy as np
+import pytest
+import torch
+
+from scripts.generate_conformal_retrieval_log import exact_top_l, resolve_dtype
+from uncertainty_rag.core.conformal_retrieval import ConformalDataError
+from uncertainty_rag.core.retrieval_log import (
+    CorpusRecord,
+    QueryRecord,
+    frozen_query_type,
+    load_bundle_records,
+    retrieval_log_row,
+    stable_split_role,
+)
+
+
+def test_stable_split_assigns_a_whole_query_deterministically():
+    first = stable_split_role(
+        "mmqa",
+        "q1",
+        seed=42,
+        development_fraction=0.2,
+        calibration_fraction=0.6,
+    )
+    second = stable_split_role(
+        "mmqa",
+        "q1",
+        seed=42,
+        development_fraction=0.2,
+        calibration_fraction=0.6,
+    )
+
+    assert first == second
+    assert first in {"development", "calibration", "test"}
+
+
+def test_keyword_query_type_uses_question_only():
+    assert frozen_query_type("What color is the flower?", "keyword_v1") == "visual_spatial"
+    assert frozen_query_type("What percentage was reported?", "keyword_v1") == "number_table"
+    assert frozen_query_type("Who founded the company?", "keyword_v1") == "fact_lookup"
+    assert frozen_query_type("What color was shown after 1990?", "keyword_v1") == "mixed"
+
+
+def test_bundle_loader_deduplicates_corpus_and_preserves_support(tmp_path):
+    dataset_dir = tmp_path / "mmqa"
+    dataset_dir.mkdir()
+    rows = [
+        {
+            "qid": "q1",
+            "question": "Question one?",
+            "chunks": [
+                {"id": "shared", "modality": "text", "content": "same", "is_support": True}
+            ],
+            "metadata": {"source_split": "train"},
+        },
+        {
+            "qid": "q2",
+            "question": "Question two?",
+            "chunks": [
+                {"id": "shared", "modality": "text", "content": "same", "is_support": False}
+            ],
+            "metadata": {"source_split": "dev"},
+        },
+    ]
+    questions_path = dataset_dir / "questions.jsonl"
+    questions_path.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
+
+    corpus, queries = load_bundle_records(
+        questions_path,
+        bundle_root=tmp_path,
+        dataset="mmqa",
+    )
+
+    assert len(corpus) == 1
+    assert queries[0].support_ids == frozenset({"shared"})
+    assert queries[1].support_ids == frozenset()
+
+
+def test_retrieval_row_uses_explicit_closed_world_label():
+    query = QueryRecord("mmqa", "q1", "Question?", frozenset({"gold"}), "train")
+    negative = CorpusRecord("negative", "text", "content", "doc")
+
+    row = retrieval_log_row(
+        query=query,
+        chunk=negative,
+        split_role="calibration",
+        query_type="pooled",
+        rank=1,
+        cosine_score=1.0000001,
+        top_l=20,
+        retriever_id="model@rev",
+        corpus_revision_id="corpus@rev",
+        preprocess_hash="preprocess@rev",
+        query_type_rule_id="pooled-v1",
+        non_support_label="false",
+    )
+
+    assert row["support_label"] == "false"
+    assert row["cosine_score"] == 1.0
+
+
+def test_split_fractions_are_validated():
+    with pytest.raises(ConformalDataError, match="below 1"):
+        stable_split_role(
+            "mmqa",
+            "q1",
+            seed=42,
+            development_fraction=0.5,
+            calibration_fraction=0.5,
+        )
+
+
+def test_exact_top_l_merges_multiple_corpus_blocks():
+    queries = np.asarray([[1.0, 0.0]], dtype=np.float32)
+    corpus = np.asarray(
+        [
+            [1.0, 0.0],
+            [0.8, 0.6],
+            [0.0, 1.0],
+        ],
+        dtype=np.float32,
+    )
+
+    scores, indices = exact_top_l(
+        queries,
+        corpus,
+        top_l=2,
+        device="cpu",
+        query_batch_size=1,
+        corpus_block_size=1,
+    )
+
+    assert indices.tolist() == [[0, 1]]
+    assert np.allclose(scores, [[1.0, 0.8]])
+
+
+def test_explicit_embedding_dtype_is_reproducible_without_a_gpu():
+    assert resolve_dtype("cpu", "float16") == torch.float16
+    assert resolve_dtype("cpu", "auto") == torch.float32
