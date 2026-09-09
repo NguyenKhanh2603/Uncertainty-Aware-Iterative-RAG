@@ -26,6 +26,7 @@ from uncertainty_rag.core.retrieval_log import (
     corpus_revision,
     frozen_query_type,
     load_bundle_records,
+    official_holdout_split_role,
     retrieval_log_row,
     stable_json_hash,
     stable_split_role,
@@ -567,6 +568,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Auto keeps the embedding matrix on GPU only when VRAM headroom is safe",
     )
     parser.add_argument("--split-seed", type=int, default=8092026)
+    parser.add_argument(
+        "--split-policy",
+        choices=("hash_all", "official_holdout"),
+        default="hash_all",
+        help=(
+            "official_holdout uses train only for development/calibration and "
+            "reserves official dev/validation exclusively for test"
+        ),
+    )
     parser.add_argument("--development-fraction", type=float, default=0.2)
     parser.add_argument("--calibration-fraction", type=float, default=0.6)
     parser.add_argument("--query-type-mode", choices=tuple(QUERY_TYPE_RULE_IDS), default="pooled")
@@ -731,6 +741,7 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary, handle_context = output_context(args.output)
     role_counts = {"development": 0, "calibration": 0, "test": 0}
+    source_split_role_counts: dict[str, dict[str, int]] = {}
     support_hits = 0
     written_rows = 0
     stage_started = time.perf_counter()
@@ -738,14 +749,28 @@ def main() -> None:
         for query_index, query in enumerate(
             tqdm(queries, desc="Write retrieval log", unit="query")
         ):
-            split_role = stable_split_role(
-                query.dataset,
-                query.qid,
-                seed=args.split_seed,
-                development_fraction=args.development_fraction,
-                calibration_fraction=args.calibration_fraction,
-            )
+            if args.split_policy == "official_holdout":
+                split_role = official_holdout_split_role(
+                    query.dataset,
+                    query.qid,
+                    query.source_split,
+                    seed=args.split_seed,
+                    development_fraction=args.development_fraction,
+                )
+            else:
+                split_role = stable_split_role(
+                    query.dataset,
+                    query.qid,
+                    seed=args.split_seed,
+                    development_fraction=args.development_fraction,
+                    calibration_fraction=args.calibration_fraction,
+                )
             role_counts[split_role] += 1
+            per_source_counts = source_split_role_counts.setdefault(
+                query.source_split,
+                {"development": 0, "calibration": 0, "test": 0},
+            )
+            per_source_counts[split_role] += 1
             query_type = frozen_query_type(query.question, args.query_type_mode)
             ranked = sorted(
                 zip(scores[query_index], indices[query_index]),
@@ -801,6 +826,13 @@ def main() -> None:
         "rows": written_rows,
         "top_l": args.top_l,
         "role_counts": role_counts,
+        "source_split_role_counts": source_split_role_counts,
+        "split_policy": args.split_policy,
+        "split_policy_detail": (
+            "official train -> development/calibration; official dev/validation -> test"
+            if args.split_policy == "official_holdout"
+            else "hash all source splits into development/calibration/test"
+        ),
         "retrieved_support_rows": support_hits,
         "retriever_id": retriever_id,
         "corpus_revision": corpus_revision_id,

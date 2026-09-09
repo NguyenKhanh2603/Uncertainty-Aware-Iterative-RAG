@@ -17,6 +17,11 @@ and enough local disk. Set the notebook's per-dataset limit to 1,000 for a serve
 timing trial or `0` for all labelled questions. vLLM is not used because this step
 does not generate answers.
 
+The paper runner uses `official_holdout`: only official training questions may enter
+development/calibration, while official dev/validation is final test only. Unlabelled
+official test files are not downloaded. Every manifest includes a
+`source_split_role_counts` audit table.
+
 A modality-agnostic framework that decomposes semantic uncertainty into **aleatoric** (data noise) and **epistemic** (knowledge gap) components to drive differentiated corrective actions — **pruning** noisy context and **retrieving** missing evidence.
 
 ## Key Features

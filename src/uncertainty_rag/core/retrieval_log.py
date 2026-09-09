@@ -16,6 +16,19 @@ QUERY_TYPE_RULE_IDS = {
     "keyword_v1": "question-keyword-v1",
 }
 
+OFFICIAL_TRAIN_SPLITS = {
+    "mmqa": frozenset({"train"}),
+    "webqa": frozenset({"train", "train_holdout"}),
+    "hotpotqa": frozenset({"distractor/train"}),
+    "tatqa": frozenset({"train"}),
+}
+OFFICIAL_HOLDOUT_SPLITS = {
+    "mmqa": frozenset({"dev"}),
+    "webqa": frozenset({"validation"}),
+    "hotpotqa": frozenset({"distractor/validation"}),
+    "tatqa": frozenset({"dev"}),
+}
+
 
 @dataclass(frozen=True)
 class CorpusRecord:
@@ -75,6 +88,41 @@ def stable_split_role(
     if unit_value < development_fraction + calibration_fraction:
         return "calibration"
     return "test"
+
+
+def official_holdout_split_role(
+    dataset: str,
+    qid: str,
+    source_split: str,
+    *,
+    seed: int,
+    development_fraction: float,
+) -> str:
+    """Keep official dev/validation exclusively for final evaluation.
+
+    Official training questions are deterministically divided between method
+    development and conformal calibration. Unknown source splits fail closed so
+    an official test set cannot silently enter a calibration bank.
+    """
+
+    if not 0 <= development_fraction < 1:
+        raise ConformalDataError("Development fraction must be in [0, 1)")
+    normalized_dataset = dataset.strip().lower()
+    normalized_split = source_split.strip().lower()
+    train_splits = OFFICIAL_TRAIN_SPLITS.get(normalized_dataset)
+    holdout_splits = OFFICIAL_HOLDOUT_SPLITS.get(normalized_dataset)
+    if train_splits is None or holdout_splits is None:
+        raise ConformalDataError(f"No frozen official split policy for dataset={dataset!r}")
+    if normalized_split in holdout_splits:
+        return "test"
+    if normalized_split not in train_splits:
+        raise ConformalDataError(
+            f"Source split {source_split!r} is not allowed by the official "
+            f"{dataset} train/holdout policy"
+        )
+    digest = hashlib.sha256(f"{seed}\0{dataset}\0{qid}".encode()).digest()
+    unit_value = int.from_bytes(digest[:8], "big") / 2**64
+    return "development" if unit_value < development_fraction else "calibration"
 
 
 def frozen_query_type(question: str, mode: str) -> str:
@@ -301,6 +349,7 @@ def retrieval_log_row(
     return {
         "dataset": query.dataset,
         "qid": query.qid,
+        "source_split": query.source_split,
         "split_role": split_role,
         "query_text": query.question,
         "query_type": query_type,

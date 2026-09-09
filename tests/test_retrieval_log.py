@@ -16,6 +16,7 @@ from uncertainty_rag.core.retrieval_log import (
     QueryRecord,
     frozen_query_type,
     load_bundle_records,
+    official_holdout_split_role,
     retrieval_log_row,
     stable_split_role,
 )
@@ -39,6 +40,46 @@ def test_stable_split_assigns_a_whole_query_deterministically():
 
     assert first == second
     assert first in {"development", "calibration", "test"}
+
+
+@pytest.mark.parametrize(
+    ("dataset", "train_split", "holdout_split"),
+    [
+        ("mmqa", "train", "dev"),
+        ("webqa", "train_holdout", "validation"),
+        ("hotpotqa", "distractor/train", "distractor/validation"),
+        ("tatqa", "train", "dev"),
+    ],
+)
+def test_official_holdout_never_enters_calibration(dataset, train_split, holdout_split):
+    train_role = official_holdout_split_role(
+        dataset,
+        "train-q",
+        train_split,
+        seed=42,
+        development_fraction=0.2,
+    )
+    holdout_role = official_holdout_split_role(
+        dataset,
+        "holdout-q",
+        holdout_split,
+        seed=42,
+        development_fraction=0.2,
+    )
+
+    assert train_role in {"development", "calibration"}
+    assert holdout_role == "test"
+
+
+def test_official_test_split_fails_closed_instead_of_entering_calibration():
+    with pytest.raises(ConformalDataError, match="not allowed"):
+        official_holdout_split_role(
+            "mmqa",
+            "q-test",
+            "test",
+            seed=42,
+            development_fraction=0.2,
+        )
 
 
 def test_keyword_query_type_uses_question_only():
@@ -138,6 +179,7 @@ def test_retrieval_row_uses_explicit_closed_world_label():
 
     assert row["support_label"] == "false"
     assert row["cosine_score"] == 1.0
+    assert row["source_split"] == "train"
 
 
 def test_split_fractions_are_validated():
