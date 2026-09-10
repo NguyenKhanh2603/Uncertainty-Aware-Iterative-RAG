@@ -113,3 +113,19 @@ def test_selection_can_backfill_beyond_original_top_k():
     assert result["backfill_count"] == 1
     assert result["selected_supports"] == 2
     assert result["formal_capped_risk_guarantee"] is False
+
+
+def test_backfill_preserves_accepted_top_k_before_using_reserve():
+    index = ReferenceBankIndex(artifact())
+    rows = [
+        row(rank=1, score=1.0, support_label="support"),
+        row(rank=2, score=0.0),
+        row(rank=3, score=1.0, support_label="support"),
+    ]
+
+    result = select_query_context(rows, index, alpha=0.2, max_context=2)
+
+    assert result["no_backfill_ranks"] == [1]
+    assert result["selected_ranks"] == [1, 3]
+    assert result["no_backfill_supports"] == 1
+    assert result["selected_supports"] == 2

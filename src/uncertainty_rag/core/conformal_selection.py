@@ -37,6 +37,40 @@ class BYResult:
     harmonic_number: float
 
 
+def backfill_rejected_indices(
+    ranks: Sequence[int],
+    chunk_ids: Sequence[str],
+    rejected_indices: Sequence[int],
+    max_context: int,
+) -> tuple[tuple[int, ...], tuple[int, ...]]:
+    """Keep accepted top-K chunks, then fill free slots from ranks K+1..L.
+
+    The first tuple is the final context and the second is the no-backfill
+    ablation.  Both are returned in retrieval order.  A reserve candidate is
+    never admitted unless it was rejected by the same query-level BY test.
+    """
+
+    if max_context < 1:
+        raise ConformalDataError("max_context must be positive")
+    if len(ranks) != len(chunk_ids):
+        raise ConformalDataError("ranks and chunk_ids must have the same length")
+    rejected = set(rejected_indices)
+    retrieval_order = sorted(
+        range(len(ranks)),
+        key=lambda index: (ranks[index], chunk_ids[index]),
+    )
+    original_top_k = set(retrieval_order[:max_context])
+    accepted_top_k = [
+        index for index in retrieval_order if index in rejected and index in original_top_k
+    ]
+    free_slots = max_context - len(accepted_top_k)
+    accepted_reserve = [
+        index for index in retrieval_order if index in rejected and index not in original_top_k
+    ]
+    selected = accepted_top_k + accepted_reserve[:free_slots]
+    return tuple(selected), tuple(accepted_top_k)
+
+
 def benjamini_yekutieli(p_values: Sequence[float], alpha: float) -> BYResult:
     """Apply BY to dependent p-values and return indices in input order."""
 
@@ -192,16 +226,14 @@ def select_query_context(
 
     by = benjamini_yekutieli([item["p_value"] for item in scored], alpha)
     by_rejected = set(by.rejected_indices)
-    capped_order = sorted(
-        by_rejected,
-        key=lambda index: (
-            scored[index]["p_value"],
-            candidates[index].rank,
-            candidates[index].chunk_id,
-        ),
+    selected_in_context_order, no_backfill_indices = backfill_rejected_indices(
+        [candidate.rank for candidate in candidates],
+        [candidate.chunk_id for candidate in candidates],
+        by.rejected_indices,
+        max_context,
     )
-    selected = set(capped_order[:max_context])
-    selected_in_context_order = sorted(selected, key=lambda index: candidates[index].rank)
+    selected = set(selected_in_context_order)
+    no_backfill = set(no_backfill_indices)
 
     decisions = []
     for index, (item, candidate) in enumerate(zip(scored, candidates)):
@@ -241,6 +273,10 @@ def select_query_context(
     reserve_supports = sum(item.support_label == "support" for item in candidates)
     selected_supports = sum(candidates[index].support_label == "support" for index in selected)
     selected_false = sum(candidates[index].support_label == "false" for index in selected)
+    no_backfill_supports = sum(
+        candidates[index].support_label == "support" for index in no_backfill
+    )
+    no_backfill_false = sum(candidates[index].support_label == "false" for index in no_backfill)
     baseline_supports = sum(
         candidates[index].support_label == "support" for index in baseline_indices
     )
@@ -265,10 +301,15 @@ def select_query_context(
         "selected_ranks": [candidates[index].rank for index in selected_in_context_order],
         "selected_chunk_ids": [candidates[index].chunk_id for index in selected_in_context_order],
         "backfill_count": sum(candidates[index].rank > max_context for index in selected),
+        "no_backfill_count": len(no_backfill),
+        "no_backfill_supports": no_backfill_supports,
+        "no_backfill_false": no_backfill_false,
+        "no_backfill_ranks": [candidates[index].rank for index in no_backfill_indices],
+        "no_backfill_chunk_ids": [candidates[index].chunk_id for index in no_backfill_indices],
         "baseline_count": len(baseline_indices),
         "baseline_supports": baseline_supports,
         "baseline_false": baseline_false,
         "formal_capped_risk_guarantee": False,
-        "procedure": "BY_then_pvalue_cap_experimental",
+        "procedure": "BY_then_rank_ordered_verified_backfill_experimental",
         "decisions": decisions,
     }

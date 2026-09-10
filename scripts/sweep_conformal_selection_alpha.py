@@ -14,7 +14,10 @@ from typing import Any, Iterable, Mapping
 from tqdm import tqdm
 
 from uncertainty_rag.core.conformal_retrieval import ConformalDataError
-from uncertainty_rag.core.conformal_selection import benjamini_yekutieli
+from uncertainty_rag.core.conformal_selection import (
+    backfill_rejected_indices,
+    benjamini_yekutieli,
+)
 
 
 def parse_alpha_grid(specification: str) -> tuple[float, ...]:
@@ -29,19 +32,17 @@ def parse_alpha_grid(specification: str) -> tuple[float, ...]:
 def selected_indices(
     decisions: list[Mapping[str, Any]], *, alpha: float, max_context: int
 ) -> tuple[set[int], int]:
-    """Reapply BY and the experimental p-value cap without recomputing p-values."""
+    """Reapply BY and rank-ordered backfill without recomputing p-values."""
 
     by = benjamini_yekutieli([float(item["p_value"]) for item in decisions], alpha)
     rejected = set(by.rejected_indices)
-    capped = sorted(
-        rejected,
-        key=lambda index: (
-            decisions[index]["p_value"],
-            decisions[index]["rank"],
-            decisions[index]["chunk_id"],
-        ),
-    )[:max_context]
-    return set(capped), len(rejected)
+    selected, _ = backfill_rejected_indices(
+        [int(item["rank"]) for item in decisions],
+        [str(item["chunk_id"]) for item in decisions],
+        by.rejected_indices,
+        max_context,
+    )
+    return set(selected), len(rejected)
 
 
 @dataclass
