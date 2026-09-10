@@ -21,6 +21,8 @@ import os
 import shutil
 import tarfile
 import time
+import zipfile
+import concurrent.futures
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
@@ -256,10 +258,13 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
         row for key, row in image_meta.items() if not (image_dir / str(row["path"])).is_file()
     ]
     if needed:
-        print(f"MMQA images: {len(needed)} official referenced assets (range download)")
-        with RemoteZip(MMQA_IMAGE_ARCHIVE) as archive:
-            members = {info.filename for info in archive.infolist()}
-            for row in tqdm(needed, desc="Extract MMQA images", unit="image"):
+        print(f"MMQA images: {len(needed)} official referenced assets (local parallel extraction)")
+        local_zip_path = downloads / "mmqa" / "final_dataset_images.zip"
+        download_url(MMQA_IMAGE_ARCHIVE, local_zip_path, "MMQA image archive")
+        with zipfile.ZipFile(local_zip_path, "r") as archive:
+            members = set(archive.namelist())
+            
+            def extract_image(row):
                 relative = Path(str(row["path"]))
                 member = f"final_dataset_images/{relative.as_posix()}"
                 if member not in members:
@@ -268,6 +273,9 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 with archive.open(member) as source, destination.open("wb") as target:
                     shutil.copyfileobj(source, target)
+                    
+            with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
+                list(tqdm(executor.map(extract_image, needed), total=len(needed), desc="Extract MMQA images", unit="image"))
 
     corpus: dict[str, dict[str, Any]] = {}
     for doc_id, row in texts.items():
