@@ -310,6 +310,9 @@ def main() -> None:
 
     output_path = args.output_dir / "selection_decisions.jsonl.gz"
     accumulators = {name: SummaryAccumulator() for name in strategies}
+    dataset_accumulators: dict[str, dict[str, SummaryAccumulator]] = {
+        name: defaultdict(SummaryAccumulator) for name in strategies
+    }
     expected_queries = reader.query_count(args.split_role)
     seen_queries = 0
     with open_output(output_path) as handle:
@@ -330,12 +333,22 @@ def main() -> None:
                     allow_underpowered=args.allow_underpowered_banks,
                 )
                 accumulators[name].update(result)
+                dataset_accumulators[name][result["dataset"]].update(result)
                 results[name] = result
             handle.write(json.dumps({"strategies": results}, ensure_ascii=False) + "\n")
             seen_queries += 1
 
     if seen_queries == 0:
         raise RuntimeError(f"No queries with split_role={args.split_role!r} were found")
+    strategy_summaries = {}
+    for name, accumulator in accumulators.items():
+        strategy_summary = accumulator.finish()
+        strategy_summary["by_dataset"] = {
+            dataset: dataset_accumulator.finish()
+            for dataset, dataset_accumulator in sorted(dataset_accumulators[name].items())
+        }
+        strategy_summaries[name] = strategy_summary
+
     summary = {
         "is_paper_ready": False,
         "formal_capped_risk_guarantee": False,
@@ -353,7 +366,7 @@ def main() -> None:
             "bank_conditioning": bank_artifact["conditioning"],
             "bank_is_paper_ready": bank_artifact.get("is_paper_ready"),
         },
-        "strategies": {name: accumulator.finish() for name, accumulator in accumulators.items()},
+        "strategies": strategy_summaries,
         "outputs": {"decisions": output_path.name},
     }
     args.output_dir.mkdir(parents=True, exist_ok=True)
