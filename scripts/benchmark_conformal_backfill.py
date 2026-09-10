@@ -299,19 +299,20 @@ def main() -> None:
     print(f"Wrote {query_output}")
     for strategy in sorted(strategies):
         for alpha in alphas:
-            overall = nested[strategy][f"{alpha:g}"].get("ALL")
-            if not overall:
-                continue
-            before = overall["methods"]["conformal_no_backfill"]
-            after = overall["methods"]["conformal_backfill"]
-            delta = overall["backfill_delta"]
-            print(
-                f"{strategy} alpha={alpha:g}: "
-                f"no-backfill R={before['conditional_reserve_support_recall']:.3f} -> "
-                f"backfill R={after['conditional_reserve_support_recall']:.3f}; "
-                f"support+={delta['backfill_supports_added']} "
-                f"false+={delta['backfill_false_added']}"
-            )
+            for scope in scopes:
+                overall = nested[strategy][f"{alpha:g}"].get(scope)
+                if not overall:
+                    continue
+                before = overall["methods"]["conformal_no_backfill"]
+                after = overall["methods"]["conformal_backfill"]
+                delta = overall["backfill_delta"]
+                print(
+                    f"{strategy} alpha={alpha:g} dataset={scope}: "
+                    f"no-backfill R={before['conditional_reserve_support_recall']:.3f} P={before['micro_evidence_precision']:.3f} F1={before.get('support_f1', 0):.3f} -> "
+                    f"backfill R={after['conditional_reserve_support_recall']:.3f} P={after['micro_evidence_precision']:.3f} F1={after.get('support_f1', 0):.3f}; "
+                    f"support+={delta['backfill_supports_added']} "
+                    f"false+={delta['backfill_false_added']}"
+                )
 
 
 if __name__ == "__main__":

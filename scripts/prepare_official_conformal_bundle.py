@@ -213,21 +213,26 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
             break
         questions.extend((split, row) for row in take_limit(jsonl_rows(paths[filename]), remaining))
 
-    text_ids = {
-        str(value)
-        for _, row in questions
-        for value in row.get("metadata", {}).get("text_doc_ids", [])
-    }
-    image_ids = {
-        str(value)
-        for _, row in questions
-        for value in row.get("metadata", {}).get("image_doc_ids", [])
-    }
-    table_ids = {
-        str(row.get("metadata", {}).get("table_id"))
-        for _, row in questions
-        if row.get("metadata", {}).get("table_id") is not None
-    }
+    text_ids = set()
+    image_ids = set()
+    table_ids = set()
+    for _, row in questions:
+        metadata = row.get("metadata", {})
+        text_ids.update(str(value) for value in metadata.get("text_doc_ids", []))
+        image_ids.update(str(value) for value in metadata.get("image_doc_ids", []))
+        if metadata.get("table_id") is not None:
+            table_ids.add(str(metadata["table_id"]))
+        for item in row.get("supporting_context", []):
+            doc_id = str(item.get("doc_id"))
+            if not doc_id or doc_id == "None":
+                continue
+            doc_part = str(item.get("doc_part", ""))
+            if doc_part == "text":
+                text_ids.add(doc_id)
+            elif doc_part == "image":
+                image_ids.add(doc_id)
+            elif doc_part == "table":
+                table_ids.add(doc_id)
     texts = {
         str(row["id"]): row
         for row in jsonl_rows(paths["MMQA_texts.jsonl.gz"])
@@ -319,6 +324,7 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
             for item in row.get("supporting_context", [])
             if item.get("doc_id") is not None
         ]
+        candidates.extend(support)
         query_rows.append(
             {
                 "qid": str(row["qid"]),
