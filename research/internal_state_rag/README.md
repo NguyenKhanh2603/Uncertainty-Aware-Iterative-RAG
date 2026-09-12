@@ -5,6 +5,11 @@ whether its evidence is sufficient. Embedding similarity remains a cheap way to
 build a reserve list, but it is no longer treated as the uncertainty signal or
 the stopping rule.
 
+The first 39-query calibration smoke experiment is reported in
+[`RESULTS_TATQA_SMOKE.md`](RESULTS_TATQA_SMOKE.md). It finds a significant
+evidence-induced gold log-probability shift, while highly concentrated support
+attention alone does not predict whether the final answer improves.
+
 ## Research question
 
 Can the model's internal computation distinguish four cases that look similar
