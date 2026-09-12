@@ -7,6 +7,7 @@ pipeline.
 
 from .calibration import CalibrationResult, Trajectory, calibrate_stop_threshold
 from .causal import mask_attention_heads
+from .edge_mask import mask_qwen2_answer_chunk_edges
 from .labels import InterventionOutcome, RetrievalState, derive_retrieval_state
 from .signals import InternalTrace, QwenInternalStateExtractor
 
@@ -20,4 +21,5 @@ __all__ = [
     "calibrate_stop_threshold",
     "derive_retrieval_state",
     "mask_attention_heads",
+    "mask_qwen2_answer_chunk_edges",
 ]

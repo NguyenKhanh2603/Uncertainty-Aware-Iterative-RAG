@@ -13,6 +13,7 @@ from research.internal_state_rag import (
     derive_retrieval_state,
 )
 from research.internal_state_rag.causal import mask_attention_heads, zero_head_slices
+from research.internal_state_rag.edge_mask import zero_attention_edges
 from research.internal_state_rag.run_causal_head_smoke import layer_matched_controls
 from research.internal_state_rag.signals import (
     InternalTrace,
@@ -127,3 +128,13 @@ def test_causal_controls_match_top_head_layer_counts():
     assert Counter(layer for layer, _ in bottom_heads) == Counter({2: 2, 4: 1})
     assert not set(random_heads) & set(top)
     assert bottom_heads == [(2, 4), (2, 3), (4, 4)]
+
+
+def test_chunk_edge_mask_only_changes_selected_head_last_query():
+    weights = torch.full((1, 2, 2, 4), 0.25)
+    masked = zero_attention_edges(weights, [1], start=1, end=3)
+
+    assert torch.allclose(masked[:, 0], weights[:, 0])
+    assert torch.allclose(masked[:, 1, 0], weights[:, 1, 0])
+    assert torch.allclose(masked[:, 1, 1], torch.tensor([[0.5, 0.0, 0.0, 0.5]]))
+    assert torch.allclose(masked.sum(dim=-1), torch.ones(1, 2, 2))
