@@ -1,0 +1,298 @@
+{
+  "status": "complete",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "split": "official_train_only",
+  "seed": 71,
+  "beta": 0.5,
+  "n_queries": 2,
+  "n_candidates": 8,
+  "intervention": "mask all answer-to-chunk edges at all layers and heads",
+  "metrics": {
+    "bge_score": {
+      "auroc": 0.4166666666666667,
+      "average_precision": 0.375,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "bge_score_query_z": {
+      "auroc": 0.41666666666666663,
+      "average_precision": 0.30952380952380953,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "attention_mass_all_layers": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.41666666666666663,
+      "query_mrr": 0.41666666666666663,
+      "query_top1_support_rate": 0.0
+    },
+    "attention_mass_all_layers_query_z": {
+      "auroc": 0.5,
+      "average_precision": 0.325,
+      "query_mrr": 0.41666666666666663,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_worst_rejection": {
+      "auroc": 0.5,
+      "average_precision": 0.29166666666666663,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_worst_rejection_query_z": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.3333333333333333,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_mean_rejection": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.375,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_mean_rejection_query_z": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.3333333333333333,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_rejection_rate": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.375,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "directer_rejection_rate_query_z": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.3333333333333333,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "top1_change_rate": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.375,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "top1_change_rate_query_z": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.3333333333333333,
+      "query_mrr": 0.375,
+      "query_top1_support_rate": 0.0
+    },
+    "mean_js_divergence": {
+      "auroc": 0.5833333333333334,
+      "average_precision": 0.3666666666666667,
+      "query_mrr": 0.41666666666666663,
+      "query_top1_support_rate": 0.0
+    },
+    "mean_js_divergence_query_z": {
+      "auroc": 0.5,
+      "average_precision": 0.325,
+      "query_mrr": 0.41666666666666663,
+      "query_top1_support_rate": 0.0
+    }
+  },
+  "observations": [
+    {
+      "qid": "ed502ace-9d87-4efa-a379-16fce990ec91",
+      "stratum": "hard",
+      "chunk_id": "tatqa-text:9f6397db9901b211d516658f",
+      "rank": 1,
+      "is_support": false,
+      "bge_score": 0.5660185217857361,
+      "attention_mass_all_layers": 0.08233496313089116,
+      "directer_worst_rejection": 0.7812500263564716,
+      "directer_mean_rejection": 0.07812500000000001,
+      "directer_rejection_rate": 0.1,
+      "top1_change_rate": 0.10000000149011612,
+      "mean_js_divergence": 0.019188402220606804,
+      "min_probability_ratio": 0.45783334970474243,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.45783334970474243,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "ed502ace-9d87-4efa-a379-16fce990ec91",
+      "stratum": "hard",
+      "chunk_id": "tatqa-table:74b976fcfe75f6de422e1a65",
+      "rank": 2,
+      "is_support": false,
+      "bge_score": 0.2240554392337799,
+      "attention_mass_all_layers": 0.07004217266372646,
+      "directer_worst_rejection": -0.0,
+      "directer_mean_rejection": -0.0,
+      "directer_rejection_rate": 0.0,
+      "top1_change_rate": 0.0,
+      "mean_js_divergence": 0.0055320411920547485,
+      "min_probability_ratio": 1.0,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "ed502ace-9d87-4efa-a379-16fce990ec91",
+      "stratum": "hard",
+      "chunk_id": "tatqa-text:ac511ca941992341fc478927",
+      "rank": 3,
+      "is_support": false,
+      "bge_score": 0.2240554392337799,
+      "attention_mass_all_layers": 0.006710188223964819,
+      "directer_worst_rejection": -0.0,
+      "directer_mean_rejection": -0.0,
+      "directer_rejection_rate": 0.0,
+      "top1_change_rate": 0.0,
+      "mean_js_divergence": 0.0005439427914097905,
+      "min_probability_ratio": 1.0,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "ed502ace-9d87-4efa-a379-16fce990ec91",
+      "stratum": "hard",
+      "chunk_id": "tatqa-text:3c6e3005b1a5a17ea92c222b",
+      "rank": 22,
+      "is_support": true,
+      "bge_score": 0.010986941866576672,
+      "attention_mass_all_layers": 0.01849869967655921,
+      "directer_worst_rejection": -0.0,
+      "directer_mean_rejection": -0.0,
+      "directer_rejection_rate": 0.0,
+      "top1_change_rate": 0.0,
+      "mean_js_divergence": 0.004521191120147705,
+      "min_probability_ratio": 1.0,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "28141973-7ae4-4107-acbf-9049508d083a",
+      "stratum": "easy",
+      "chunk_id": "tatqa-text:45d5a3e2826fd700a0c385c7",
+      "rank": 1,
+      "is_support": false,
+      "bge_score": 0.750552773475647,
+      "attention_mass_all_layers": 0.11196227956161937,
+      "directer_worst_rejection": 21.82812503273295,
+      "directer_mean_rejection": 5.197916507720947,
+      "directer_rejection_rate": 0.6666666666666666,
+      "top1_change_rate": 0.6666666865348816,
+      "mean_js_divergence": 0.3814530670642853,
+      "min_probability_ratio": 3.312575214131641e-10,
+      "probability_ratios": [
+        0.23383839428424835,
+        1.0,
+        0.1271357387304306,
+        0.0028979547787457705,
+        3.312575214131641e-10,
+        1.0
+      ]
+    },
+    {
+      "qid": "28141973-7ae4-4107-acbf-9049508d083a",
+      "stratum": "easy",
+      "chunk_id": "tatqa-table:2e83e4dbcebb5add37c7ac6b",
+      "rank": 2,
+      "is_support": true,
+      "bge_score": 0.6851073503494263,
+      "attention_mass_all_layers": 0.09404827357950406,
+      "directer_worst_rejection": 0.7500000866260945,
+      "directer_mean_rejection": 0.12500001490116122,
+      "directer_rejection_rate": 0.16666666666666666,
+      "top1_change_rate": 0.1666666716337204,
+      "mean_js_divergence": 0.01755346916615963,
+      "min_probability_ratio": 0.4723665118217468,
+      "probability_ratios": [
+        0.4723665118217468,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "28141973-7ae4-4107-acbf-9049508d083a",
+      "stratum": "easy",
+      "chunk_id": "tatqa-table:08850196f6330affa2de3b42",
+      "rank": 3,
+      "is_support": false,
+      "bge_score": 0.29992473125457764,
+      "attention_mass_all_layers": 0.020116604061163692,
+      "directer_worst_rejection": -0.0,
+      "directer_mean_rejection": -0.0,
+      "directer_rejection_rate": 0.0,
+      "top1_change_rate": 0.0,
+      "mean_js_divergence": 0.0008891860488802195,
+      "min_probability_ratio": 1.0,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "qid": "28141973-7ae4-4107-acbf-9049508d083a",
+      "stratum": "easy",
+      "chunk_id": "tatqa-table:3fe824f5ab599fe59225aa07",
+      "rank": 4,
+      "is_support": false,
+      "bge_score": 0.04672495648264885,
+      "attention_mass_all_layers": 0.013387242868003132,
+      "directer_worst_rejection": -0.0,
+      "directer_mean_rejection": -0.0,
+      "directer_rejection_rate": 0.0,
+      "top1_change_rate": 0.0,
+      "mean_js_divergence": 0.00022828082728665322,
+      "min_probability_ratio": 1.0,
+      "probability_ratios": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  ]
+}
