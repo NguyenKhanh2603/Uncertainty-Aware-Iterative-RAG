@@ -13,6 +13,7 @@ from research.internal_state_rag import (
     derive_retrieval_state,
 )
 from research.internal_state_rag.causal import mask_attention_heads, zero_head_slices
+from research.internal_state_rag.directer_plausibility import distribution_plausibility
 from research.internal_state_rag.edge_mask import zero_attention_edges
 from research.internal_state_rag.run_causal_head_smoke import layer_matched_controls
 from research.internal_state_rag.signals import (
@@ -138,3 +139,16 @@ def test_chunk_edge_mask_only_changes_selected_head_last_query():
     assert torch.allclose(masked[:, 1, 0], weights[:, 1, 0])
     assert torch.allclose(masked[:, 1, 1], torch.tensor([[0.5, 0.0, 0.0, 0.5]]))
     assert torch.allclose(masked.sum(dim=-1), torch.ones(1, 2, 2))
+
+
+def test_directer_plausibility_scores_intervened_top_token_under_raw_model():
+    raw = torch.tensor([[4.0, 3.0, 0.0], [3.0, 2.0, 0.0]])
+    intervened = torch.tensor([[2.0, 5.0, 0.0], [4.0, 1.0, 0.0]])
+
+    result = distribution_plausibility(raw, intervened, beta=0.5)
+
+    assert result.probability_ratios[0] < 0.5
+    assert result.probability_ratios[1] == 1.0
+    assert result.rejection_rate == 0.5
+    assert result.top1_change_rate == 0.5
+    assert result.worst_rejection_score > 0
