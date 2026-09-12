@@ -1,0 +1,613 @@
+{
+  "dataset": "tatqa",
+  "input_role": "test",
+  "source_split": "dev",
+  "seed": 211,
+  "top_l": 30,
+  "n_role_queries": 1000,
+  "n_queries_with_support_in_top_l": 768,
+  "conditional_retrieval_ceiling": 0.768,
+  "n_discovery_exclusions": 63,
+  "plan": [
+    {
+      "qid": "cd3367c7-d3bd-440c-8c51-90a6ee95cc77",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9a09c7a7-922e-48ad-b9c0-12e7bca38f25",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9963bd65-093e-4801-8050-d2524ff06e7f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "86ae8d77-4dcd-4f82-baac-61c6a2551760",
+      "role": "evaluation"
+    },
+    {
+      "qid": "23c33e5c-13bf-4aeb-8116-8394c054bfed",
+      "role": "evaluation"
+    },
+    {
+      "qid": "23b15783-1924-4c42-8804-a5503a750db7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e83eb382-8267-4a3e-b208-d095d8d418a6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4ba37f67-0474-4e5c-8f45-da51a2873072",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4aa8a4b9-c2a7-4422-8733-9409a6547563",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bf146b6a-47c4-41d8-9238-217c9d514785",
+      "role": "evaluation"
+    },
+    {
+      "qid": "de3e8b87-a5cd-42e9-9fd1-ea0e1381412e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "162f80b9-b689-4405-b6b2-5e98d3882ce7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a75bb0b1-4fb1-405c-b2f1-1df4ee3cc9be",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4990b27f-a8a6-4683-82f8-c1cf657ba9c1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e9b75381-50b1-4717-a322-31ed1eef4259",
+      "role": "evaluation"
+    },
+    {
+      "qid": "92245c0e-817d-4c23-9f75-e247eb9ec1b1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bde0702e-2847-485b-be4a-fb037790bd59",
+      "role": "evaluation"
+    },
+    {
+      "qid": "1564df87-7658-4b60-8f1e-1ac808265704",
+      "role": "evaluation"
+    },
+    {
+      "qid": "dfa78d9d-1866-426f-a101-fdfb5597249e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ff71e762-7a3d-4b9e-aa75-3ab148d8154c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d374633d-d7ff-41b7-9982-f0388c3d0323",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6100c476-160a-4f1e-bfc1-a16f4cc18b52",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2f25de01-c367-4011-8749-a1132424b6d0",
+      "role": "evaluation"
+    },
+    {
+      "qid": "856c56ac-e6f5-4cfc-8f29-69f67dc717da",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a366ea30-5ba3-4f62-b027-7fd4c0b7d6af",
+      "role": "evaluation"
+    },
+    {
+      "qid": "64c6bf36-ab9a-406f-ba60-474ef47583e1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a3ea64bc-4447-4c0b-b76c-84575a3a0de2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d0ed80ce-7ced-4c7f-88f6-2ea50d1b18e6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d1dec9f8-616f-4c60-9a5d-f31904b85014",
+      "role": "evaluation"
+    },
+    {
+      "qid": "56a014a9-5b9c-41e5-9523-ebbd3a01dd6d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "07d44d17-d3d3-488e-9ea9-7f7f0ab1d1ef",
+      "role": "evaluation"
+    },
+    {
+      "qid": "59f389c8-7610-4b3b-b20b-694a08978246",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fda3b0cb-bc87-4cbc-bc8f-79604538a700",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c3454b58-520a-4b25-a484-70e360c9c046",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e2665282-60dd-4ef1-b29b-fde6a2628d9d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "764e5559-92f5-4d41-afea-941e0beda820",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b382a11b-749b-425a-a77d-20e943e00f77",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c5d0c182-6f28-4868-8f77-db446c0de097",
+      "role": "evaluation"
+    },
+    {
+      "qid": "09998ed3-ee55-45ea-9093-3a0a27baa8fa",
+      "role": "evaluation"
+    },
+    {
+      "qid": "dbe29d15-d27a-430b-87ab-219b7b2c3cca",
+      "role": "evaluation"
+    },
+    {
+      "qid": "58d97328-c6a8-4f7e-9740-80c0384306fb",
+      "role": "evaluation"
+    },
+    {
+      "qid": "af49c57c-91aa-4e69-b3e7-1df2d762b250",
+      "role": "evaluation"
+    },
+    {
+      "qid": "01de2123-400f-4411-98d9-cd3f9f1e4136",
+      "role": "evaluation"
+    },
+    {
+      "qid": "94d96afd-4f9f-4edd-9e9e-6585ab8c1c40",
+      "role": "evaluation"
+    },
+    {
+      "qid": "46aa7434-afd4-43da-8627-0a68f2f5d92d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0d0c77cf-d32c-4b0e-8da0-dcaa3f681f59",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c719f476-2e7d-4ce9-bae1-7fe582aca5d4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7ff6facd-1f7b-471c-9e38-5177c4eac9ba",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4d8f127b-56e1-4c09-bd1d-b7f3b3d45d45",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b56ab133-db52-421b-a9f8-afd2efa309a3",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9238f11f-18d1-416b-ad2d-2692229c8d3a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "69d47933-e853-40e9-a9cb-8af38f182b1d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "749fd08d-6f7c-406a-8f37-15ea39b9dd37",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8c882f0d-684c-430e-8194-997c565a7258",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a3e21403-222e-4328-8f7d-9383d2d91fe9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fa43e8cd-7fea-4738-85ee-f61ae8529f96",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ee06875e-3417-44b8-b0e9-96e8b8e36ff4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "91555b4e-09e9-46ce-a849-6adf2a0483d2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "467722ba-4605-4155-86c5-5b1392095649",
+      "role": "evaluation"
+    },
+    {
+      "qid": "258df1b4-3db1-4616-ae6b-c46a98b88dcf",
+      "role": "evaluation"
+    },
+    {
+      "qid": "161c5ecf-1d8d-45aa-bc75-ea5de0d06af8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4cf34f4c-68c1-40f0-bb79-80ee15b256ed",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e378f03f-8e13-4020-b4ba-641859e16e25",
+      "role": "evaluation"
+    },
+    {
+      "qid": "62813488-b5b2-4bec-8630-eb6438670b1d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "428f0639-82af-4a18-a169-b531c63f8fce",
+      "role": "evaluation"
+    },
+    {
+      "qid": "15765eb2-062e-475f-aef1-aaa58df90870",
+      "role": "evaluation"
+    },
+    {
+      "qid": "cb794a58-89f6-4be2-8722-f7b5c7fc6747",
+      "role": "evaluation"
+    },
+    {
+      "qid": "54087793-6e0a-454f-aa50-f39a24bf8d1b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fec503e8-6f91-483e-856d-bb1278bd031f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "89b7aa90-ca4b-425e-a466-e5194b967983",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ab09c56c-5e7a-4554-96c3-e3b2d1859453",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3683a97f-66f4-4450-a978-4322b673b914",
+      "role": "evaluation"
+    },
+    {
+      "qid": "066fbf2d-e3e7-4f55-bbe0-a71ddeaa2685",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a5992e2e-726e-469c-88f3-e7b2ea8db24c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ef9d4839-5277-4614-bb73-f902fd8a38b6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "58d693a9-0c2f-4427-8984-a1191261cf2d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5a97069f-9b7c-446f-8738-73f534c52fe0",
+      "role": "evaluation"
+    },
+    {
+      "qid": "15d9e034-c5f9-4bd4-95df-74cf1fe689e7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "105cf4ce-97d9-482e-beac-c2a3a66d8435",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6c9d393a-c3d5-496f-a9d1-717fe1878c68",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fe7894b9-6cb8-429a-9efb-321e17e31232",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b326ee9d-156e-411e-bfce-77f7f6350c5b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c3f4ec9b-2e21-42fd-950b-2e7b24e4b0b9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4b63994e-6645-4dd6-8132-5c6773cf7362",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d9eba295-6903-457d-924d-663e41d20b46",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d0f9e7d5-d8e9-4435-b646-f62b13a2073d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "73dc23b9-e36f-48a8-b99f-cf07ffe6832b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b194279c-16e5-4a17-9733-c8babb6e8281",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2ff93d2d-d0c9-4076-aa57-563d3340c4b8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5beff07b-d9e0-4592-b11a-47bc4bbb5e07",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7a1f65b6-25e2-48e2-a3cc-baddc688545e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f4511ab0-2ad9-472a-9a26-024b64f7bbc0",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ffb5a0e7-8e72-43ea-9fb8-9a6db5a53300",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9d2bd743-f600-4e40-86dd-ebd18cbbe311",
+      "role": "evaluation"
+    },
+    {
+      "qid": "74a2f6e2-f2d5-427c-ae75-41c35dd57abd",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bdfa7f74-0ec6-461f-a531-c164c7134a2f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c174c321-d180-4335-b562-e570536f0725",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b9c6abaf-9cf8-4bd1-a01e-c6967767d2b4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b8ed9d15-95cd-4b7c-9406-8c0302bf66d9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8a21f821-eaf6-421a-8c67-795e7e2d1f61",
+      "role": "evaluation"
+    },
+    {
+      "qid": "021b891a-e0bf-40c5-8b3a-a57798995b71",
+      "role": "evaluation"
+    },
+    {
+      "qid": "992216cc-19ce-435a-847f-43632606dd5d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d8ef780b-5c02-4c2e-a0c5-b9fd8dba625c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e151e953-f5ab-4041-8e6f-7aec08ed5a60",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c3993366-da98-42f2-a5b2-3de28c4d0e10",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e02b2c21-3972-41cc-b391-5478da7df9d8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "545cb01f-9b10-4a1b-8a7c-e9e74e725b26",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c91ad938-6ad1-4481-8f6b-43ccd2f69926",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6ba10044-d6d0-4fe5-b3a1-e6f6d5bf3832",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b9a81c14-263b-4d58-9bd6-8dec2b27ac34",
+      "role": "evaluation"
+    },
+    {
+      "qid": "40094db9-c0f5-4a92-9986-db48c0769f85",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e302a7ec-94e5-4bea-bff4-5d4b9d4f6265",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a4e02fba-5fe2-440b-ae68-2cb050e887ab",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5c7d8918-6083-4ac1-a0eb-137a114a7cd7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "681dcc0f-a32e-46ca-9785-1289a6aba802",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5f282807-f3fe-4efd-a4ef-b88a3d580bf9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7cbff88c-a7d9-437d-b38a-4174a7103c63",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d023e08e-4208-4fed-b81f-665840cec045",
+      "role": "evaluation"
+    },
+    {
+      "qid": "014da777-ac60-4be9-ac5c-86fce0791b10",
+      "role": "evaluation"
+    },
+    {
+      "qid": "eec369e8-5d50-4bec-91a5-5037f73a12d6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "832cdc96-2fe8-4e8e-9793-c268ae320cac",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fc7baa9f-ec1a-407a-b353-7c08b2996135",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3de31a7f-0d57-4471-a3ab-4f698274be0c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "80743191-c89d-4a2b-b431-f6b551ecdb41",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9c9e2117-9318-4d67-9ba0-de60485b3c4d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d9aa3edf-6f53-442a-9e8c-da8f60a14edd",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2c542baf-9bb5-4f75-b1dc-4b79180885f5",
+      "role": "evaluation"
+    },
+    {
+      "qid": "58adf6c4-41ae-4f3f-84cb-cf3469a80ce4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e03ec618-ea4c-48c7-b887-e1b8e2742808",
+      "role": "evaluation"
+    },
+    {
+      "qid": "dafea934-5628-452d-9936-543e9b0fbc0a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8146c032-8aed-4bd6-b771-429be981a19a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3561fe2c-d1b1-4968-9d89-b6fa2d24bbe7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f140a65f-c408-45fc-8c60-e98e13530452",
+      "role": "evaluation"
+    },
+    {
+      "qid": "793f8643-9944-42b4-a703-1a054ea88aa7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "75cadcb4-da5e-4e3e-b2ad-36a31be3d013",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2a73bcb6-7e52-4498-8b58-3e95f0be08c8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3c257d89-4281-43df-998a-f7850b4fda9c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "54df78bf-1e81-4ebe-ba8d-278fee472ffd",
+      "role": "evaluation"
+    },
+    {
+      "qid": "dde6a61f-c49d-405d-9fd0-f6315bf636c9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b4884040-a0bc-428a-9a1c-6346acb6dc3c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "73693527-ed4b-4d07-941e-0e654095a43d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "54fec8b2-3105-45fc-aa90-fd07cdd582ae",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c3bdd929-97a7-418c-a0e3-c06274ff97d6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "359f9c4c-b405-40e5-88b5-86bfa0069b89",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bb759b34-4a56-4561-8bb9-f5a636d8046e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b8e468a0-b2a2-4673-adf5-105ce2410bcc",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ee74c321-b0e8-44f6-b15a-a4e8511b6183",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2d2c69eb-ded0-455a-8ef8-3122421ff731",
+      "role": "evaluation"
+    },
+    {
+      "qid": "767af2ff-98d0-4cd6-9e9f-56de5ec687a3",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5fa12af1-123b-4683-b2ed-5a2b439c50f4",
+      "role": "evaluation"
+    }
+  ]
+}

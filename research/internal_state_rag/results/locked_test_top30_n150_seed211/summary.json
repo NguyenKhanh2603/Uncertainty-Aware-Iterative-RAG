@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "planned_queries": 150,
+  "completed_queries": 150,
+  "rows": "research/internal_state_rag/results/locked_test_top30_n150_seed211/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/locked_test_top30_n150_seed211/manifest.json"
+}
