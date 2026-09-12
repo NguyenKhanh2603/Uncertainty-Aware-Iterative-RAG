@@ -14,6 +14,7 @@ multipart archives; their original candidate IDs and labels are preserved.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import gzip
 import hashlib
 import json
@@ -22,14 +23,13 @@ import shutil
 import tarfile
 import time
 import zipfile
-import concurrent.futures
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
 import pyarrow.parquet as pq
 import requests
 from huggingface_hub import hf_hub_download
-from remotezip import RemoteZip
 from tqdm import tqdm
 
 MMQA_GIT_REVISION = "4dd14328c6d02a4daa357cc6032915a0b14602e3"
@@ -67,6 +67,36 @@ TATQA_FILES = {
     "train": "tatqa_dataset_train.json",
     "dev": "tatqa_dataset_dev.json",
 }
+
+
+@dataclass
+class QuestionLimiter:
+    """Apply either one total query limit or equal train/holdout limits."""
+
+    total_limit: int = 0
+    per_role_limit: int | None = None
+    counts: dict[str, int] = field(
+        default_factory=lambda: {"train": 0, "heldout": 0}
+    )
+
+    def remaining(self, role: str) -> int | None:
+        if self.per_role_limit is not None:
+            return max(0, self.per_role_limit - self.counts[role])
+        if self.total_limit:
+            return max(0, self.total_limit - sum(self.counts.values()))
+        return None
+
+    def add(self, role: str, count: int) -> None:
+        self.counts[role] += count
+
+    def accept(self, role: str) -> bool:
+        if self.remaining(role) == 0:
+            return False
+        self.add(role, 1)
+        return True
+
+    def role_full(self, role: str) -> bool:
+        return self.remaining(role) == 0
 
 
 def jsonl_rows(path: Path) -> Iterator[dict[str, Any]]:
@@ -193,7 +223,13 @@ def table_to_markdown(value: Any, *, title: str = "") -> str:
     return "\n".join(([title] if title else []) + lines)
 
 
-def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, Any]:
+def prepare_mmqa(
+    root: Path,
+    downloads: Path,
+    max_questions: int,
+    *,
+    max_questions_per_role: int | None = None,
+) -> dict[str, Any]:
     started = time.perf_counter()
     names = [
         "MMQA_train.jsonl.gz",
@@ -207,11 +243,12 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
         for name in names
     }
     questions: list[tuple[str, dict[str, Any]]] = []
+    limiter = QuestionLimiter(max_questions, max_questions_per_role)
     for split, filename in (("train", "MMQA_train.jsonl.gz"), ("dev", "MMQA_dev.jsonl.gz")):
-        remaining = None if max_questions == 0 else max_questions - len(questions)
-        if remaining is not None and remaining <= 0:
-            break
-        questions.extend((split, row) for row in take_limit(jsonl_rows(paths[filename]), remaining))
+        role = "heldout" if split == "dev" else "train"
+        selected = take_limit(jsonl_rows(paths[filename]), limiter.remaining(role))
+        limiter.add(role, len(selected))
+        questions.extend((split, row) for row in selected)
 
     text_ids = {
         str(value)
@@ -263,7 +300,7 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
         download_url(MMQA_IMAGE_ARCHIVE, local_zip_path, "MMQA image archive")
         with zipfile.ZipFile(local_zip_path, "r") as archive:
             members = set(archive.namelist())
-            
+
             def extract_image(row):
                 relative = Path(str(row["path"]))
                 member = f"final_dataset_images/{relative.as_posix()}"
@@ -273,9 +310,16 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 with archive.open(member) as source, destination.open("wb") as target:
                     shutil.copyfileobj(source, target)
-                    
+
             with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
-                list(tqdm(executor.map(extract_image, needed), total=len(needed), desc="Extract MMQA images", unit="image"))
+                list(
+                    tqdm(
+                        executor.map(extract_image, needed),
+                        total=len(needed),
+                        desc="Extract MMQA images",
+                        unit="image",
+                    )
+                )
 
     corpus: dict[str, dict[str, Any]] = {}
     for doc_id, row in texts.items():
@@ -341,6 +385,7 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
     write_jsonl(root / "mmqa" / "questions.jsonl", query_rows, total=len(query_rows))
     return {
         "questions": len(query_rows),
+        "question_roles": limiter.counts,
         "corpus": len(corpus),
         "images": len(image_meta),
         "source": "official allenai/multimodalqa",
@@ -364,15 +409,25 @@ class _ProgressReader:
         return True
 
 
+def _existing_webqa_image_paths(
+    destination: Path, selected_ids: set[str]
+) -> dict[str, str]:
+    """Index already-extracted selected images with one directory scan."""
+
+    if not destination.is_dir():
+        return {}
+    found: dict[str, str] = {}
+    for path in destination.iterdir():
+        if path.is_file() and path.stem in selected_ids:
+            found.setdefault(path.stem, f"webqa/images/{path.name}")
+    return found
+
+
 def _extract_webqa_images(
     archive: Path, selected_ids: set[str], destination: Path
 ) -> dict[str, str]:
     destination.mkdir(parents=True, exist_ok=True)
-    found: dict[str, str] = {}
-    for image_id in selected_ids:
-        existing = list(destination.glob(f"{image_id}.*"))
-        if existing:
-            found[image_id] = f"webqa/images/{existing[0].name}"
+    found = _existing_webqa_image_paths(destination, selected_ids)
     remaining = selected_ids - found.keys()
     if not remaining:
         return found
@@ -424,6 +479,7 @@ def prepare_webqa(
     downloads: Path,
     max_questions: int,
     *,
+    max_questions_per_role: int | None = None,
     keep_archive: bool,
     skip_disk_check: bool,
 ) -> dict[str, Any]:
@@ -446,11 +502,12 @@ def prepare_webqa(
         for source_split, filename_stem in redistributed_splits.items()
     }
     questions: list[tuple[str, dict[str, Any]]] = []
+    limiter = QuestionLimiter(max_questions, max_questions_per_role)
     for split, path in split_files.items():
-        remaining = None if max_questions == 0 else max_questions - len(questions)
-        if remaining is not None and remaining <= 0:
-            break
-        questions.extend((split, row) for row in take_limit(jsonl_rows(path), remaining))
+        role = "heldout" if split == "validation" else "train"
+        selected = take_limit(jsonl_rows(path), limiter.remaining(role))
+        limiter.add(role, len(selected))
+        questions.extend((split, row) for row in selected)
 
     selected_text_ids = {
         str(value)
@@ -491,11 +548,11 @@ def prepare_webqa(
             f"Missing {len(selected_image_ids - image_meta.keys())} official WebQA image candidates"
         )
 
-    existing_count = sum(
-        bool(list((root / "webqa" / "images").glob(f"{image_id}.*")))
-        for image_id in selected_image_ids
+    image_destination = root / "webqa" / "images"
+    existing_image_paths = _existing_webqa_image_paths(
+        image_destination, selected_image_ids
     )
-    if existing_count != len(selected_image_ids):
+    if len(existing_image_paths) != len(selected_image_ids):
         estimated_extract = WEBQA_APPROX_EXTRACTED_BYTES * (
             len(selected_image_ids) / max(1, 400_000)
         )
@@ -516,15 +573,11 @@ def prepare_webqa(
         archive = hf_download(
             WEBQA_IMAGE_REPO, WEBQA_IMAGE_REVISION, WEBQA_IMAGE_ARCHIVE, downloads
         )
-        image_paths = _extract_webqa_images(archive, selected_image_ids, root / "webqa" / "images")
+        image_paths = _extract_webqa_images(archive, selected_image_ids, image_destination)
         if not keep_archive:
             archive.unlink(missing_ok=True)
     else:
-        image_paths = {
-            image_id: "webqa/images/"
-            + list((root / "webqa" / "images").glob(f"{image_id}.*"))[0].name
-            for image_id in selected_image_ids
-        }
+        image_paths = existing_image_paths
 
     corpus: dict[str, dict[str, Any]] = {}
     for chunk_id, row in docs.items():
@@ -580,6 +633,7 @@ def prepare_webqa(
     write_jsonl(root / "webqa" / "questions.jsonl", query_rows, total=len(query_rows))
     return {
         "questions": len(query_rows),
+        "question_roles": limiter.counts,
         "corpus": len(corpus),
         "images": len(selected_image_ids),
         "source": "official WebQA fields via pinned redistributions; no synthetic candidates",
@@ -591,14 +645,22 @@ def prepare_webqa(
     }
 
 
-def prepare_hotpotqa(root: Path, downloads: Path, max_questions: int) -> dict[str, Any]:
+def prepare_hotpotqa(
+    root: Path,
+    downloads: Path,
+    max_questions: int,
+    *,
+    max_questions_per_role: int | None = None,
+) -> dict[str, Any]:
     started = time.perf_counter()
     corpus: dict[str, dict[str, Any]] = {}
     query_rows: list[dict[str, Any]] = []
     sources: dict[str, str] = {}
+    limiter = QuestionLimiter(max_questions, max_questions_per_role)
     for split in ("train", "validation"):
+        role = "heldout" if split == "validation" else "train"
         for filename in HOTPOT_FILES[split]:
-            if max_questions and len(query_rows) >= max_questions:
+            if limiter.role_full(role):
                 break
             path = hf_download(HOTPOT_REPO, HOTPOT_REVISION, filename, downloads)
             sources[filename] = sha256_file(path)
@@ -608,7 +670,7 @@ def prepare_hotpotqa(root: Path, downloads: Path, max_questions: int) -> dict[st
             )
             for batch in parquet.iter_batches(batch_size=1024):
                 for row in batch.to_pylist():
-                    if max_questions and len(query_rows) >= max_questions:
+                    if limiter.role_full(role):
                         break
                     context = row.get("context") or {}
                     support_titles = {
@@ -632,6 +694,8 @@ def prepare_hotpotqa(root: Path, downloads: Path, max_questions: int) -> dict[st
                         candidates.append(chunk_id)
                         if str(title) in support_titles:
                             support.append(chunk_id)
+                    if not limiter.accept(role):
+                        break
                     query_rows.append(
                         {
                             "qid": str(row["id"]),
@@ -647,7 +711,7 @@ def prepare_hotpotqa(root: Path, downloads: Path, max_questions: int) -> dict[st
                         }
                     )
                 progress.update(len(batch))
-                if max_questions and len(query_rows) >= max_questions:
+                if limiter.role_full(role):
                     break
             progress.close()
     write_jsonl(
@@ -658,6 +722,7 @@ def prepare_hotpotqa(root: Path, downloads: Path, max_questions: int) -> dict[st
     write_jsonl(root / "hotpotqa" / "questions.jsonl", query_rows, total=len(query_rows))
     return {
         "questions": len(query_rows),
+        "question_roles": limiter.counts,
         "corpus": len(corpus),
         "source": HOTPOT_REPO,
         "revision": HOTPOT_REVISION,
@@ -675,14 +740,22 @@ def tatqa_answers(question: dict[str, Any]) -> list[str]:
     return list(dict.fromkeys(value for value in values if value))
 
 
-def prepare_tatqa(root: Path, downloads: Path, max_questions: int) -> dict[str, Any]:
+def prepare_tatqa(
+    root: Path,
+    downloads: Path,
+    max_questions: int,
+    *,
+    max_questions_per_role: int | None = None,
+) -> dict[str, Any]:
     started = time.perf_counter()
     corpus: dict[str, dict[str, Any]] = {}
     query_rows: list[dict[str, Any]] = []
     sources: dict[str, str] = {}
+    limiter = QuestionLimiter(max_questions, max_questions_per_role)
     for split, filename in TATQA_FILES.items():
-        if max_questions and len(query_rows) >= max_questions:
-            break
+        role = "heldout" if split == "dev" else "train"
+        if limiter.role_full(role):
+            continue
         path = download_url(
             f"{TATQA_RAW_ROOT}/{filename}", downloads / "tatqa" / filename, f"TAT-QA {split}"
         )
@@ -721,7 +794,7 @@ def prepare_tatqa(root: Path, downloads: Path, max_questions: int) -> dict[str, 
                 )
             candidates = [table_id, *paragraph_ids.values()]
             for question in document.get("questions", []):
-                if max_questions and len(query_rows) >= max_questions:
+                if limiter.role_full(role):
                     break
                 mapping = question.get("mapping") or {}
                 related = {str(value) for value in question.get("rel_paragraphs", [])}
@@ -731,6 +804,8 @@ def prepare_tatqa(root: Path, downloads: Path, max_questions: int) -> dict[str, 
                 support = [paragraph_ids[key] for key in related if key in paragraph_ids]
                 if "table" in answer_from or mapping.get("table"):
                     support.insert(0, table_id)
+                if not limiter.accept(role):
+                    break
                 query_rows.append(
                     {
                         "qid": str(question["uid"]),
@@ -746,7 +821,7 @@ def prepare_tatqa(root: Path, downloads: Path, max_questions: int) -> dict[str, 
                         },
                     }
                 )
-            if max_questions and len(query_rows) >= max_questions:
+            if limiter.role_full(role):
                 break
     write_jsonl(
         root / "tatqa" / "corpus.jsonl", (corpus[key] for key in sorted(corpus)), total=len(corpus)
@@ -754,6 +829,7 @@ def prepare_tatqa(root: Path, downloads: Path, max_questions: int) -> dict[str, 
     write_jsonl(root / "tatqa" / "questions.jsonl", query_rows, total=len(query_rows))
     return {
         "questions": len(query_rows),
+        "question_roles": limiter.counts,
         "corpus": len(corpus),
         "source": "official NExTplusplus/TAT-QA",
         "revision": TATQA_GIT_REVISION,
@@ -772,11 +848,24 @@ def main() -> None:
         default=0,
         help="Per-dataset limit for a trial run; 0 uses every labelled train+dev question",
     )
+    parser.add_argument(
+        "--max-questions-per-role",
+        type=int,
+        help=(
+            "Select this many official-training and this many labelled official-holdout "
+            "questions per dataset. Use with --development-fraction 0 in the retrieval "
+            "runner to obtain separate calibration and test query sets."
+        ),
+    )
     parser.add_argument("--keep-downloads", action="store_true")
     parser.add_argument("--skip-disk-check", action="store_true")
     args = parser.parse_args()
     if args.max_questions < 0:
         parser.error("--max-questions cannot be negative")
+    if args.max_questions_per_role is not None and args.max_questions_per_role < 1:
+        parser.error("--max-questions-per-role must be positive")
+    if args.max_questions and args.max_questions_per_role is not None:
+        parser.error("--max-questions and --max-questions-per-role cannot be combined")
     selected = [value.strip() for value in args.datasets.split(",") if value.strip()]
     unknown = set(selected) - {"mmqa", "webqa", "hotpotqa", "tatqa"}
     if unknown:
@@ -787,26 +876,44 @@ def main() -> None:
     downloads = root / ".downloads"
     print(
         f"Official bundle output={root} datasets={selected} "
-        f"max_questions={'ALL' if args.max_questions == 0 else args.max_questions}",
+        f"max_questions={'ALL' if args.max_questions == 0 else args.max_questions} "
+        f"max_questions_per_role={args.max_questions_per_role}",
         flush=True,
     )
     builders = {
-        "mmqa": lambda: prepare_mmqa(root, downloads, args.max_questions),
+        "mmqa": lambda: prepare_mmqa(
+            root,
+            downloads,
+            args.max_questions,
+            max_questions_per_role=args.max_questions_per_role,
+        ),
         "webqa": lambda: prepare_webqa(
             root,
             downloads,
             args.max_questions,
+            max_questions_per_role=args.max_questions_per_role,
             keep_archive=args.keep_downloads,
             skip_disk_check=args.skip_disk_check,
         ),
-        "hotpotqa": lambda: prepare_hotpotqa(root, downloads, args.max_questions),
-        "tatqa": lambda: prepare_tatqa(root, downloads, args.max_questions),
+        "hotpotqa": lambda: prepare_hotpotqa(
+            root,
+            downloads,
+            args.max_questions,
+            max_questions_per_role=args.max_questions_per_role,
+        ),
+        "tatqa": lambda: prepare_tatqa(
+            root,
+            downloads,
+            args.max_questions,
+            max_questions_per_role=args.max_questions_per_role,
+        ),
     }
     manifest: dict[str, Any] = {
         "schema_version": 2,
         "data_grade": "official",
         "candidate_scope": "dataset_provided_per_query",
         "max_questions_per_dataset": args.max_questions or None,
+        "max_questions_per_role": args.max_questions_per_role,
         "synthetic_candidates": False,
         "datasets": {},
     }

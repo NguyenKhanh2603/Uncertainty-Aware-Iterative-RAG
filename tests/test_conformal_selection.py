@@ -99,6 +99,17 @@ def test_pipeline_fingerprint_mismatch_is_rejected():
         index.score(candidate)
 
 
+def test_selection_score_fingerprint_mismatch_is_rejected():
+    bank = artifact()
+    bank["pipeline_fingerprints"]["mmqa"]["conformal_score_id"] = "reranker@v1"
+    candidate = row(rank=1, score=0.5)
+    candidate["selection_score"] = 0.8
+    candidate["selection_score_id"] = "reranker@v2"
+
+    with pytest.raises(ConformalDataError, match="conformal_score_id"):
+        ReferenceBankIndex(bank).score(candidate)
+
+
 def test_selection_can_backfill_beyond_original_top_k():
     index = ReferenceBankIndex(artifact())
     rows = [

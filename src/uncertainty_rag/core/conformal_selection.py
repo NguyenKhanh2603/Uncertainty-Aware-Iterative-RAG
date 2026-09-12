@@ -20,7 +20,7 @@ from typing import Any, Mapping, Sequence
 from uncertainty_rag.core.conformal_retrieval import (
     ConformalDataError,
     RetrievalCandidate,
-    conformal_p_value,
+    conformal_p_value_from_validated_scores,
     parse_condition_fields,
     parse_rank_bins,
     rank_bin_for,
@@ -142,8 +142,13 @@ class ReferenceBankIndex:
             "preprocess_hash": candidate.preprocess_hash,
             "query_type_rule_id": candidate.query_type_rule_id,
             "top_l": candidate.top_l,
+            "conformal_score_id": candidate.conformal_score_id,
         }
-        mismatched = [field for field, value in observed.items() if expected.get(field) != value]
+        mismatched = [
+            field
+            for field, value in observed.items()
+            if field in expected and expected[field] != value
+        ]
         if mismatched:
             raise ConformalDataError(
                 f"Pipeline fingerprint mismatch for {candidate.dataset}: {', '.join(mismatched)}"
@@ -196,7 +201,9 @@ class ReferenceBankIndex:
             "condition": condition,
             "bank_size": len(scores),
             "bank_status": "underpowered_allowed" if underpowered else "ok",
-            "p_value": conformal_p_value(candidate.cosine_score, scores),
+            "p_value": conformal_p_value_from_validated_scores(
+                candidate.conformal_score, scores
+            ),
         }
 
 
@@ -256,6 +263,8 @@ def select_query_context(
                 "modality": candidate.modality,
                 "rank": candidate.rank,
                 "cosine_score": candidate.cosine_score,
+                "selection_score": candidate.selection_score,
+                "selection_score_id": candidate.selection_score_id,
                 "support_label": candidate.support_label,
                 "condition": item["condition"],
                 "bank_size": item["bank_size"],

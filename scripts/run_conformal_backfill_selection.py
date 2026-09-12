@@ -123,7 +123,9 @@ def build_dataset_pooled_artifact(
     grouped: dict[str, list[float]] = defaultdict(list)
     for row in rows:
         if row["split_role"] == "calibration" and row["support_label"] == "false":
-            grouped[str(row["dataset"])].append(float(row["cosine_score"]))
+            grouped[str(row["dataset"])].append(
+                float(row.get("selection_score", row["cosine_score"]))
+            )
     banks = []
     for dataset, scores in sorted(grouped.items()):
         scores.sort()

@@ -37,6 +37,23 @@ DEFAULT_MODEL_REVISION = "e10d47f5691d0454a0fb5d13f46f2199b74cb436"
 DEFAULT_HF_REPO = "danny2507/attention-uq-800q-colab"
 DEFAULT_HF_REVISION = "26c3b8269d6ec5f17463f714bbc400658dd01313"
 PREPROCESS_VERSION = "conformal-retrieval-log-v2-image-caption-fusion"
+CANDIDATE_SCOPES = ("auto", "official_pool", "global_corpus")
+
+
+def resolve_candidate_scope(requested: str, has_official_pools: bool) -> str:
+    """Resolve the requested search scope to the value recorded in artifacts."""
+
+    if requested not in CANDIDATE_SCOPES:
+        raise ValueError(f"Unsupported candidate_scope={requested}")
+    if requested == "auto":
+        return "dataset_provided_per_query" if has_official_pools else "global_corpus"
+    if requested == "official_pool":
+        if not has_official_pools:
+            raise ValueError(
+                "candidate_scope=official_pool requires per-query candidate_ids in the bundle"
+            )
+        return "dataset_provided_per_query"
+    return "global_corpus"
 
 
 def gpu_inventory(device: str) -> dict[str, Any]:
@@ -552,6 +569,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--truncate-dim", type=int, default=512)
     parser.add_argument("--top-l", type=int, default=20)
     parser.add_argument(
+        "--candidate-scope",
+        choices=CANDIDATE_SCOPES,
+        default="auto",
+        help=(
+            "auto preserves the bundle default; official_pool ranks only the candidates "
+            "listed for each query; global_corpus ranks every query against the full "
+            "deduplicated corpus stored in the bundle"
+        ),
+    )
+    parser.add_argument(
         "--retrieval-mode",
         choices=("global", "modality_aware"),
         default="global",
@@ -604,6 +631,8 @@ def main() -> None:
         bundle_root=bundle_root,
         dataset=args.dataset,
     )
+    has_official_pools = bool(queries) and all(query.candidate_ids for query in queries)
+    candidate_scope = resolve_candidate_scope(args.candidate_scope, has_official_pools)
     timings["load_records"] = time.perf_counter() - stage_started
     corpus_revision_id = corpus_revision(
         tqdm(corpus, desc="Fingerprint official corpus", unit="chunk")
@@ -615,6 +644,7 @@ def main() -> None:
     retrieval_policy = {
         "mode": args.retrieval_mode,
         "top_l": args.top_l,
+        "candidate_scope": candidate_scope,
         "min_per_modality": (
             args.min_per_modality if args.retrieval_mode == "modality_aware" else None
         ),
@@ -695,10 +725,9 @@ def main() -> None:
         timings["encode_queries"] = 0.0
 
     corpus_index_by_id = {chunk.chunk_id: index for index, chunk in enumerate(corpus)}
-    has_official_pools = questions_path.with_name("corpus.jsonl").is_file()
     stage_started = time.perf_counter()
     search_stats: dict[str, Any]
-    if has_official_pools:
+    if candidate_scope == "dataset_provided_per_query":
         candidate_indices = [
             [corpus_index_by_id[chunk_id] for chunk_id in query.candidate_ids] for query in queries
         ]
@@ -799,7 +828,11 @@ def main() -> None:
                 row["retrieval_mode"] = args.retrieval_mode
                 row["min_per_modality"] = retrieval_policy["min_per_modality"]
                 row["modality_rank"] = modality_ranks[chunk.modality]
-                row["candidate_pool_size"] = len(query.candidate_ids) or len(corpus)
+                row["candidate_pool_size"] = (
+                    len(query.candidate_ids)
+                    if candidate_scope == "dataset_provided_per_query"
+                    else len(corpus)
+                )
                 row["retrieved_l"] = len(ranked)
                 handle.write(json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n")
                 written_rows += 1
@@ -840,22 +873,22 @@ def main() -> None:
         "query_type_rule_id": query_type_rule_id,
         "non_support_label": args.non_support_label,
         "retrieval_policy": retrieval_policy,
-        "candidate_scope": "dataset_provided_per_query" if has_official_pools else "global_corpus",
+        "candidate_scope": candidate_scope,
         "candidate_pool": {
             "minimum": (
                 min((len(query.candidate_ids) for query in queries), default=0)
-                if has_official_pools
-                else None
+                if candidate_scope == "dataset_provided_per_query"
+                else len(corpus)
             ),
             "maximum": (
                 max((len(query.candidate_ids) for query in queries), default=0)
-                if has_official_pools
-                else None
+                if candidate_scope == "dataset_provided_per_query"
+                else len(corpus)
             ),
             "mean": (
                 sum(len(query.candidate_ids) for query in queries) / len(queries)
-                if has_official_pools and queries
-                else None
+                if candidate_scope == "dataset_provided_per_query" and queries
+                else float(len(corpus))
             ),
         },
         "device": args.device,

@@ -66,6 +66,8 @@ class RetrievalCandidate:
     query_type_rule_id: str
     source_doc_id: str | None = None
     retrieved_l: int | None = None
+    selection_score: float | None = None
+    selection_score_id: str | None = None
 
     @classmethod
     def from_mapping(cls, row: Mapping[str, Any]) -> RetrievalCandidate:
@@ -116,6 +118,16 @@ class RetrievalCandidate:
                 if row.get("retrieved_l") is not None
                 else None
             ),
+            selection_score=(
+                float(row["selection_score"])
+                if row.get("selection_score") is not None
+                else None
+            ),
+            selection_score_id=(
+                str(row["selection_score_id"]).strip()
+                if row.get("selection_score_id") is not None
+                else None
+            ),
         )
         candidate.validate()
         return candidate
@@ -154,6 +166,17 @@ class RetrievalCandidate:
             raise ConformalDataError(
                 f"cosine_score must be in [-1, 1], got {self.cosine_score}"
             )
+        if self.selection_score is not None:
+            if not isfinite(self.selection_score):
+                raise ConformalDataError("selection_score must be finite")
+            if not self.selection_score_id:
+                raise ConformalDataError(
+                    "selection_score_id is required when selection_score is present"
+                )
+        elif self.selection_score_id is not None:
+            raise ConformalDataError(
+                "selection_score is required when selection_score_id is present"
+            )
 
     @property
     def effective_retrieved_l(self) -> int:
@@ -162,13 +185,24 @@ class RetrievalCandidate:
         return self.retrieved_l if self.retrieved_l is not None else self.top_l
 
     @property
-    def pipeline_fingerprint(self) -> tuple[str, str, str, str, int]:
+    def conformal_score(self) -> float:
+        """Return an optional frozen reranker score, otherwise legacy cosine."""
+
+        return self.selection_score if self.selection_score is not None else self.cosine_score
+
+    @property
+    def conformal_score_id(self) -> str:
+        return self.selection_score_id or "cosine_score"
+
+    @property
+    def pipeline_fingerprint(self) -> tuple[str, str, str, str, int, str]:
         return (
             self.retriever_id,
             self.corpus_revision,
             self.preprocess_hash,
             self.query_type_rule_id,
             self.top_l,
+            self.conformal_score_id,
         )
 
 
@@ -241,6 +275,14 @@ def conformal_p_value(cosine_score: float, sorted_false_scores: Sequence[float])
         for index in range(len(sorted_false_scores) - 1)
     ):
         raise ConformalDataError("Reference-bank scores must be sorted ascending")
+    return conformal_p_value_from_validated_scores(cosine_score, sorted_false_scores)
+
+
+def conformal_p_value_from_validated_scores(
+    cosine_score: float, sorted_false_scores: Sequence[float]
+) -> float:
+    """Score against a non-empty bank whose ascending order was already validated."""
+
     first_greater_or_equal = bisect_left(sorted_false_scores, cosine_score)
     count_greater_or_equal = len(sorted_false_scores) - first_greater_or_equal
     return (1.0 + count_greater_or_equal) / (len(sorted_false_scores) + 1.0)
@@ -274,7 +316,7 @@ def build_reference_bank_artifact(
     seen_chunk: set[tuple[str, str, str]] = set()
     ranks_by_qid: dict[tuple[str, str], set[int]] = defaultdict(set)
     query_signatures: dict[tuple[str, str], set[tuple[str, str, int, int]]] = defaultdict(set)
-    fingerprints: dict[str, set[tuple[str, str, str, str, int]]] = defaultdict(set)
+    fingerprints: dict[str, set[tuple[str, str, str, str, int, str]]] = defaultdict(set)
     query_counts: dict[str, set[str]] = defaultdict(set)
     label_counts: dict[str, int] = defaultdict(int)
 
@@ -365,7 +407,7 @@ def build_reference_bank_artifact(
     underpowered: list[dict[str, Any]] = []
     for key in sorted(grouped):
         members = grouped[key]
-        scores = sorted(candidate.cosine_score for candidate in members)
+        scores = sorted(candidate.conformal_score for candidate in members)
         condition = dict(zip(condition_fields, key))
         bank = {
             "condition": condition,
@@ -430,6 +472,7 @@ def build_reference_bank_artifact(
                 "preprocess_hash": next(iter(values))[2],
                 "query_type_rule_id": next(iter(values))[3],
                 "top_l": next(iter(values))[4],
+                "conformal_score_id": next(iter(values))[5],
             }
             for dataset, values in sorted(fingerprints.items())
         },

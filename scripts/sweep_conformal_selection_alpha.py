@@ -29,6 +29,12 @@ def parse_alpha_grid(specification: str) -> tuple[float, ...]:
     return tuple(values)
 
 
+def format_metric(value: float | None) -> str:
+    """Format optional metrics without crashing when no chunks were selected."""
+
+    return "n/a" if value is None else f"{value:.3f}"
+
+
 def selected_indices(
     decisions: list[Mapping[str, Any]], *, alpha: float, max_context: int
 ) -> tuple[set[int], int]:
@@ -230,12 +236,12 @@ def main() -> None:
         for alpha in alphas:
             result = json_results[strategy][f"{alpha:g}"]["overall"]
             print(
-                f"alpha={alpha:g} selected={result['average_selected_chunks']:.3f} "
-                f"empty={result['empty_context_rate']:.3f} "
-                f"precision={result['micro_evidence_precision']:.3f} "
-                f"recall={result['conditional_reserve_support_recall']:.3f} "
-                f"support_f1={result['support_f1']:.3f} "
-                f"mean_fdp={result['mean_query_fdp']:.3f}"
+                f"alpha={alpha:g} selected={format_metric(result['average_selected_chunks'])} "
+                f"empty={format_metric(result['empty_context_rate'])} "
+                f"precision={format_metric(result['micro_evidence_precision'])} "
+                f"recall={format_metric(result['conditional_reserve_support_recall'])} "
+                f"support_f1={format_metric(result['support_f1'])} "
+                f"mean_fdp={format_metric(result['mean_query_fdp'])}"
             )
 
 

@@ -2,6 +2,7 @@ import pytest
 
 from scripts.sweep_conformal_selection_alpha import (
     SweepMetrics,
+    format_metric,
     parse_alpha_grid,
     selected_indices,
 )
@@ -20,6 +21,11 @@ def test_parse_alpha_grid_sorts_and_deduplicates():
     assert parse_alpha_grid("0.1,0.05,0.1") == (0.05, 0.1)
     with pytest.raises(ConformalDataError):
         parse_alpha_grid("1.0")
+
+
+def test_format_metric_handles_undefined_precision():
+    assert format_metric(None) == "n/a"
+    assert format_metric(0.1254) == "0.125"
 
 
 def test_higher_alpha_can_select_more_saved_p_values():

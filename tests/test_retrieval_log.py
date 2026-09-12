@@ -8,6 +8,7 @@ from scripts.generate_conformal_retrieval_log import (
     candidate_pool_top_l,
     exact_top_l,
     modality_aware_top_l,
+    resolve_candidate_scope,
     resolve_dtype,
 )
 from uncertainty_rag.core.conformal_retrieval import ConformalDataError
@@ -275,3 +276,19 @@ def test_candidate_pool_top_l_is_ragged_and_never_crosses_query_pool():
     assert [values.tolist() for values in indices] == [[0, 1], [2, 3]]
     assert [len(values) for values in scores] == [2, 2]
     assert stats["candidate_pairs"] == 4
+
+
+def test_candidate_scope_auto_preserves_official_pool_behavior():
+    assert resolve_candidate_scope("auto", has_official_pools=True) == (
+        "dataset_provided_per_query"
+    )
+    assert resolve_candidate_scope("auto", has_official_pools=False) == "global_corpus"
+
+
+def test_candidate_scope_can_force_global_corpus_with_official_pools():
+    assert resolve_candidate_scope("global_corpus", has_official_pools=True) == "global_corpus"
+
+
+def test_candidate_scope_rejects_missing_official_pools():
+    with pytest.raises(ValueError, match="requires per-query candidate_ids"):
+        resolve_candidate_scope("official_pool", has_official_pools=False)

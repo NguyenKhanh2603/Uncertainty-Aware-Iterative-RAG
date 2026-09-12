@@ -2,8 +2,10 @@ import pytest
 
 from uncertainty_rag.core.conformal_retrieval import (
     ConformalDataError,
+    RetrievalCandidate,
     build_reference_bank_artifact,
     conformal_p_value,
+    conformal_p_value_from_validated_scores,
     parse_rank_bins,
 )
 
@@ -43,6 +45,18 @@ def test_conformal_p_value_counts_ties_conservatively():
 
     assert conformal_p_value(0.5, scores) == pytest.approx(4 / 5)
     assert conformal_p_value(0.95, scores) == pytest.approx(1 / 5)
+    assert conformal_p_value_from_validated_scores(0.5, scores) == pytest.approx(4 / 5)
+
+
+def test_candidate_can_use_a_frozen_selection_score():
+    row = candidate(qid="q", rank=1, score=0.2)
+    row["selection_score"] = 3.5
+    row["selection_score_id"] = "cross-encoder@test"
+
+    parsed = RetrievalCandidate.from_mapping(row)
+
+    assert parsed.cosine_score == 0.2
+    assert parsed.conformal_score == 3.5
 
 
 def test_reference_banks_keep_only_calibration_false_matches():
