@@ -1,0 +1,147 @@
+{
+  "status": "complete",
+  "n_queries": 150,
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "max_new_tokens": 24,
+  "thresholds": {
+    "bge_a05": -0.31508107857399703,
+    "fusion_a05": 0.1853133884408862,
+    "bge_a10": 0.6915157210060502,
+    "fusion_a10": 0.38534087473828127
+  },
+  "fusion": {
+    "features": [
+      "bge_score",
+      "mean_attention_mass",
+      "mean_attention_fraction"
+    ],
+    "coefficients": [
+      1.1739825833602124,
+      3.221464068155586,
+      -3.133361146353143
+    ],
+    "intercept": -1.20768299805417
+  },
+  "results": {
+    "all": {
+      "n_queries": 150,
+      "methods": {
+        "full_top30": {
+          "em": 0.17333333333333334,
+          "f1": 0.3434992690334866,
+          "numerical_accuracy": 0.29333333333333333,
+          "mean_chunks": 30.0,
+          "mean_tokens": 4034.0066666666667
+        },
+        "bge_a05": {
+          "em": 0.18666666666666668,
+          "f1": 0.3457413626782407,
+          "numerical_accuracy": 0.3,
+          "mean_chunks": 16.08,
+          "mean_tokens": 2351.4133333333334
+        },
+        "fusion_a05": {
+          "em": 0.19333333333333333,
+          "f1": 0.3488391623610669,
+          "numerical_accuracy": 0.3,
+          "mean_chunks": 13.393333333333333,
+          "mean_tokens": 1819.4533333333334
+        },
+        "bge_a10": {
+          "em": 0.17333333333333334,
+          "f1": 0.33541210448689,
+          "numerical_accuracy": 0.28,
+          "mean_chunks": 5.02,
+          "mean_tokens": 762.6133333333333
+        },
+        "fusion_a10": {
+          "em": 0.15333333333333332,
+          "f1": 0.3232222072381692,
+          "numerical_accuracy": 0.2866666666666667,
+          "mean_chunks": 5.373333333333333,
+          "mean_tokens": 810.9266666666666
+        }
+      }
+    },
+    "easy": {
+      "n_queries": 113,
+      "methods": {
+        "full_top30": {
+          "em": 0.19469026548672566,
+          "f1": 0.38428209961860926,
+          "numerical_accuracy": 0.3185840707964602,
+          "mean_chunks": 30.0,
+          "mean_tokens": 4117.309734513275
+        },
+        "bge_a05": {
+          "em": 0.23008849557522124,
+          "f1": 0.41536529169960673,
+          "numerical_accuracy": 0.34513274336283184,
+          "mean_chunks": 16.68141592920354,
+          "mean_tokens": 2442.407079646018
+        },
+        "fusion_a05": {
+          "em": 0.22123893805309736,
+          "f1": 0.40252917167546887,
+          "numerical_accuracy": 0.3274336283185841,
+          "mean_chunks": 13.415929203539823,
+          "mean_tokens": 1778.646017699115
+        },
+        "bge_a10": {
+          "em": 0.20353982300884957,
+          "f1": 0.39680553969459925,
+          "numerical_accuracy": 0.336283185840708,
+          "mean_chunks": 4.336283185840708,
+          "mean_tokens": 656.433628318584
+        },
+        "fusion_a10": {
+          "em": 0.17699115044247787,
+          "f1": 0.3702099939944205,
+          "numerical_accuracy": 0.30973451327433627,
+          "mean_chunks": 4.654867256637168,
+          "mean_tokens": 705.6017699115044
+        }
+      }
+    },
+    "hard": {
+      "n_queries": 37,
+      "methods": {
+        "full_top30": {
+          "em": 0.10810810810810811,
+          "f1": 0.2189462999491929,
+          "numerical_accuracy": 0.21621621621621623,
+          "mean_chunks": 30.0,
+          "mean_tokens": 3779.5945945945946
+        },
+        "bge_a05": {
+          "em": 0.05405405405405406,
+          "f1": 0.1331061199913659,
+          "numerical_accuracy": 0.16216216216216217,
+          "mean_chunks": 14.243243243243244,
+          "mean_tokens": 2073.5135135135133
+        },
+        "fusion_a05": {
+          "em": 0.10810810810810811,
+          "f1": 0.18486697175221767,
+          "numerical_accuracy": 0.21621621621621623,
+          "mean_chunks": 13.324324324324325,
+          "mean_tokens": 1944.081081081081
+        },
+        "bge_a10": {
+          "em": 0.08108108108108109,
+          "f1": 0.1479132347984807,
+          "numerical_accuracy": 0.10810810810810811,
+          "mean_chunks": 7.108108108108108,
+          "mean_tokens": 1086.8918918918919
+        },
+        "fusion_a10": {
+          "em": 0.08108108108108109,
+          "f1": 0.1797189666042125,
+          "numerical_accuracy": 0.21621621621621623,
+          "mean_chunks": 7.5675675675675675,
+          "mean_tokens": 1132.5945945945946
+        }
+      }
+    }
+  }
+}
