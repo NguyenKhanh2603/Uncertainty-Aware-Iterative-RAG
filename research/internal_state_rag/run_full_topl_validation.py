@@ -129,6 +129,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--n-calibration", type=int, default=150)
     parser.add_argument("--n-evaluation", type=int, default=150)
+    parser.add_argument(
+        "--n-train",
+        type=int,
+        default=0,
+        help="Limit scorer-train queries for a smoke run; zero uses all.",
+    )
     parser.add_argument("--top-l", type=int, default=30)
     parser.add_argument("--seed", type=int, default=101)
     parser.add_argument("--max-answer-tokens", type=int, default=12)
@@ -148,6 +154,8 @@ def main() -> None:
     eligible = eligible_qids(questions, retrieval)
     train_payload = json.loads(args.train_results.read_text(encoding="utf-8"))
     train_qids = list(dict.fromkeys(str(row["qid"]) for row in train_payload["observations"]))
+    if args.n_train > 0:
+        train_qids = train_qids[: args.n_train]
     discovery_exclusions = result_qids(
         [
             Path("research/internal_state_rag/results/tatqa_smoke_n39_seed17.json"),
