@@ -22,7 +22,90 @@ from scipy.stats import spearmanr
 from eval.metrics import exact_match, numerical_accuracy, token_f1
 from research.internal_state_rag import QwenInternalStateExtractor
 from uncertainty_rag.modality.base import ContextChunk
-from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
+from uncertainty_rag.models.llm_client import (
+    AlignmentResult,
+    ChunkAlignmentError,
+    ChunkSpan,
+    ChunkStatus,
+    HuggingFaceLocalClient,
+)
+
+
+class ResearchTextClient(HuggingFaceLocalClient):
+    """Text-only chunk alignment without modifying the production client."""
+
+    def align_and_prepare_inputs(
+        self, query: str, chunks: list[ContextChunk]
+    ) -> AlignmentResult:
+        if self.is_qwen_vl:
+            return super().align_and_prepare_inputs(query, chunks)
+
+        content = query + "\n\nContext:\n"
+        marker_rows = []
+        for index, chunk in enumerate(chunks):
+            start_marker = chr(0xE000 + index * 2)
+            end_marker = chr(0xE000 + index * 2 + 1)
+            if ord(end_marker) > 0xF8FF:
+                raise ChunkAlignmentError("Ran out of private-use alignment markers.")
+            content += f"{start_marker}{chunk.content}{end_marker}\n"
+            marker_rows.append((index, chunk, start_marker, end_marker))
+
+        rendered = self.tokenizer.apply_chat_template(
+            [{"role": "user", "content": content}],
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        marker_positions = []
+        for index, chunk, start_marker, end_marker in marker_rows:
+            start = rendered.find(start_marker)
+            end = rendered.find(end_marker)
+            if start < 0 or end < 0:
+                raise ChunkAlignmentError(f"Markers missing for chunk {chunk.id}.")
+            marker_positions.extend(
+                [(start, "start", index, chunk), (end, "end", index, chunk)]
+            )
+        marker_positions.sort(key=lambda item: item[0])
+
+        clean_prompt = ""
+        cursor = 0
+        character_spans: dict[int, dict[str, int]] = {}
+        for position, kind, index, _ in marker_positions:
+            clean_prompt += rendered[cursor:position]
+            character_spans.setdefault(index, {})[kind] = len(clean_prompt)
+            cursor = position + 1
+        clean_prompt += rendered[cursor:]
+
+        inputs = self.tokenizer(
+            [clean_prompt],
+            return_tensors="pt",
+            return_offsets_mapping=True,
+        ).to(self.model.device)
+        offsets = inputs["offset_mapping"][0].tolist()
+        spans = []
+        for index, chunk, _, _ in marker_rows:
+            character_start = character_spans[index]["start"]
+            character_end = character_spans[index]["end"]
+            token_indices = [
+                token_index
+                for token_index, (token_start, token_end) in enumerate(offsets)
+                if token_start < character_end
+                and token_end > character_start
+                and token_start != token_end
+            ]
+            if token_indices:
+                start, end = token_indices[0], token_indices[-1] + 1
+                status = ChunkStatus.FULL
+            else:
+                start, end, status = None, None, ChunkStatus.FULLY_TRUNCATED
+            spans.append(
+                ChunkSpan(index, chunk.id, chunk.modality, start, end, status)
+            )
+        del inputs["offset_mapping"]
+        return AlignmentResult(
+            inputs=inputs,
+            batch_chunk_spans=[spans],
+            prompt_strings=[clean_prompt],
+        )
 
 
 def iter_jsonl(path: Path) -> Iterable[dict[str, Any]]:
@@ -160,7 +243,7 @@ def main() -> None:
     retrieval = load_retrieval(args.retrieval)
     examples = select_examples(questions, retrieval, top_k=args.top_k, limit=args.n)
 
-    client = HuggingFaceLocalClient(args.model, device="cuda", load_in_4bit=False)
+    client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
     layers = [int(value) for value in args.layers.split(",") if value.strip()] or None
     extractor = QwenInternalStateExtractor(client, layers=layers)
     results = []
