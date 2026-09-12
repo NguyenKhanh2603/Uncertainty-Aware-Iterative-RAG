@@ -26,8 +26,11 @@ from uncertainty_rag.models.llm_client import HuggingFaceLocalClient
 
 
 def iter_jsonl(path: Path) -> Iterable[dict[str, Any]]:
-    opener = gzip.open if path.suffix == ".gz" else path.open
-    with opener(path, "rt", encoding="utf-8") as handle:
+    if path.suffix == ".gz":
+        handle = gzip.open(path, "rt", encoding="utf-8")
+    else:
+        handle = path.open("rt", encoding="utf-8")
+    with handle:
         for line in handle:
             if line.strip():
                 yield json.loads(line)
