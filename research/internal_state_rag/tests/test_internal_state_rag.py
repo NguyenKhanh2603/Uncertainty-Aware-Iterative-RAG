@@ -1,3 +1,4 @@
+from collections import Counter
 from math import isinf
 from types import SimpleNamespace
 
@@ -12,6 +13,7 @@ from research.internal_state_rag import (
     derive_retrieval_state,
 )
 from research.internal_state_rag.causal import mask_attention_heads, zero_head_slices
+from research.internal_state_rag.run_causal_head_smoke import layer_matched_controls
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -109,3 +111,19 @@ def test_attention_head_mask_hook_is_removed_after_context():
     with mask_attention_heads(model, [(0, 2)]):
         assert projection(hidden).tolist() == [[[1, 1, 1, 1, 0, 0, 1, 1]]]
     assert projection(hidden).tolist() == [[[1, 1, 1, 1, 1, 1, 1, 1]]]
+
+
+def test_causal_controls_match_top_head_layer_counts():
+    ranking = [
+        {"layer": layer, "head": head, "support_fraction": 1 - head / 10}
+        for layer in (2, 4)
+        for head in range(5)
+    ]
+    top = [(2, 0), (2, 1), (4, 0)]
+    random_heads, bottom_heads = layer_matched_controls(
+        ranking, top, num_heads=5, seed=7
+    )
+    assert Counter(layer for layer, _ in random_heads) == Counter({2: 2, 4: 1})
+    assert Counter(layer for layer, _ in bottom_heads) == Counter({2: 2, 4: 1})
+    assert not set(random_heads) & set(top)
+    assert bottom_heads == [(2, 4), (2, 3), (4, 4)]

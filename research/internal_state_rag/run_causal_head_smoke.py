@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -68,6 +69,33 @@ def ranked_heads(scores: np.ndarray, layer_ids: list[int]) -> list[dict[str, Any
                 }
             )
     return sorted(ranking, key=lambda row: (-row["support_fraction"], row["layer"], row["head"]))
+
+
+def layer_matched_controls(
+    ranking: list[dict[str, Any]],
+    top_heads: list[tuple[int, int]],
+    *,
+    num_heads: int,
+    seed: int,
+) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    """Choose random and bottom controls with the same per-layer counts as top heads."""
+
+    score = {
+        (int(row["layer"]), int(row["head"])): float(row["support_fraction"])
+        for row in ranking
+    }
+    top_set = set(top_heads)
+    counts = Counter(layer for layer, _ in top_heads)
+    generator = random.Random(seed)
+    random_heads = []
+    bottom_heads = []
+    for layer, count in sorted(counts.items()):
+        candidates = [(layer, head) for head in range(num_heads) if (layer, head) not in top_set]
+        if len(candidates) < count:
+            raise ValueError(f"Layer {layer} has too few non-top heads for a matched control.")
+        random_heads.extend(generator.sample(candidates, count))
+        bottom_heads.extend(sorted(candidates, key=lambda head: score[head])[:count])
+    return random_heads, bottom_heads
 
 
 def parse_args() -> argparse.Namespace:
@@ -164,15 +192,12 @@ def main() -> None:
     discovery_scores /= len(discovery_rows)
     ranking = ranked_heads(discovery_scores, extractor.layers)
     top_heads = [(row["layer"], row["head"]) for row in ranking[: args.n_heads]]
-    bottom_heads = [(row["layer"], row["head"]) for row in ranking[-args.n_heads :]]
-    excluded = set(top_heads) | set(bottom_heads)
-    pool = [
-        (layer, head)
-        for layer in extractor.layers
-        for head in range(int(client.model.config.num_attention_heads))
-        if (layer, head) not in excluded
-    ]
-    random_heads = random.Random(args.seed + 1).sample(pool, args.n_heads)
+    random_heads, bottom_heads = layer_matched_controls(
+        ranking,
+        top_heads,
+        num_heads=int(client.model.config.num_attention_heads),
+        seed=args.seed + 1,
+    )
     print("top heads", top_heads, flush=True)
     print("random heads", random_heads, flush=True)
 
