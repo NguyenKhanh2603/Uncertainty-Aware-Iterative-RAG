@@ -1,0 +1,83 @@
+{
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "split_role": "calibration",
+  "n": 1,
+  "top_k_missing_support": 2,
+  "layers": [
+    12,
+    14,
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    30,
+    32,
+    34,
+    35
+  ],
+  "mean_missing_em": 0.0,
+  "mean_oracle_em": 0.0,
+  "mean_missing_f1": 0.0,
+  "mean_oracle_f1": 0.0,
+  "mean_gold_logprob_gain": -0.3284858465194702,
+  "positive_gold_logprob_gain_rate": 0.0,
+  "logprob_gain_f1_gain_spearman": null,
+  "mean_support_attention_fraction": 0.6731825470924377,
+  "mean_max_head_support_attention_fraction": 0.9825869202613831,
+  "results": [
+    {
+      "qid": "2965da5c-4d2a-402c-85c6-c1514f998285",
+      "question": "How many product categories are available?",
+      "gold": "6",
+      "support_ranks": [
+        22
+      ],
+      "missing_prediction": "12",
+      "oracle_prediction": "41",
+      "missing_em": 0.0,
+      "oracle_em": 0.0,
+      "missing_f1": 0.0,
+      "oracle_f1": 0.0,
+      "missing_numerical_accuracy": 0.0,
+      "oracle_numerical_accuracy": 0.0,
+      "f1_gain": 0.0,
+      "layer_ids": [
+        12,
+        14,
+        16,
+        18,
+        20,
+        22,
+        24,
+        26,
+        28,
+        30,
+        32,
+        34,
+        35
+      ],
+      "gold_logprob_gain_by_layer": [
+        0.005890846252441406,
+        0.33702754974365234,
+        -0.32320404052734375,
+        -0.2639007568359375,
+        -0.3979482650756836,
+        0.36414527893066406,
+        -2.056608200073242,
+        -5.047513961791992,
+        -2.2428321838378906,
+        3.205275535583496,
+        2.092660903930664,
+        0.7724161148071289,
+        -0.7157249450683594
+      ],
+      "mean_gold_logprob_gain": -0.3284858465194702,
+      "final_gold_logprob_gain": -0.7157249450683594,
+      "mean_support_attention_fraction": 0.6731825470924377,
+      "max_head_support_attention_fraction": 0.9825869202613831
+    }
+  ]
+}
