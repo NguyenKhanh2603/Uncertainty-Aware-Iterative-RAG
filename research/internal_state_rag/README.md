@@ -10,6 +10,12 @@ The first 39-query calibration smoke experiment is reported in
 evidence-induced gold log-probability shift, while highly concentrated support
 attention alone does not predict whether the final answer improves.
 
+The held-out causal masking experiment is reported in
+[`RESULTS_CAUSAL_HEADS.md`](RESULTS_CAUSAL_HEADS.md). Masking top
+support-attention heads lowers gold likelihood, but the effect is not
+significantly larger than layer-matched controls; raw attention is therefore a
+candidate-head discovery statistic rather than a validated confidence signal.
+
 ## Research question
 
 Can the model's internal computation distinguish four cases that look similar
