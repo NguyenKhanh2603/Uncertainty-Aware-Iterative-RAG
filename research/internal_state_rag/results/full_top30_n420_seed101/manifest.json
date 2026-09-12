@@ -1,0 +1,1693 @@
+{
+  "dataset": "tatqa",
+  "input_role": "calibration",
+  "source_split": "train",
+  "seed": 101,
+  "top_l": 30,
+  "n_role_queries": 1000,
+  "n_queries_with_support_in_top_l": 810,
+  "conditional_retrieval_ceiling": 0.81,
+  "n_discovery_exclusions": 63,
+  "plan": [
+    {
+      "qid": "aee40f29-4bb1-4d0b-810a-01404c52d991",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b9e41e7c-bf5d-4d23-b0cf-7fe5988f7229",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ecbc5209-1b5b-4954-b616-f1644fbd9bae",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "eb59d26d-4657-4323-9580-d647283dd3de",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b4166246-1d4e-4b3f-9ef2-988278df41b6",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "e47b7f46-e159-401d-8642-1fdb455c6bb1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bfd7fc68-610e-4077-bbf3-e36dced32142",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "6ee0355a-840c-4b5d-b6c1-1da1baed970c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d49539d7-ec5c-4191-b189-d30e2254ca67",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "7406d801-c702-4120-98be-d7e55d4a6ca1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "588d7900-a924-486c-885d-7250ae3a2594",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b21b7d73-a581-4e3f-8847-58280b20d59a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "dc90309b-c2cb-4d6b-904e-66571f48836c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "fbaeb1fd-f86f-442d-84f0-0cff1d966c89",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8a6f481b-bd53-4719-8263-5b76aca01cef",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "f7ec6eca-72db-4cdd-bc8d-c7d421f8bc5b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "938c285f-27e3-4274-baf9-74c3b6e61575",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "86382223-b165-48ba-b08a-44aad1195137",
+      "role": "evaluation"
+    },
+    {
+      "qid": "33ba4de7-7f92-4916-bb4b-786db411884b",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "bd201a3b-d023-4729-9e5c-77a8a5ad7462",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9c569bea-e036-4c27-8e41-82c6efab1d31",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "43534a69-ffbb-4c73-8605-7b787ff86979",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "faff1473-eb12-45f3-b3f6-91c8d597ee56",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5769019a-461b-42fd-9803-a97c21dfcac8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "830a3f30-5b82-418f-96ae-25bd095679de",
+      "role": "evaluation"
+    },
+    {
+      "qid": "33e1f138-3e4e-4ec6-a92a-9853bcec45b7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "35c016f0-c636-410e-80c0-3bd7d4b98406",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "a34b8922-c831-4a4a-bd0d-44bdd6b43921",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "33e2cec1-a31d-4782-90ae-0995e9d16547",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "865936a8-7148-46ed-a9b1-f83b565c693a",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "26594b63-42e7-49de-ba14-d8ea2929c157",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b2688206-ce96-48ac-9e22-647863621c91",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "1cd257c6-d908-49d7-81aa-fdf6ddc24569",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "6b190882-0f19-437c-8494-146e7a6c6a1e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8de4eb0d-1ca9-4a9a-a181-015f1c874e58",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8abfdf40-d451-474b-bf1c-c294663462a2",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "2bcad99d-c7b7-4751-8a73-5ff484496a59",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "6a475b57-ea8f-446b-b6fc-5e0082fb9e68",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "72f4849e-5b1c-42f0-bc0f-11846138d1e3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "53cf95f3-bc38-4c03-96e7-e73c76a35a84",
+      "role": "evaluation"
+    },
+    {
+      "qid": "64a6c46c-a5cd-4065-bbc2-3156a4d50eda",
+      "role": "evaluation"
+    },
+    {
+      "qid": "42b7a8d9-53f0-4c5c-9e4a-3142ee7d0bbe",
+      "role": "evaluation"
+    },
+    {
+      "qid": "77191f82-0a18-4050-8911-bff9f1a401d9",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ded4b917-6db2-462d-8442-b607b4b4ecf0",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "724958d2-3753-4321-b2e4-b08396be8a81",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "775e8c59-63c8-48ca-845a-1227125e06ea",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "fa09db3f-9a02-4224-8e6e-270a2a174a48",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "bc012d28-d692-4c81-bf38-ba522521a229",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4de8122e-9f3d-4941-ab51-7e7ce7097206",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b4ebd0dd-019b-4dfd-b287-e02dc0c137d4",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "81881d0f-ec55-4a9b-bbe5-576d737fbb17",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "7003ed08-c3d1-4d01-b45e-2644a392b37c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "a0ba1379-d964-409b-a1c3-8c0e45c4c859",
+      "role": "evaluation"
+    },
+    {
+      "qid": "82f60693-8964-42a4-80b6-5f36daef01a5",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5af62fdf-d76a-4416-bf77-2abf7c05af1b",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "470bb13c-51db-4653-a41a-64aa1150d4f0",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e26d0c78-86ae-4180-b8ed-0c8c77d5d13e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "27c714e5-1840-42e9-b17f-228bd9041ced",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c8cfb12e-6066-4f58-b5e7-4f93fbd5a3d7",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "db06dbbe-eb39-40bb-9cce-94f42b302247",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ed704fdc-4068-4d4a-a20c-c6f14d533993",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "707f3104-14d5-4170-9596-3492bd74fa48",
+      "role": "evaluation"
+    },
+    {
+      "qid": "782d78e9-38d1-4f12-9b3b-e2c58f5f113b",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "0f090d90-18d8-446a-bfb2-9d485fd76a78",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4fdebfcf-6b2d-43e8-9af5-7a0e534766ab",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "0f6125b2-42b7-46dd-9d6a-75b39dece141",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3e16eca4-992f-4f55-94cc-834524616106",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "10614ac9-04ed-4232-804e-24882a9ab1b5",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "6582c3de-7108-41e4-ae26-a7bb13f3723c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "904679f4-77f5-4575-975a-2b7b18eedbcf",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d2014099-7bce-4550-a537-8cd002d1f2ee",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b10455a5-8132-4593-b8c4-6ba2021a8ae6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "eda72068-7f51-4167-be0d-e685a748ec47",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8edae51d-e4fb-4785-9527-2952ec671ec1",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3c13ce1e-c1f6-4649-93b4-17d4901a1ce4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0a4b7003-409c-4c68-8807-127d1f6f816e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e94e3b01-1ce3-4dba-8aa8-4aaff5af3381",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bd85fa1f-d369-484f-8a56-a77b90f02eda",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d7f780dc-aea1-414f-a826-0f036d1af3b8",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "337c485d-fbd5-410a-9e53-b2cd8a46cb27",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "0aa035e4-f009-4067-9904-b7d249900f1f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "19642eba-6d0f-4323-be47-8a3781448b59",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2192f39a-be86-43f9-9c50-ca014fba19cc",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "f5227355-dc37-4c35-bb80-b07f6bc30c2c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "694c5c87-e47f-43d8-bd55-d9c47eb54c94",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4f8f575d-d1c3-429f-ac18-1cf0beef2c54",
+      "role": "evaluation"
+    },
+    {
+      "qid": "41f11c5b-c73d-4ec1-88f7-4216ae207eb4",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "b32ebe59-91be-47a3-8ccd-f70f4c2f0ff7",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1c4216e2-ae51-484b-96bc-eb8b2526b57c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "49995e73-6740-40f5-9322-cfa4f0a4377d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "04ce5f81-a6b1-4ae4-bb3a-79bafe4b5a0f",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "6de594b4-f953-4e56-852e-a9eaadb08ec7",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "bb215411-5edb-4fee-b9d1-a591b92a6a2b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8ee547bf-784c-4fbd-a5b1-adc151550fdd",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d4090dde-4c3e-49c7-8645-7394c344b8f8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ccf20925-44c5-4c96-ab83-73401e5918e6",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a7500738-2bd2-4061-b496-e690e5fd5bae",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "73d21073-e091-4f7f-82e2-fb67afed07b2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0dc550d6-ba0a-4f46-b606-b102f5441631",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "0d92fff4-72fa-4feb-9b9c-d40aa45fd7ac",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9a017e35-1279-498d-8b7d-15c0c01ccb15",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "093bacf1-af9b-4ba0-bed7-2d60c9e68b03",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6043e270-40b7-4687-9c22-c23f797cc4c2",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5211abcb-d90d-47b4-a9f2-2965427f0737",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "599d5a31-f968-47b6-8b9d-a67a9c9e280e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "63785bbb-0d15-42f7-ae62-c7ea197f1da6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "48e3d695-f9e7-46b4-b196-ee8c8f0836c4",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a9d259dd-ecc0-4c47-aa63-eec04e443241",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d00c1841-9ef2-426d-b16b-903b6f5b0a78",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "cca74d6f-5b53-4928-8534-4ddc1453522c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "68e3348b-1644-427f-8daa-eb8f8ebc7487",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "f127e1ca-2707-4c71-98e9-b6b32b39890f",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "89f44070-0740-42f3-88bb-fa108d0e54c2",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3fcf5adf-273a-4265-a488-c524c0881937",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a4d8a84a-bc01-449b-954f-e85f6f40e445",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b523506c-7ca0-4456-9bf9-d62b6f4254b4",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "cd429041-4adc-49b5-8c6b-40c6237e1e5a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6f99edf8-cdb9-4033-891a-a317f7948a83",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "a8523b56-e4c4-4abd-b86e-b48e9b0cd5ba",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bb358043-b480-47e9-9da4-48bb3d75fc67",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "72b1b9c6-21a8-4727-8be8-a0502828f463",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3d4a0379-4450-4e2e-84c7-3183357e1d57",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f0acb7ba-4f34-4561-833d-b3903bd920cc",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "7db61e5a-a26a-42d1-9cf3-ef63dca7998f",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "d6a1e18b-fb18-4a23-916c-bcc2e485d64c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "1b56f13f-b686-4ae3-94bb-4d05e05ed9ed",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "e4e86d42-6531-439d-a324-66b3d1533577",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "61ad62bd-4e07-43b6-8420-a5f76c131060",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2fa73896-2c1a-430f-8024-123ec374657b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d869b8d1-5857-4921-ad7e-56e9bb6e184d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9e23566f-2072-4489-92db-c93bc42f7a10",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3e1a88fd-b2f4-40dd-a7f1-baef93720d4a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "daae71da-a242-4691-b0a3-ab630be6e71e",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "0fff833e-325c-4cf6-8651-cfd8307d6951",
+      "role": "evaluation"
+    },
+    {
+      "qid": "788d53e9-b25c-41ba-9675-52acbb527873",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "60b4a92c-0acc-42b0-bbce-f66df867e4ca",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "f1ad3da8-6d65-4b83-af29-eb1ad166d506",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d9b0bdec-a7fe-4a48-9762-94cf0ab84a75",
+      "role": "evaluation"
+    },
+    {
+      "qid": "22e17140-c3c8-4888-819b-e4b234aa2888",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1e0575a4-28dc-4e64-acdf-46cf9242fd67",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7446127e-68e4-4d89-8e6d-b20085019e32",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c065451d-f348-422a-bc61-940a3ecca042",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "06fec2d0-c023-4eb0-bcfe-0a43cf26e2fe",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ac52e9aa-428e-4a7e-b686-a3c1c5fa8340",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "6280d80a-8042-4404-93f4-67a8e26082f9",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8ef11c10-24d1-4bf3-8997-e7f6508cfe77",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "36915333-341a-49b2-a1de-8ce136c1e87c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "16fde714-cc9f-42e7-859f-f9855253cf55",
+      "role": "evaluation"
+    },
+    {
+      "qid": "58d222a8-62db-4bfc-b482-e122aa8f8fc6",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "2e7fd98a-5d33-4605-b731-a2abf7b1b802",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7b7108df-3586-4bb4-9d65-67a3a408d543",
+      "role": "evaluation"
+    },
+    {
+      "qid": "acafc779-6df2-4f2d-b22e-1b727f76f78d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "2593e227-a34d-4426-8510-77a9051af505",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e247fa90-8c58-4582-8a69-fcc098340c41",
+      "role": "evaluation"
+    },
+    {
+      "qid": "56e08b8e-4741-4e5e-8720-c4cda7aa30c0",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "97975b6c-611c-4e82-978d-8c142a62ef4e",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4fb0be1f-2398-4d90-a536-a715f8eb1e1d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "fffff61c-d43f-4f0e-b347-ea036a8ea066",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "de31b710-b046-43d8-b1cb-2f41f03dd632",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d4d9632c-1c24-49c6-b038-c01ef479916e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "7102c8f6-65bd-4bfa-aed4-11676f81d48a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8c782d31-119a-4709-92a2-ad2652f681a6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "2d132aa3-a0c4-4b56-8d65-ac0e77c02916",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8d12d881-995b-4e44-b59d-3421ac564632",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3569878f-5638-4866-b52c-376277ce42d6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "33047ebf-ad4e-49c7-9712-b304643b3710",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1f2526ba-db90-4388-8499-8fda51621e85",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e7d9078d-3c6c-44e4-91a4-c655380c1864",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "14277a21-e68b-4809-a480-803c3c9f33dc",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d91d62cc-b176-42c9-963b-6866beace179",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "c502823a-fa1d-49e3-b14e-6973d72afc2f",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "b503b3c3-02f0-4393-b819-3ebe0433ae36",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "f4518ad2-3cf5-4cad-8b8d-ac98a45d4917",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "2dfe3479-605d-4b6e-ba8f-2640977e24a4",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "dba56004-ed1a-4d6a-b051-c14f22fa847e",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "bb1d7b83-f46d-4fa7-94c1-4284383398e4",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "19f54d24-5bd3-481b-ac04-c08024c69867",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5c6c4629-baf9-47e4-aeea-1841ad767fe8",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "b24a5a4b-4990-42f0-a456-816ae3b2e1bf",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c21cc21c-1311-4574-810d-5fb14bc3b847",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "321846cc-12d5-4426-bf40-9ee4d5358894",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "6affb108-b011-4945-a620-fe26a5579f44",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2211a5ce-9c29-44ce-985a-6c74462bed03",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3597746f-7238-4a6c-a6eb-531daed6548a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "50ffe3d3-71f5-4e4d-8406-9e2b50b6387c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7a6c059d-c900-4878-a926-caf29c23f85a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "34f30985-6b1c-4e6e-a480-dc9db4f5d58b",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "5ad888a0-38a4-43cf-92f2-8595a6bdd102",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "04eae13c-154a-48df-aba9-5ba611f242c5",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e43c28ee-191d-4524-8838-17bab1246c2e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3d2d4b31-1c36-4526-a31e-6d0a2b5cef96",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "80e685a4-2dcb-4d01-8bb7-84c562af3b9e",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "af5c91cd-f088-4f64-bec0-dd47230d6ee3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c5779a4d-8b62-442f-b622-81d253fc6232",
+      "role": "evaluation"
+    },
+    {
+      "qid": "27aa84fd-665d-4780-abc0-d6032e70909e",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "63e16af0-27a4-4ab7-a902-16b95e815ff5",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "64a086c9-db3e-4376-bde3-0320d697d7b9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "008b9936-2795-43fb-b82a-88760033f21d",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "650f649f-2973-47d0-b567-956d43757fdb",
+      "role": "evaluation"
+    },
+    {
+      "qid": "08885f18-ca2c-4e92-8c32-70916adef5fe",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "96faee70-dcfc-41b7-ac01-638e9c87afd0",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5c8b5f35-8146-4113-9b05-23d186191106",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5d11fdb7-6145-4e3f-92f6-bdfe2bc5a482",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7d48bdc4-ed4a-492a-9c00-b994ceb53b75",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "9fb21da5-ca15-4ee1-a27f-a26f3eb453f9",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "4e5da616-de39-48fc-8f9b-24db6b54dcbf",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "881a2069-07af-4e68-b12b-afc1889e31ca",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d469f8f2-63e3-4b4e-9a36-cea6753f3a05",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "9b3e95c6-ca16-464f-9a45-611acc84227a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "2f561b61-16b7-4130-a503-2f4632dc3398",
+      "role": "evaluation"
+    },
+    {
+      "qid": "1b79c093-0bf7-4f49-960c-ffccbaca96d6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2892fc21-7f00-48d6-8b39-a752a2eed7c6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8c3a50c6-0809-4c4a-ba07-dcd9ba2d751e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "436e18aa-5ae5-4817-b0a6-d4e7c36eeadf",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7f5350d9-79f2-4349-abe1-9b2c7753164b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9cf7907d-620e-4022-9b10-aa835d732015",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8b08afaf-e692-4891-9595-386a78e4de56",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "06643afd-eb9a-4368-8adf-73bb077d57c3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b8053146-b789-415c-a2a0-f16743e90bed",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a662838a-59a1-482b-8365-06c05759baf8",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "125b026f-2d4f-496e-abf7-6635c605d7ee",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "073af9d3-01b7-4c26-986f-8972fdb260ed",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "28a137bf-c91a-4190-8754-7ca45bece7b8",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1665b441-93e5-481d-b0b4-2d28ce70e1a8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e48c96f3-7b8a-491d-a6bc-e6717c25de63",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7165beca-39c6-4fb0-bb9f-f9490187900f",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "eac9a6a8-dca4-41a0-81d6-41a846aa78a2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9ad8bdbc-9a6d-4076-8d9c-51f83f66b4e9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "18d4aead-787f-45f7-8be0-23a3ab412ee2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ce22262d-913f-4b24-a50a-df7fe59b0d1b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5e5b89e8-a5cc-44ee-b657-b951cfdd3013",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "2119a070-2a77-4436-9f28-890068d2bcde",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c5363e6f-2911-45d3-b07a-ca8b5f14d310",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "60963376-24dd-4401-b16a-f96b7109238a",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "a9ad3e13-e64e-4e92-aa07-ffa8dc940cbc",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0bbba170-5fd5-467e-ae60-abd972d2b348",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3a9ea974-2a3e-4cf0-a549-05599ebd4c09",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "10ee265b-ed53-464f-ac00-f94e096c8bde",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "84a505ca-674c-4652-9f39-7ed9ec43ad09",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "3e22d3d5-cd39-4c87-b2dd-603792e0c7c1",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4b2450d6-9328-44ac-b74d-dc51dcefdfad",
+      "role": "evaluation"
+    },
+    {
+      "qid": "32f657ec-647d-452f-930c-220b9299efc7",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "f567c5e9-0dc4-4fe8-a36b-d6b0b1015483",
+      "role": "evaluation"
+    },
+    {
+      "qid": "48fd0708-24b7-4840-b4c5-9d63921bfcf4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b168778d-7c73-4dd5-9024-2fd93b457de9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "454fe6ef-138e-4541-9855-2b26ea94b464",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b2284511-3933-4e46-aa10-df0beac2cd60",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8a386578-b085-4f82-8298-d5f61fba6d52",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "bb0bed48-e14d-449f-92bd-9b344c9128d3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5964b119-824e-4277-8f83-ef83a15dead0",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "12eaea40-21b9-4206-a0ba-b1a9997eecdb",
+      "role": "evaluation"
+    },
+    {
+      "qid": "daabfaea-3185-48a2-9975-ef17097533f3",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "a7a5692b-12a0-47b6-b5b1-5c585cc5620b",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "858940e9-21f1-45db-acf2-21f298e367e5",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "9bad213f-ccf8-4427-9bb8-ac113829602a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "87c48dcf-7d40-4111-8129-47fddbb43aea",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "f4abf4ae-2015-4e76-bbfb-c157c005e96d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "f45e63db-29fb-4533-97ab-1975cc9004fb",
+      "role": "evaluation"
+    },
+    {
+      "qid": "73c7f3fa-75d2-4759-af01-5e51105b896e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d09332c7-20e6-426a-ba9b-1bdd2baa8702",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "85e595ae-e3b8-46cd-b133-2572adbd836d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "efe48874-070b-47ca-82c1-cc57798294e6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f69cd9f7-cf4d-4df8-806a-047eb0210e50",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d31eb78c-ccd2-42bf-98b7-62ac1c5e7e70",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "14396f6f-bfc5-4e8e-88d8-9452bb21cb95",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "f88f2e6c-c36e-4990-8fa4-d29f9972383a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "767a33ed-2a5e-4d26-8711-f590c7888be2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a9d256bc-dda7-4fb8-b4bf-53ab514d878e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "2cae4fb7-d8f5-4272-af61-9c94a63b7bac",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5e98b9bc-1ec9-46d1-ac75-01036e604b1c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8b895bdb-e0dc-49d7-8b26-e62657c63772",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2335a2d6-b4f9-40fd-82a9-3e1b346e8cb6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d3b0cafc-c9a3-45f5-aa55-d0615c139462",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7abea844-a63e-4e8b-9181-446f9c66da92",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e99b87ab-b4fa-4831-a849-8e485c5b6e9d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4ffd3dea-c182-4f67-a538-8f44b878d9f5",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d2bf0ce9-7da4-4764-bc98-69290c3bba56",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "fe42645d-c4c4-4892-ac79-a605c0f4e0cf",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8ab1ce53-a8c3-4c8e-af4a-15617ec32c4e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "cc42e86a-c56d-4638-b94c-bf4cc5ebd7c5",
+      "role": "evaluation"
+    },
+    {
+      "qid": "bb9f53c0-2fe6-49f6-a26b-b2f8952b1d21",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "61536c36-8e29-4a92-b8ec-a3481e16d146",
+      "role": "evaluation"
+    },
+    {
+      "qid": "885268d4-4580-4148-8cf5-455d3ee9b7fb",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a0e2ffde-2955-4bf8-8a84-5891ed4a9757",
+      "role": "evaluation"
+    },
+    {
+      "qid": "261cec47-33d2-4cec-8baf-5eb81ecf089c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b4e7b8b8-5f36-4e0d-80fc-cf7657a9fef6",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "939a904c-6df5-487a-9618-ecb5f6033c22",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "36fa8c8b-12ef-453b-9a59-feca388f56a6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "206c655a-e238-4aff-a4a8-986510850ddf",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "28bef5c4-e904-4836-b49b-34aa295f4f4e",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "3b262526-1e70-45c6-8fbb-cc62fb3900da",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "37a86349-71a5-492b-b647-754eadad0035",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "dc53690e-8a82-43b5-ab8e-6a31c4692ce1",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3573ba23-bae6-4f8c-a772-831316b7b549",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "9711a877-d567-4066-b75b-891ab8a1361a",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "3dd72794-266b-4a57-92d5-dbb32e5e81ed",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "dea7163b-1497-40b9-81a2-471502b6e0c9",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "83dcc128-9777-4ae2-ba55-50162ac43257",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "2497017d-3e7d-475a-bbfd-e1f53db71e5c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7d2a24d5-05ab-40db-a34a-6bb473f53ea9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2c67b499-67d9-457b-9580-d45e22430106",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "517141b9-4b42-49d0-ba52-c6347756e05d",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "c90dab47-2b26-4381-8e6c-e5aae4d67cc8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9cc1cf50-1990-4dd7-8054-14e961af8281",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8f360368-0dea-49a3-8a42-65c50607b265",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f773a0bb-d8bb-49ca-9799-230a678f1a63",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "fa9372c5-659f-4ad7-ae66-ac7bdc939d86",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "2c6cdd11-6b7e-44d0-be4b-e582a1c6f389",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7fe7bbd8-9f5b-4bd5-ba91-255bdc205ea4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "7108fbae-7a5f-477f-9f6f-aa055bb5701f",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8108ff79-cb6d-4be4-9959-1b0f56dff72a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "1c78b8ad-5dd7-471e-bafd-71e1515afaa3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "7b2b81fe-e9ae-4c86-9108-3d6f381d8e90",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c5027ca9-2d3e-4ad0-b165-69f9ab58b2be",
+      "role": "evaluation"
+    },
+    {
+      "qid": "106e362b-8b6c-43da-afa9-3e0d446f4478",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a95d0f4c-208c-41d8-98bb-cce6c51108b1",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "74083229-ffa3-49f9-8f46-3600831c3be8",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "11d5580d-9a3a-492c-a958-8206482e5de1",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "cdc1a769-4520-41fa-9664-e83b035f8ce5",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "082507b9-c5e3-41a9-9a11-25836c63f687",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "03ffdb11-7405-45dc-85e1-2ce82bad663b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fd851472-5853-43f3-805a-de69a4637d56",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "8c9a46b7-7b89-491d-89e6-6c2e96905e3f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "851b195e-7e00-444e-b458-803455fdb785",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "4ba330c0-1173-48a4-a9cd-c07c9da7786e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8250ebde-65db-4c0e-bcb7-57ad3a92e75d",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "952c2131-59a2-42ce-8121-26d53c9d78be",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6490a76b-69b5-4cfc-9204-58dec2b5b2d2",
+      "role": "evaluation"
+    },
+    {
+      "qid": "38ecd3f0-e34d-439f-b9ff-ff60e6106a15",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0aac0b36-feb1-4213-ab7e-a39e5552926e",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f944b361-6e00-45c8-a7e1-1f5c6e0fd6b1",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "17a14127-0e39-48cf-a9d9-5b1d022c1be2",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ba74b178-ac08-479f-a6dc-68ca68e3bf15",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "96be48fe-a8ae-4a43-a8ec-e09121053df7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "88f8833c-baec-418b-aa37-8f1fa3b93c05",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b27aeb06-3f43-49c4-9b7e-07579939bd94",
+      "role": "evaluation"
+    },
+    {
+      "qid": "6b008a72-3d90-40fe-8a92-048341e79634",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1dbde460-30ed-4d95-8fb2-0bd6dfab61fc",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3c256b48-526d-4284-958d-1eb8c1167921",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4b213d0c-6f59-42e1-b10e-a634422b4f62",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5d1c6495-ee76-4572-b920-1462c4245a4d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "af8c557d-8db2-453e-a943-1aad79435ca6",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "70d30aec-a4e1-45fb-9c41-57336fc0c7f4",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c095a6f0-14eb-438f-a337-7ed5658db35d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b01864e7-0e92-4b21-9258-b2070a0ed07c",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "ef7e4bf1-dd7c-4905-9cd1-3480d7d46be9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c22dd300-0758-46a3-9281-614f9556a503",
+      "role": "evaluation"
+    },
+    {
+      "qid": "f8a50026-ae51-441b-b74c-8f5f750cadc6",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e7b20fd3-ca7e-4fc0-8c52-a07296ef7de3",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1df7923c-cd07-46d6-9252-9b5e39c729cd",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "66d2343a-29b3-47ea-ade5-cf2d54682363",
+      "role": "evaluation"
+    },
+    {
+      "qid": "59c9f895-ff60-4517-9951-e6cfa52b208d",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "35dac8cf-104c-4f5c-ab03-361cea5e42fb",
+      "role": "evaluation"
+    },
+    {
+      "qid": "df030358-1bf7-43aa-b159-2621b54c812b",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "545ec5e2-d221-47fc-8f7e-9470f3d50199",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "4aefde0b-e80c-43a3-8878-ac7af5201c22",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "03e6f4ce-d5e9-4718-8988-85cbabffda71",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "e4b2737e-bb4b-4f91-a30f-b62e81a69859",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "5c5a8f85-d5ec-4153-813a-c6361190a298",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "783c2a69-8e72-4315-8f24-6424c431bbd1",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "368821d1-fd61-437a-a678-f7e04a67a71c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8a5a529e-63d9-4967-aa49-beaba37efbac",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "fd2e3353-828a-4089-adbb-13e8cf830749",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3d580cca-4705-4d44-be3a-49b29db72639",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "d2039910-5745-4641-a441-0476c4685298",
+      "role": "evaluation"
+    },
+    {
+      "qid": "92d9a52b-2c32-4736-b863-6055a605f183",
+      "role": "evaluation"
+    },
+    {
+      "qid": "91bd7d5c-1e11-4855-ac8a-49824ef8d66f",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "b31f64ff-8e1a-46e0-9303-1a069c9ea577",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "9c5661de-0551-4e6e-bae8-b5171c27634f",
+      "role": "evaluation"
+    },
+    {
+      "qid": "cea4a6d9-3e3b-4f16-ab95-efdbd76ffbd4",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "5570bf90-e513-406e-95ba-9f05d0685890",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "ba876dea-ea46-4d80-80c3-773b1013409c",
+      "role": "evaluation"
+    },
+    {
+      "qid": "8bd117c8-689b-4404-9975-14aba4d22483",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "a0df8af8-a712-46ed-a996-9db9d6067ab4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "9d951112-ed87-4794-84d1-ebcdc32e8516",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "772fac33-70a1-47b1-9c37-279ad9692137",
+      "role": "evaluation"
+    },
+    {
+      "qid": "4b179dfa-3222-48c9-a047-c9d09f4bc683",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "25eb7156-f16b-4901-a9a3-ce190572a96c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "24e5d679-e4f1-47b4-a0ca-77550ef8c4be",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "c29abd5f-f371-4534-a500-daf5ddaf1a91",
+      "role": "evaluation"
+    },
+    {
+      "qid": "342286b3-623c-4029-b159-2325a42d259a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "27bffe94-56f1-4b23-8883-34b5e3809efe",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "4bca4aeb-f8db-43ba-a10a-b94783d5d295",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "6a702970-dd34-4682-9072-c25f026fc2c7",
+      "role": "evaluation"
+    },
+    {
+      "qid": "e4c66bcf-1360-4805-9014-7dd312e5f0d3",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a5dbd519-b3f0-4124-867a-86e28524d354",
+      "role": "evaluation"
+    },
+    {
+      "qid": "b7910060-0e51-4986-bb22-e59fbcbbd488",
+      "role": "evaluation"
+    },
+    {
+      "qid": "679adde7-2617-49e3-81f5-031a07677719",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c2897096-e60e-4a81-aa8d-40e3dd5e9665",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "9cb6ead8-72bc-4a20-ab27-9c07c5368759",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "1ff18612-f679-43dc-b015-b2de291063a6",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "de4977a4-a1c8-44fd-afcf-5bd7b8a32fa5",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "76fab682-8963-4855-90a2-e68df40d6f4c",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "33cdd75e-c10c-4bec-8117-744b7b10bd45",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "28067691-2468-43f9-ba5d-201dacef8197",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "223975f5-30fd-4ecc-bc68-0db03d540ec8",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a9842490-28f7-421e-870e-4a926335386b",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "71fc1927-998d-482a-8435-0bc5c96ceeb8",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "fa8764f2-e366-48ae-92ed-19f55f306b60",
+      "role": "evaluation"
+    },
+    {
+      "qid": "3c7c6154-c516-4900-b26a-eb3d1f4bb122",
+      "role": "evaluation"
+    },
+    {
+      "qid": "ff9f180d-424c-4351-a8be-9724e72b753b",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d6a3a306-fb34-48dc-838e-3d109f60d685",
+      "role": "evaluation"
+    },
+    {
+      "qid": "281ec4c8-1632-40e9-bdf2-8ceac4303d61",
+      "role": "evaluation"
+    },
+    {
+      "qid": "847400ae-6d72-4afa-9b2c-c9677578034a",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "b7e32477-3f78-48df-ab59-2764f0e097e9",
+      "role": "evaluation"
+    },
+    {
+      "qid": "76ed6ed6-8581-408e-b54a-3d19e1f5be9d",
+      "role": "evaluation"
+    },
+    {
+      "qid": "2a330cfc-863a-4682-a270-7159a11eee8b",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "0db252ea-bd9c-4b17-b252-7fe8ce405628",
+      "role": "evaluation"
+    },
+    {
+      "qid": "5e1c2c90-1129-42ad-b071-844763a1e939",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "92430c66-de38-4ad0-a50b-81bbb31f8263",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "bcffe8e7-6bc3-4d63-ba91-6b58a6c7a0a7",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "ba9e7c31-b9b0-40bf-ba91-d97e6aa733a0",
+      "role": "evaluation"
+    },
+    {
+      "qid": "0a36372a-151d-432f-becb-5b2d738f0e56",
+      "role": "evaluation"
+    },
+    {
+      "qid": "fdf6dd90-79e7-46e7-90be-b12cf61f8acf",
+      "role": "evaluation"
+    },
+    {
+      "qid": "918c1037-ee49-4906-93d5-1517bfb17825",
+      "role": "evaluation"
+    },
+    {
+      "qid": "a278ed38-357b-4bcc-91d5-f344dde175e4",
+      "role": "scorer_train"
+    },
+    {
+      "qid": "ef0cd7b1-edd5-446b-8557-1d15d825b518",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "8cb720f5-84c7-49ee-8b5f-b266ce4eea3a",
+      "role": "evaluation"
+    },
+    {
+      "qid": "d9218c5e-78b9-436c-b54f-e41ab63515b4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "35096122-545b-4be2-8ea2-ebafd94c687f",
+      "role": "scorer_train"
+    }
+  ]
+}
