@@ -1,0 +1,147 @@
+{
+  "status": "complete",
+  "n_queries": 150,
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "max_new_tokens": 24,
+  "thresholds": {
+    "bge_a05": -0.31508107857399703,
+    "fusion_a05": 0.1853133884408862,
+    "bge_a10": 0.6915157210060502,
+    "fusion_a10": 0.38534087473828127
+  },
+  "fusion": {
+    "features": [
+      "bge_score",
+      "mean_attention_mass",
+      "mean_attention_fraction"
+    ],
+    "coefficients": [
+      1.1739825833602124,
+      3.221464068155586,
+      -3.133361146353143
+    ],
+    "intercept": -1.20768299805417
+  },
+  "results": {
+    "all": {
+      "n_queries": 150,
+      "methods": {
+        "full_top30": {
+          "em": 0.16666666666666666,
+          "f1": 0.30893728137266624,
+          "numerical_accuracy": 0.32666666666666666,
+          "mean_chunks": 30.0,
+          "mean_tokens": 4165.086666666667
+        },
+        "bge_a05": {
+          "em": 0.16666666666666666,
+          "f1": 0.3216568796921222,
+          "numerical_accuracy": 0.3333333333333333,
+          "mean_chunks": 15.68,
+          "mean_tokens": 2423.9733333333334
+        },
+        "fusion_a05": {
+          "em": 0.16666666666666666,
+          "f1": 0.3250956466550019,
+          "numerical_accuracy": 0.32666666666666666,
+          "mean_chunks": 13.226666666666667,
+          "mean_tokens": 1928.8
+        },
+        "bge_a10": {
+          "em": 0.16666666666666666,
+          "f1": 0.31663063834420807,
+          "numerical_accuracy": 0.32,
+          "mean_chunks": 4.966666666666667,
+          "mean_tokens": 802.5466666666666
+        },
+        "fusion_a10": {
+          "em": 0.15333333333333332,
+          "f1": 0.31552398445288676,
+          "numerical_accuracy": 0.32,
+          "mean_chunks": 5.346666666666667,
+          "mean_tokens": 847.1133333333333
+        }
+      }
+    },
+    "easy": {
+      "n_queries": 138,
+      "methods": {
+        "full_top30": {
+          "em": 0.18115942028985507,
+          "f1": 0.32769235207864006,
+          "numerical_accuracy": 0.34057971014492755,
+          "mean_chunks": 30.0,
+          "mean_tokens": 4172.463768115942
+        },
+        "bge_a05": {
+          "em": 0.18115942028985507,
+          "f1": 0.34312830838400676,
+          "numerical_accuracy": 0.34782608695652173,
+          "mean_chunks": 15.869565217391305,
+          "mean_tokens": 2449.6884057971015
+        },
+        "fusion_a05": {
+          "em": 0.18115942028985507,
+          "f1": 0.3444930160964343,
+          "numerical_accuracy": 0.34057971014492755,
+          "mean_chunks": 13.253623188405797,
+          "mean_tokens": 1913.5434782608695
+        },
+        "bge_a10": {
+          "em": 0.18115942028985507,
+          "f1": 0.33743495886275204,
+          "numerical_accuracy": 0.3333333333333333,
+          "mean_chunks": 4.644927536231884,
+          "mean_tokens": 746.8623188405797
+        },
+        "fusion_a10": {
+          "em": 0.16666666666666666,
+          "f1": 0.337267270885643,
+          "numerical_accuracy": 0.3333333333333333,
+          "mean_chunks": 5.057971014492754,
+          "mean_tokens": 798.8333333333334
+        }
+      }
+    },
+    "hard": {
+      "n_queries": 12,
+      "methods": {
+        "full_top30": {
+          "em": 0.0,
+          "f1": 0.09325396825396826,
+          "numerical_accuracy": 0.16666666666666666,
+          "mean_chunks": 30.0,
+          "mean_tokens": 4080.25
+        },
+        "bge_a05": {
+          "em": 0.0,
+          "f1": 0.07473544973544972,
+          "numerical_accuracy": 0.16666666666666666,
+          "mean_chunks": 13.5,
+          "mean_tokens": 2128.25
+        },
+        "fusion_a05": {
+          "em": 0.0,
+          "f1": 0.10202589807852964,
+          "numerical_accuracy": 0.16666666666666666,
+          "mean_chunks": 12.916666666666666,
+          "mean_tokens": 2104.25
+        },
+        "bge_a10": {
+          "em": 0.0,
+          "f1": 0.07738095238095238,
+          "numerical_accuracy": 0.16666666666666666,
+          "mean_chunks": 8.666666666666666,
+          "mean_tokens": 1442.9166666666667
+        },
+        "fusion_a10": {
+          "em": 0.0,
+          "f1": 0.06547619047619048,
+          "numerical_accuracy": 0.16666666666666666,
+          "mean_chunks": 8.666666666666666,
+          "mean_tokens": 1402.3333333333333
+        }
+      }
+    }
+  }
+}
