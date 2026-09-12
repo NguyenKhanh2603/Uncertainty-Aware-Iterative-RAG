@@ -47,10 +47,10 @@ def subset_ranking(
             and (stratum == "all" or row["stratum"] == stratum)
         ]
         selected = [rows[index] for index in indices]
-        output[stratum] = {
-            "n_queries": len({row["qid"] for row in selected}),
-            **ranking_metrics(selected, scores[indices]),
-        }
+        n_queries = len({row["qid"] for row in selected})
+        output[stratum] = {"n_queries": n_queries}
+        if selected:
+            output[stratum].update(ranking_metrics(selected, scores[indices]))
     return output
 
 
