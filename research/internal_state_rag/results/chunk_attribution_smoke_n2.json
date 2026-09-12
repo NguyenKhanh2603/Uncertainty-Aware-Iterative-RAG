@@ -1,0 +1,179 @@
+{
+  "status": "complete",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "split": "official_train_only",
+  "seed": 31,
+  "n_queries": 2,
+  "n_candidates": 6,
+  "context_k": 6,
+  "heads": [
+    [
+      14,
+      13
+    ],
+    [
+      14,
+      15
+    ],
+    [
+      14,
+      8
+    ],
+    [
+      18,
+      8
+    ],
+    [
+      14,
+      11
+    ],
+    [
+      14,
+      10
+    ],
+    [
+      18,
+      13
+    ],
+    [
+      14,
+      12
+    ]
+  ],
+  "metrics": {
+    "cosine_score": {
+      "auroc": 0.75,
+      "average_precision": 0.75,
+      "query_mrr": 1.0,
+      "query_top1_support_rate": 1.0
+    },
+    "bge_score": {
+      "auroc": 1.0,
+      "average_precision": 1.0,
+      "query_mrr": 1.0,
+      "query_top1_support_rate": 1.0
+    },
+    "selected_head_attention": {
+      "auroc": 0.75,
+      "average_precision": 0.5833333333333333,
+      "query_mrr": 0.75,
+      "query_top1_support_rate": 0.5
+    },
+    "draft_causal_delta": {
+      "auroc": 0.75,
+      "average_precision": 0.75,
+      "query_mrr": 0.6666666666666666,
+      "query_top1_support_rate": 0.5
+    },
+    "draft_absolute_influence": {
+      "auroc": 0.5,
+      "average_precision": 0.6666666666666666,
+      "query_mrr": 0.6666666666666666,
+      "query_top1_support_rate": 0.5
+    },
+    "gold_causal_delta": {
+      "auroc": 0.5,
+      "average_precision": 0.41666666666666663,
+      "query_mrr": 0.6666666666666666,
+      "query_top1_support_rate": 0.5
+    }
+  },
+  "observations": [
+    {
+      "qid": "4af6718b-f4d3-40c4-a966-5a58d9c88fd4",
+      "question": "What led to increase in the revenue of MDG on sequential basis?",
+      "gold": "driven by Microcontrollers, due to both higher average selling prices of approximately 6%, entirely due to product mix, and higher volumes of approximately 2%.",
+      "draft": "Higher average selling prices of approximately 9%, entirely due to improved product mix.",
+      "chunk_id": "tatqa-text:31eaf68ba55afa9696ccfe60",
+      "rank": 1,
+      "modality": "text",
+      "is_support": true,
+      "cosine_score": 0.7035658359527588,
+      "bge_score": 0.9458011984825134,
+      "selected_head_attention": 0.003193934135197196,
+      "draft_causal_delta": 0.00038452446460723877,
+      "draft_absolute_influence": 0.00038452446460723877,
+      "gold_causal_delta": 0.0012612342834472656
+    },
+    {
+      "qid": "4af6718b-f4d3-40c4-a966-5a58d9c88fd4",
+      "question": "What led to increase in the revenue of MDG on sequential basis?",
+      "gold": "driven by Microcontrollers, due to both higher average selling prices of approximately 6%, entirely due to product mix, and higher volumes of approximately 2%.",
+      "draft": "Higher average selling prices of approximately 9%, entirely due to improved product mix.",
+      "chunk_id": "tatqa-text:6940ce4ebeac5d0efb83abdb",
+      "rank": 2,
+      "modality": "text",
+      "is_support": false,
+      "cosine_score": 0.6668264269828796,
+      "bge_score": 0.8714748620986938,
+      "selected_head_attention": 0.0020387191616464406,
+      "draft_causal_delta": -0.00010439753532409668,
+      "draft_absolute_influence": 0.00010439753532409668,
+      "gold_causal_delta": -0.0007185935974121094
+    },
+    {
+      "qid": "4af6718b-f4d3-40c4-a966-5a58d9c88fd4",
+      "question": "What led to increase in the revenue of MDG on sequential basis?",
+      "gold": "driven by Microcontrollers, due to both higher average selling prices of approximately 6%, entirely due to product mix, and higher volumes of approximately 2%.",
+      "draft": "Higher average selling prices of approximately 9%, entirely due to improved product mix.",
+      "chunk_id": "tatqa-text:60f3b1933770d416d02bf609",
+      "rank": 3,
+      "modality": "text",
+      "is_support": false,
+      "cosine_score": 0.6575438976287842,
+      "bge_score": 0.3928025960922241,
+      "selected_head_attention": 0.00161512508202577,
+      "draft_causal_delta": -0.00017890334129333496,
+      "draft_absolute_influence": 0.00017890334129333496,
+      "gold_causal_delta": -0.00040721893310546875
+    },
+    {
+      "qid": "c4ef798a-5ead-4db6-b617-4195a6a4c3b1",
+      "question": "What could affect the future foreign tax rate?",
+      "gold": "Changes in the composition in earnings in countries with tax rates differing from the U.S. federal rate.",
+      "draft": "Changes in the composition of earnings in countries with tax rates differing from the U.S. federal rate could",
+      "chunk_id": "tatqa-text:10d7c151d2e7e87da35a1c76",
+      "rank": 1,
+      "modality": "text",
+      "is_support": true,
+      "cosine_score": 0.5859099626541138,
+      "bge_score": 0.9966233968734741,
+      "selected_head_attention": 0.005534872434509452,
+      "draft_causal_delta": -1.2720003724098206e-05,
+      "draft_absolute_influence": 1.2720003724098206e-05,
+      "gold_causal_delta": 0.0013093948364257812
+    },
+    {
+      "qid": "c4ef798a-5ead-4db6-b617-4195a6a4c3b1",
+      "question": "What could affect the future foreign tax rate?",
+      "gold": "Changes in the composition in earnings in countries with tax rates differing from the U.S. federal rate.",
+      "draft": "Changes in the composition of earnings in countries with tax rates differing from the U.S. federal rate could",
+      "chunk_id": "tatqa-text:98104e5275dcfc0830ac4235",
+      "rank": 2,
+      "modality": "text",
+      "is_support": false,
+      "cosine_score": 0.47616109251976013,
+      "bge_score": 0.16026602685451508,
+      "selected_head_attention": 0.0023847688037221815,
+      "draft_causal_delta": 7.309019565582275e-05,
+      "draft_absolute_influence": 7.309019565582275e-05,
+      "gold_causal_delta": 0.0013932883739471436
+    },
+    {
+      "qid": "c4ef798a-5ead-4db6-b617-4195a6a4c3b1",
+      "question": "What could affect the future foreign tax rate?",
+      "gold": "Changes in the composition in earnings in countries with tax rates differing from the U.S. federal rate.",
+      "draft": "Changes in the composition of earnings in countries with tax rates differing from the U.S. federal rate could",
+      "chunk_id": "tatqa-text:ac74ecf71db0000367cc8877",
+      "rank": 3,
+      "modality": "text",
+      "is_support": false,
+      "cosine_score": 0.44834786653518677,
+      "bge_score": 0.09670579433441162,
+      "selected_head_attention": 0.012229979125550017,
+      "draft_causal_delta": 1.6383826732635498e-05,
+      "draft_absolute_influence": 1.6383826732635498e-05,
+      "gold_causal_delta": 0.003809720277786255
+    }
+  ]
+}
