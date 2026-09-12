@@ -16,6 +16,16 @@ support-attention heads lowers gold likelihood, but the effect is not
 significantly larger than layer-matched controls; raw attention is therefore a
 candidate-head discovery statistic rather than a validated confidence signal.
 
+The 120-query chunk-retention experiment is reported in
+[`RESULTS_POSITION_CONTROLLED_PRUNING.md`](RESULTS_POSITION_CONTROLLED_PRUNING.md).
+After reversing context order as a position control, distributed all-layer
+answer-to-chunk attention improves support ranking over BGE. A query-held-out
+linear fusion reaches 60.8% Top-1 support versus 45.0% for BGE on the balanced
+pilot. At approximately 90% all-support coverage, a three-way
+train/calibration/evaluation pilot prunes 31.8% of false candidates versus 0.7%
+for BGE. This is a chunk-retention signal; it is not yet a validated stopping
+confidence score.
+
 ## Research question
 
 Can the model's internal computation distinguish four cases that look similar
@@ -145,6 +155,12 @@ only when its internal state says the evidence is insufficient.
 - `labels.py` creates action-aware counterfactual labels.
 - `calibration.py` calibrates an anytime stopping threshold on whole query
   trajectories.
+- `run_attention_chunk_ranking.py` measures chunk-level attention features on
+  stratified easy and hard retrieval cases.
+- `run_position_control.py` repeats the same teacher-forced draft with reversed
+  context and averages away fixed prompt-position effects.
+- `analyze_position_control.py` evaluates query-held-out fusion and a disjoint
+  train/calibration/evaluation pruning pilot.
 
 Example import:
 

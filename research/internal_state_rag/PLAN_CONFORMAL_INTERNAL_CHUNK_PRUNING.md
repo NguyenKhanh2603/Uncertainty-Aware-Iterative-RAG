@@ -391,3 +391,28 @@ attribution. If Gate 2 fails, exact edge masking remains the research method and
 latency becomes an explicit limitation. If Gate 3 fails, the internal score is
 not yet suitable for conformal pruning even if its mechanistic analysis is
 interesting.
+
+## 13. Executed pilot update
+
+The first causal branch did not pass Gates 1-2. Layer-14/18 high-attention heads
+did not beat layer-matched causal controls, and exact answer-to-chunk edge
+masking produced near-random support ranking. The sparse-head causal claim is
+therefore removed from the current pruning method.
+
+A separate distributed-attention branch passed an exploratory version of Gate
+3. On 120 train-only questions, averaging all-layer answer-to-chunk attention
+over original and reversed context orders improved MRR from 0.613 (BGE) to
+0.714. Leave-one-query-out fusion reached 0.766. In 100 disjoint three-way
+train/calibration/evaluation trials at alpha 0.1, fusion retained all support for
+90.9% of evaluation queries while pruning 31.8% of false candidates; BGE pruned
+0.7% at 89.9% coverage.
+
+These results justify the next development-bank run, with two constraints:
+
+1. use the complete frozen Top-L candidates instead of the labelled
+   support-plus-three-negative proxy;
+2. keep training, calibration, and final evaluation queries disjoint, then
+   measure downstream answer quality after pruning.
+
+See `RESULTS_POSITION_CONTROLLED_PRUNING.md` for the full protocol, controls,
+statistics, and limitations.
