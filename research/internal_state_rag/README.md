@@ -26,6 +26,13 @@ train/calibration/evaluation pilot prunes 31.8% of false candidates versus 0.7%
 for BGE. This is a chunk-retention signal; it is not yet a validated stopping
 confidence score.
 
+The DIRECTER probability-ratio adaptation is evaluated in
+[`RESULTS_DIRECTER_PLAUSIBILITY.md`](RESULTS_DIRECTER_PLAUSIBILITY.md). Exact
+full-vs-chunk-masked plausibility is near random for support ranking, because it
+measures fidelity to the model's current behavior and can strongly protect a
+distractor. Its defensible use is a set-level veto that restores chunks when a
+proposed pruned context moves generation too far from the full-context output.
+
 ## Research question
 
 Can the model's internal computation distinguish four cases that look similar
