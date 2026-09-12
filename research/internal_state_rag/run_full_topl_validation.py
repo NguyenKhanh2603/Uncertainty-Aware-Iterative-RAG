@@ -25,14 +25,16 @@ from research.internal_state_rag.run_tatqa_smoke import (
 def eligible_qids(
     questions: dict[str, dict[str, Any]],
     retrieval: dict[str, list[dict[str, Any]]],
+    *,
+    source_split: str = "train",
 ) -> list[str]:
-    """Return calibration-role train questions with support inside frozen Top-L."""
+    """Return questions from one source split with support inside frozen Top-L."""
 
     return sorted(
         qid
         for qid, rows in retrieval.items()
         if qid in questions
-        and questions[qid].get("metadata", {}).get("source_split") == "train"
+        and questions[qid].get("metadata", {}).get("source_split") == source_split
         and any(row["support_label"] == "support" for row in rows)
     )
 
@@ -130,6 +132,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n-calibration", type=int, default=150)
     parser.add_argument("--n-evaluation", type=int, default=150)
     parser.add_argument(
+        "--input-role", choices=("calibration", "test"), default="calibration"
+    )
+    parser.add_argument("--source-split", default="train")
+    parser.add_argument(
+        "--evaluation-only",
+        action="store_true",
+        help="Extract only evaluation queries, for a locked test-role run.",
+    )
+    parser.add_argument(
         "--n-train",
         type=int,
         default=0,
@@ -150,10 +161,12 @@ def main() -> None:
     summary_path = args.output_dir / "summary.json"
     corpus = load_rows(args.corpus, "id")
     questions = load_rows(args.questions, "qid")
-    retrieval = load_retrieval(args.retrieval)
-    eligible = eligible_qids(questions, retrieval)
+    retrieval = load_retrieval(args.retrieval, split_role=args.input_role)
+    eligible = eligible_qids(questions, retrieval, source_split=args.source_split)
     train_payload = json.loads(args.train_results.read_text(encoding="utf-8"))
     train_qids = list(dict.fromkeys(str(row["qid"]) for row in train_payload["observations"]))
+    if args.evaluation_only:
+        train_qids = []
     if args.n_train > 0:
         train_qids = train_qids[: args.n_train]
     discovery_exclusions = result_qids(
@@ -182,8 +195,8 @@ def main() -> None:
         )
         manifest = {
             "dataset": "tatqa",
-            "input_role": "calibration",
-            "source_split": "train",
+            "input_role": args.input_role,
+            "source_split": args.source_split,
             "seed": args.seed,
             "top_l": args.top_l,
             "n_role_queries": len(retrieval),

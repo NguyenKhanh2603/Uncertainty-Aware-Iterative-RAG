@@ -124,10 +124,12 @@ def load_rows(path: Path, key: str) -> dict[str, dict[str, Any]]:
     return {str(row[key]): row for row in iter_jsonl(path)}
 
 
-def load_retrieval(path: Path) -> dict[str, list[dict[str, Any]]]:
+def load_retrieval(
+    path: Path, *, split_role: str = "calibration"
+) -> dict[str, list[dict[str, Any]]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in iter_jsonl(path):
-        if row.get("split_role") == "calibration":
+        if row.get("split_role") == split_role:
             grouped[str(row["qid"])].append(row)
     for rows in grouped.values():
         rows.sort(key=lambda row: (int(row["rank"]), str(row["chunk_id"])))
