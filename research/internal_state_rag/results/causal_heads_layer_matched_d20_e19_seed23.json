@@ -1,0 +1,1727 @@
+{
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "split_role": "calibration",
+  "seed": 23,
+  "discovery_n": 20,
+  "evaluation_n": 19,
+  "n_heads_masked": 8,
+  "layers": [
+    12,
+    14,
+    16,
+    18,
+    20,
+    22,
+    24,
+    26,
+    28,
+    30,
+    32,
+    34,
+    35
+  ],
+  "top_heads": [
+    [
+      14,
+      13
+    ],
+    [
+      14,
+      15
+    ],
+    [
+      14,
+      8
+    ],
+    [
+      18,
+      8
+    ],
+    [
+      14,
+      11
+    ],
+    [
+      14,
+      10
+    ],
+    [
+      18,
+      13
+    ],
+    [
+      14,
+      12
+    ]
+  ],
+  "random_heads": [
+    [
+      14,
+      6
+    ],
+    [
+      14,
+      2
+    ],
+    [
+      14,
+      3
+    ],
+    [
+      14,
+      1
+    ],
+    [
+      14,
+      14
+    ],
+    [
+      14,
+      5
+    ],
+    [
+      18,
+      11
+    ],
+    [
+      18,
+      15
+    ]
+  ],
+  "bottom_heads": [
+    [
+      14,
+      4
+    ],
+    [
+      14,
+      6
+    ],
+    [
+      14,
+      3
+    ],
+    [
+      14,
+      0
+    ],
+    [
+      14,
+      1
+    ],
+    [
+      14,
+      7
+    ],
+    [
+      18,
+      0
+    ],
+    [
+      18,
+      1
+    ]
+  ],
+  "head_ranking": [
+    {
+      "layer": 14,
+      "head": 13,
+      "support_fraction": 0.8850630521774292
+    },
+    {
+      "layer": 14,
+      "head": 15,
+      "support_fraction": 0.7935713529586792
+    },
+    {
+      "layer": 14,
+      "head": 8,
+      "support_fraction": 0.7672162652015686
+    },
+    {
+      "layer": 18,
+      "head": 8,
+      "support_fraction": 0.7554839849472046
+    },
+    {
+      "layer": 14,
+      "head": 11,
+      "support_fraction": 0.7530164122581482
+    },
+    {
+      "layer": 14,
+      "head": 10,
+      "support_fraction": 0.7230981588363647
+    },
+    {
+      "layer": 18,
+      "head": 13,
+      "support_fraction": 0.7079301476478577
+    },
+    {
+      "layer": 14,
+      "head": 12,
+      "support_fraction": 0.6934511065483093
+    },
+    {
+      "layer": 18,
+      "head": 11,
+      "support_fraction": 0.6701804399490356
+    },
+    {
+      "layer": 28,
+      "head": 2,
+      "support_fraction": 0.6624761819839478
+    },
+    {
+      "layer": 14,
+      "head": 9,
+      "support_fraction": 0.66096431016922
+    },
+    {
+      "layer": 24,
+      "head": 12,
+      "support_fraction": 0.6352366209030151
+    },
+    {
+      "layer": 12,
+      "head": 6,
+      "support_fraction": 0.6242409944534302
+    },
+    {
+      "layer": 12,
+      "head": 4,
+      "support_fraction": 0.6191248893737793
+    },
+    {
+      "layer": 24,
+      "head": 15,
+      "support_fraction": 0.6161950826644897
+    },
+    {
+      "layer": 12,
+      "head": 1,
+      "support_fraction": 0.6159960627555847
+    },
+    {
+      "layer": 18,
+      "head": 12,
+      "support_fraction": 0.6112567782402039
+    },
+    {
+      "layer": 24,
+      "head": 9,
+      "support_fraction": 0.6054013967514038
+    },
+    {
+      "layer": 26,
+      "head": 6,
+      "support_fraction": 0.6048537492752075
+    },
+    {
+      "layer": 14,
+      "head": 14,
+      "support_fraction": 0.5978528261184692
+    },
+    {
+      "layer": 14,
+      "head": 5,
+      "support_fraction": 0.591685950756073
+    },
+    {
+      "layer": 26,
+      "head": 0,
+      "support_fraction": 0.5878633260726929
+    },
+    {
+      "layer": 30,
+      "head": 6,
+      "support_fraction": 0.5869735479354858
+    },
+    {
+      "layer": 18,
+      "head": 14,
+      "support_fraction": 0.5840838551521301
+    },
+    {
+      "layer": 18,
+      "head": 15,
+      "support_fraction": 0.5772166848182678
+    },
+    {
+      "layer": 18,
+      "head": 10,
+      "support_fraction": 0.5669553875923157
+    },
+    {
+      "layer": 18,
+      "head": 9,
+      "support_fraction": 0.5571497678756714
+    },
+    {
+      "layer": 26,
+      "head": 3,
+      "support_fraction": 0.5506659746170044
+    },
+    {
+      "layer": 18,
+      "head": 2,
+      "support_fraction": 0.5494769215583801
+    },
+    {
+      "layer": 35,
+      "head": 12,
+      "support_fraction": 0.5430313348770142
+    },
+    {
+      "layer": 12,
+      "head": 2,
+      "support_fraction": 0.5389012694358826
+    },
+    {
+      "layer": 18,
+      "head": 4,
+      "support_fraction": 0.5383654832839966
+    },
+    {
+      "layer": 30,
+      "head": 5,
+      "support_fraction": 0.5381546020507812
+    },
+    {
+      "layer": 14,
+      "head": 2,
+      "support_fraction": 0.5334890484809875
+    },
+    {
+      "layer": 28,
+      "head": 5,
+      "support_fraction": 0.5330916047096252
+    },
+    {
+      "layer": 24,
+      "head": 10,
+      "support_fraction": 0.5285208225250244
+    },
+    {
+      "layer": 24,
+      "head": 6,
+      "support_fraction": 0.5254846215248108
+    },
+    {
+      "layer": 12,
+      "head": 11,
+      "support_fraction": 0.5245487093925476
+    },
+    {
+      "layer": 24,
+      "head": 7,
+      "support_fraction": 0.5239146947860718
+    },
+    {
+      "layer": 28,
+      "head": 0,
+      "support_fraction": 0.5207701325416565
+    },
+    {
+      "layer": 26,
+      "head": 1,
+      "support_fraction": 0.5194239020347595
+    },
+    {
+      "layer": 12,
+      "head": 5,
+      "support_fraction": 0.518865704536438
+    },
+    {
+      "layer": 12,
+      "head": 15,
+      "support_fraction": 0.5160261988639832
+    },
+    {
+      "layer": 24,
+      "head": 8,
+      "support_fraction": 0.5113286375999451
+    },
+    {
+      "layer": 12,
+      "head": 13,
+      "support_fraction": 0.5008118152618408
+    },
+    {
+      "layer": 20,
+      "head": 11,
+      "support_fraction": 0.49661216139793396
+    },
+    {
+      "layer": 35,
+      "head": 8,
+      "support_fraction": 0.49346786737442017
+    },
+    {
+      "layer": 34,
+      "head": 15,
+      "support_fraction": 0.49187570810317993
+    },
+    {
+      "layer": 24,
+      "head": 5,
+      "support_fraction": 0.4903222918510437
+    },
+    {
+      "layer": 16,
+      "head": 4,
+      "support_fraction": 0.49031075835227966
+    },
+    {
+      "layer": 24,
+      "head": 1,
+      "support_fraction": 0.48934412002563477
+    },
+    {
+      "layer": 20,
+      "head": 3,
+      "support_fraction": 0.4886050224304199
+    },
+    {
+      "layer": 24,
+      "head": 13,
+      "support_fraction": 0.47768598794937134
+    },
+    {
+      "layer": 12,
+      "head": 0,
+      "support_fraction": 0.47316861152648926
+    },
+    {
+      "layer": 12,
+      "head": 9,
+      "support_fraction": 0.47197818756103516
+    },
+    {
+      "layer": 16,
+      "head": 2,
+      "support_fraction": 0.46936482191085815
+    },
+    {
+      "layer": 14,
+      "head": 7,
+      "support_fraction": 0.4691081643104553
+    },
+    {
+      "layer": 20,
+      "head": 10,
+      "support_fraction": 0.4673291742801666
+    },
+    {
+      "layer": 28,
+      "head": 1,
+      "support_fraction": 0.46630340814590454
+    },
+    {
+      "layer": 35,
+      "head": 15,
+      "support_fraction": 0.462348073720932
+    },
+    {
+      "layer": 16,
+      "head": 3,
+      "support_fraction": 0.4623402953147888
+    },
+    {
+      "layer": 16,
+      "head": 0,
+      "support_fraction": 0.4590621590614319
+    },
+    {
+      "layer": 20,
+      "head": 12,
+      "support_fraction": 0.45850858092308044
+    },
+    {
+      "layer": 12,
+      "head": 10,
+      "support_fraction": 0.45806947350502014
+    },
+    {
+      "layer": 34,
+      "head": 14,
+      "support_fraction": 0.4565492272377014
+    },
+    {
+      "layer": 14,
+      "head": 1,
+      "support_fraction": 0.4559502601623535
+    },
+    {
+      "layer": 14,
+      "head": 0,
+      "support_fraction": 0.4532124102115631
+    },
+    {
+      "layer": 16,
+      "head": 13,
+      "support_fraction": 0.45022982358932495
+    },
+    {
+      "layer": 16,
+      "head": 14,
+      "support_fraction": 0.4483497142791748
+    },
+    {
+      "layer": 22,
+      "head": 10,
+      "support_fraction": 0.4479016363620758
+    },
+    {
+      "layer": 28,
+      "head": 7,
+      "support_fraction": 0.44636407494544983
+    },
+    {
+      "layer": 35,
+      "head": 13,
+      "support_fraction": 0.4459068179130554
+    },
+    {
+      "layer": 20,
+      "head": 8,
+      "support_fraction": 0.443503201007843
+    },
+    {
+      "layer": 16,
+      "head": 10,
+      "support_fraction": 0.4419196546077728
+    },
+    {
+      "layer": 28,
+      "head": 9,
+      "support_fraction": 0.4417460858821869
+    },
+    {
+      "layer": 16,
+      "head": 9,
+      "support_fraction": 0.441643625497818
+    },
+    {
+      "layer": 12,
+      "head": 14,
+      "support_fraction": 0.43760281801223755
+    },
+    {
+      "layer": 26,
+      "head": 8,
+      "support_fraction": 0.4375036656856537
+    },
+    {
+      "layer": 20,
+      "head": 9,
+      "support_fraction": 0.4368053376674652
+    },
+    {
+      "layer": 26,
+      "head": 4,
+      "support_fraction": 0.43499407172203064
+    },
+    {
+      "layer": 22,
+      "head": 0,
+      "support_fraction": 0.4347705841064453
+    },
+    {
+      "layer": 35,
+      "head": 5,
+      "support_fraction": 0.4302810728549957
+    },
+    {
+      "layer": 34,
+      "head": 0,
+      "support_fraction": 0.42931121587753296
+    },
+    {
+      "layer": 30,
+      "head": 2,
+      "support_fraction": 0.4287946820259094
+    },
+    {
+      "layer": 30,
+      "head": 8,
+      "support_fraction": 0.4272080957889557
+    },
+    {
+      "layer": 35,
+      "head": 2,
+      "support_fraction": 0.42677026987075806
+    },
+    {
+      "layer": 28,
+      "head": 15,
+      "support_fraction": 0.4241552948951721
+    },
+    {
+      "layer": 34,
+      "head": 7,
+      "support_fraction": 0.42382293939590454
+    },
+    {
+      "layer": 14,
+      "head": 3,
+      "support_fraction": 0.4231055676937103
+    },
+    {
+      "layer": 26,
+      "head": 2,
+      "support_fraction": 0.42196208238601685
+    },
+    {
+      "layer": 16,
+      "head": 5,
+      "support_fraction": 0.4203636646270752
+    },
+    {
+      "layer": 22,
+      "head": 9,
+      "support_fraction": 0.4188070297241211
+    },
+    {
+      "layer": 35,
+      "head": 3,
+      "support_fraction": 0.4185696244239807
+    },
+    {
+      "layer": 34,
+      "head": 10,
+      "support_fraction": 0.4168994426727295
+    },
+    {
+      "layer": 28,
+      "head": 10,
+      "support_fraction": 0.41491246223449707
+    },
+    {
+      "layer": 28,
+      "head": 8,
+      "support_fraction": 0.41477689146995544
+    },
+    {
+      "layer": 22,
+      "head": 5,
+      "support_fraction": 0.40834230184555054
+    },
+    {
+      "layer": 30,
+      "head": 0,
+      "support_fraction": 0.40655046701431274
+    },
+    {
+      "layer": 12,
+      "head": 8,
+      "support_fraction": 0.4048520028591156
+    },
+    {
+      "layer": 12,
+      "head": 7,
+      "support_fraction": 0.40158089995384216
+    },
+    {
+      "layer": 14,
+      "head": 6,
+      "support_fraction": 0.3968777656555176
+    },
+    {
+      "layer": 35,
+      "head": 1,
+      "support_fraction": 0.39625754952430725
+    },
+    {
+      "layer": 12,
+      "head": 12,
+      "support_fraction": 0.39417076110839844
+    },
+    {
+      "layer": 34,
+      "head": 12,
+      "support_fraction": 0.3941403925418854
+    },
+    {
+      "layer": 34,
+      "head": 9,
+      "support_fraction": 0.3896612226963043
+    },
+    {
+      "layer": 28,
+      "head": 14,
+      "support_fraction": 0.3883942663669586
+    },
+    {
+      "layer": 16,
+      "head": 8,
+      "support_fraction": 0.38763514161109924
+    },
+    {
+      "layer": 20,
+      "head": 4,
+      "support_fraction": 0.3854934871196747
+    },
+    {
+      "layer": 22,
+      "head": 3,
+      "support_fraction": 0.38364338874816895
+    },
+    {
+      "layer": 18,
+      "head": 3,
+      "support_fraction": 0.3835633099079132
+    },
+    {
+      "layer": 30,
+      "head": 7,
+      "support_fraction": 0.3834976553916931
+    },
+    {
+      "layer": 16,
+      "head": 7,
+      "support_fraction": 0.38298720121383667
+    },
+    {
+      "layer": 12,
+      "head": 3,
+      "support_fraction": 0.3817179203033447
+    },
+    {
+      "layer": 35,
+      "head": 6,
+      "support_fraction": 0.37956392765045166
+    },
+    {
+      "layer": 16,
+      "head": 1,
+      "support_fraction": 0.3784450590610504
+    },
+    {
+      "layer": 22,
+      "head": 8,
+      "support_fraction": 0.37536871433258057
+    },
+    {
+      "layer": 35,
+      "head": 9,
+      "support_fraction": 0.37482500076293945
+    },
+    {
+      "layer": 35,
+      "head": 4,
+      "support_fraction": 0.37376707792282104
+    },
+    {
+      "layer": 18,
+      "head": 7,
+      "support_fraction": 0.37093067169189453
+    },
+    {
+      "layer": 20,
+      "head": 0,
+      "support_fraction": 0.36735326051712036
+    },
+    {
+      "layer": 35,
+      "head": 10,
+      "support_fraction": 0.36718082427978516
+    },
+    {
+      "layer": 22,
+      "head": 11,
+      "support_fraction": 0.36159366369247437
+    },
+    {
+      "layer": 35,
+      "head": 0,
+      "support_fraction": 0.35968437790870667
+    },
+    {
+      "layer": 16,
+      "head": 15,
+      "support_fraction": 0.35914045572280884
+    },
+    {
+      "layer": 20,
+      "head": 14,
+      "support_fraction": 0.3561128079891205
+    },
+    {
+      "layer": 22,
+      "head": 2,
+      "support_fraction": 0.35290423035621643
+    },
+    {
+      "layer": 24,
+      "head": 2,
+      "support_fraction": 0.3520846664905548
+    },
+    {
+      "layer": 35,
+      "head": 7,
+      "support_fraction": 0.3518509268760681
+    },
+    {
+      "layer": 26,
+      "head": 11,
+      "support_fraction": 0.3508032560348511
+    },
+    {
+      "layer": 20,
+      "head": 15,
+      "support_fraction": 0.35032588243484497
+    },
+    {
+      "layer": 22,
+      "head": 15,
+      "support_fraction": 0.3468056321144104
+    },
+    {
+      "layer": 28,
+      "head": 12,
+      "support_fraction": 0.3438069224357605
+    },
+    {
+      "layer": 28,
+      "head": 4,
+      "support_fraction": 0.3433507978916168
+    },
+    {
+      "layer": 22,
+      "head": 1,
+      "support_fraction": 0.3429189920425415
+    },
+    {
+      "layer": 34,
+      "head": 11,
+      "support_fraction": 0.3425787091255188
+    },
+    {
+      "layer": 34,
+      "head": 6,
+      "support_fraction": 0.34255024790763855
+    },
+    {
+      "layer": 24,
+      "head": 14,
+      "support_fraction": 0.3421294391155243
+    },
+    {
+      "layer": 26,
+      "head": 14,
+      "support_fraction": 0.34205758571624756
+    },
+    {
+      "layer": 22,
+      "head": 14,
+      "support_fraction": 0.3401699960231781
+    },
+    {
+      "layer": 26,
+      "head": 5,
+      "support_fraction": 0.34005552530288696
+    },
+    {
+      "layer": 14,
+      "head": 4,
+      "support_fraction": 0.3376302123069763
+    },
+    {
+      "layer": 16,
+      "head": 6,
+      "support_fraction": 0.3373202979564667
+    },
+    {
+      "layer": 16,
+      "head": 11,
+      "support_fraction": 0.337110698223114
+    },
+    {
+      "layer": 35,
+      "head": 11,
+      "support_fraction": 0.33643996715545654
+    },
+    {
+      "layer": 35,
+      "head": 14,
+      "support_fraction": 0.3362138569355011
+    },
+    {
+      "layer": 20,
+      "head": 6,
+      "support_fraction": 0.33559998869895935
+    },
+    {
+      "layer": 24,
+      "head": 3,
+      "support_fraction": 0.3324405550956726
+    },
+    {
+      "layer": 20,
+      "head": 5,
+      "support_fraction": 0.33231303095817566
+    },
+    {
+      "layer": 30,
+      "head": 15,
+      "support_fraction": 0.32936689257621765
+    },
+    {
+      "layer": 22,
+      "head": 7,
+      "support_fraction": 0.32892972230911255
+    },
+    {
+      "layer": 34,
+      "head": 13,
+      "support_fraction": 0.3285807967185974
+    },
+    {
+      "layer": 32,
+      "head": 7,
+      "support_fraction": 0.32855963706970215
+    },
+    {
+      "layer": 28,
+      "head": 13,
+      "support_fraction": 0.32729893922805786
+    },
+    {
+      "layer": 18,
+      "head": 5,
+      "support_fraction": 0.32713818550109863
+    },
+    {
+      "layer": 24,
+      "head": 11,
+      "support_fraction": 0.32311004400253296
+    },
+    {
+      "layer": 28,
+      "head": 3,
+      "support_fraction": 0.32060331106185913
+    },
+    {
+      "layer": 22,
+      "head": 12,
+      "support_fraction": 0.3202062249183655
+    },
+    {
+      "layer": 28,
+      "head": 11,
+      "support_fraction": 0.318886935710907
+    },
+    {
+      "layer": 24,
+      "head": 4,
+      "support_fraction": 0.3179038465023041
+    },
+    {
+      "layer": 28,
+      "head": 6,
+      "support_fraction": 0.3176383078098297
+    },
+    {
+      "layer": 34,
+      "head": 5,
+      "support_fraction": 0.31731104850769043
+    },
+    {
+      "layer": 30,
+      "head": 3,
+      "support_fraction": 0.3169364333152771
+    },
+    {
+      "layer": 22,
+      "head": 6,
+      "support_fraction": 0.3147489130496979
+    },
+    {
+      "layer": 32,
+      "head": 12,
+      "support_fraction": 0.31290873885154724
+    },
+    {
+      "layer": 20,
+      "head": 2,
+      "support_fraction": 0.3125016987323761
+    },
+    {
+      "layer": 26,
+      "head": 13,
+      "support_fraction": 0.30656716227531433
+    },
+    {
+      "layer": 34,
+      "head": 8,
+      "support_fraction": 0.3061419725418091
+    },
+    {
+      "layer": 22,
+      "head": 13,
+      "support_fraction": 0.30602556467056274
+    },
+    {
+      "layer": 22,
+      "head": 4,
+      "support_fraction": 0.3030112683773041
+    },
+    {
+      "layer": 30,
+      "head": 1,
+      "support_fraction": 0.30129897594451904
+    },
+    {
+      "layer": 26,
+      "head": 9,
+      "support_fraction": 0.3006463050842285
+    },
+    {
+      "layer": 24,
+      "head": 0,
+      "support_fraction": 0.2993730902671814
+    },
+    {
+      "layer": 32,
+      "head": 6,
+      "support_fraction": 0.29789888858795166
+    },
+    {
+      "layer": 32,
+      "head": 3,
+      "support_fraction": 0.2940710186958313
+    },
+    {
+      "layer": 32,
+      "head": 9,
+      "support_fraction": 0.2937549948692322
+    },
+    {
+      "layer": 20,
+      "head": 1,
+      "support_fraction": 0.2911522388458252
+    },
+    {
+      "layer": 34,
+      "head": 1,
+      "support_fraction": 0.29088571667671204
+    },
+    {
+      "layer": 18,
+      "head": 6,
+      "support_fraction": 0.29081737995147705
+    },
+    {
+      "layer": 26,
+      "head": 7,
+      "support_fraction": 0.28887173533439636
+    },
+    {
+      "layer": 20,
+      "head": 7,
+      "support_fraction": 0.28742265701293945
+    },
+    {
+      "layer": 18,
+      "head": 1,
+      "support_fraction": 0.28593307733535767
+    },
+    {
+      "layer": 32,
+      "head": 0,
+      "support_fraction": 0.28434664011001587
+    },
+    {
+      "layer": 30,
+      "head": 13,
+      "support_fraction": 0.2836610972881317
+    },
+    {
+      "layer": 18,
+      "head": 0,
+      "support_fraction": 0.2812916934490204
+    },
+    {
+      "layer": 30,
+      "head": 12,
+      "support_fraction": 0.2744174003601074
+    },
+    {
+      "layer": 26,
+      "head": 15,
+      "support_fraction": 0.27318084239959717
+    },
+    {
+      "layer": 26,
+      "head": 12,
+      "support_fraction": 0.27182987332344055
+    },
+    {
+      "layer": 30,
+      "head": 4,
+      "support_fraction": 0.2680630385875702
+    },
+    {
+      "layer": 32,
+      "head": 1,
+      "support_fraction": 0.2610625624656677
+    },
+    {
+      "layer": 32,
+      "head": 14,
+      "support_fraction": 0.2592027187347412
+    },
+    {
+      "layer": 20,
+      "head": 13,
+      "support_fraction": 0.25712814927101135
+    },
+    {
+      "layer": 34,
+      "head": 4,
+      "support_fraction": 0.2529180943965912
+    },
+    {
+      "layer": 26,
+      "head": 10,
+      "support_fraction": 0.24869415163993835
+    },
+    {
+      "layer": 30,
+      "head": 14,
+      "support_fraction": 0.24388548731803894
+    },
+    {
+      "layer": 32,
+      "head": 10,
+      "support_fraction": 0.24254491925239563
+    },
+    {
+      "layer": 32,
+      "head": 5,
+      "support_fraction": 0.24147549271583557
+    },
+    {
+      "layer": 32,
+      "head": 4,
+      "support_fraction": 0.2389850914478302
+    },
+    {
+      "layer": 30,
+      "head": 11,
+      "support_fraction": 0.23845012485980988
+    },
+    {
+      "layer": 32,
+      "head": 2,
+      "support_fraction": 0.2342483550310135
+    },
+    {
+      "layer": 16,
+      "head": 12,
+      "support_fraction": 0.23411543667316437
+    },
+    {
+      "layer": 30,
+      "head": 10,
+      "support_fraction": 0.23021574318408966
+    },
+    {
+      "layer": 34,
+      "head": 3,
+      "support_fraction": 0.22287078201770782
+    },
+    {
+      "layer": 32,
+      "head": 13,
+      "support_fraction": 0.2202407419681549
+    },
+    {
+      "layer": 32,
+      "head": 15,
+      "support_fraction": 0.20269575715065002
+    },
+    {
+      "layer": 34,
+      "head": 2,
+      "support_fraction": 0.1947178989648819
+    },
+    {
+      "layer": 30,
+      "head": 9,
+      "support_fraction": 0.18941941857337952
+    },
+    {
+      "layer": 32,
+      "head": 8,
+      "support_fraction": 0.1862734705209732
+    },
+    {
+      "layer": 32,
+      "head": 11,
+      "support_fraction": 0.1754342019557953
+    }
+  ],
+  "top_mask_summary": {
+    "mean_gold_logprob_delta": -0.4636117549747915,
+    "mean_numerical_accuracy_delta": 0.0,
+    "mean_f1_delta": 0.021695280983206673,
+    "improved_f1": 1,
+    "same_f1": 16,
+    "worse_f1": 2
+  },
+  "random_mask_summary": {
+    "mean_gold_logprob_delta": -0.2555210950269707,
+    "mean_numerical_accuracy_delta": -0.05263157894736842,
+    "mean_f1_delta": -0.04682159945317841,
+    "improved_f1": 1,
+    "same_f1": 16,
+    "worse_f1": 2
+  },
+  "bottom_mask_summary": {
+    "mean_gold_logprob_delta": -0.11540070771068138,
+    "mean_numerical_accuracy_delta": 0.0,
+    "mean_f1_delta": -0.004362510554461021,
+    "improved_f1": 1,
+    "same_f1": 17,
+    "worse_f1": 1
+  },
+  "top_minus_random_gold_logprob_delta": -0.2080906599478208,
+  "top_vs_random_wilcoxon_p": 0.4180412292480469,
+  "results": [
+    {
+      "qid": "25b420c6-e7ea-4916-81bc-0d4c96e39f4b",
+      "question": "Who is the Chief Financial Officer of the company?",
+      "gold": "Alexander K. Arrow",
+      "baseline_prediction": "LEIGH R. FOX",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -3.409414052963257,
+      "top_mask_prediction": "LEIGH R. FOX",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -5.118457794189453,
+      "top_mask_gold_logprob_delta": -1.7090437412261963,
+      "random_mask_prediction": "Leigh R. Fox",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -3.143606424331665,
+      "random_mask_gold_logprob_delta": 0.2658076286315918,
+      "bottom_mask_prediction": "LEIGH R. FOX",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -2.055525541305542,
+      "bottom_mask_gold_logprob_delta": 1.3538885116577148
+    },
+    {
+      "qid": "a0da10b4-7000-4a3a-8d19-e9f3a65aaa47",
+      "question": "What were the Level 2 fair value estimates based on?",
+      "gold": "observable market data.",
+      "baseline_prediction": "Level 2 inputs",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -1.9107928276062012,
+      "top_mask_prediction": "Level 2 observable market data.",
+      "top_mask_f1": 0.7499999999999999,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -2.05356502532959,
+      "top_mask_gold_logprob_delta": -0.14277219772338867,
+      "random_mask_prediction": "Level 2 fair value estimates were based on observable market data.",
+      "random_mask_f1": 0.42857142857142855,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -4.080414295196533,
+      "random_mask_gold_logprob_delta": -2.169621467590332,
+      "bottom_mask_prediction": "Level 2 fair value estimates were based on inputs that are observable in the market.",
+      "bottom_mask_f1": 0.23529411764705882,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -1.832385540008545,
+      "bottom_mask_gold_logprob_delta": 0.07840728759765625
+    },
+    {
+      "qid": "cf515095-b229-46d5-992c-0eb53db58776",
+      "question": "In 2019, how many geographic regions have total revenues of more than $20,000 thousand?",
+      "gold": "2",
+      "baseline_prediction": "2",
+      "baseline_f1": 1.0,
+      "baseline_em": 1.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -0.11891186982393265,
+      "top_mask_prediction": "2",
+      "top_mask_f1": 1.0,
+      "top_mask_em": 1.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -0.3689093589782715,
+      "top_mask_gold_logprob_delta": -0.24999748915433884,
+      "random_mask_prediction": "Asia Pacific",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -1.6531341075897217,
+      "random_mask_gold_logprob_delta": -1.534222237765789,
+      "bottom_mask_prediction": "2",
+      "bottom_mask_f1": 1.0,
+      "bottom_mask_em": 1.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -0.0332401879131794,
+      "bottom_mask_gold_logprob_delta": 0.08567168191075325
+    },
+    {
+      "qid": "90384e3e-13a6-43a9-9696-35918771cd39",
+      "question": "What was the amount of basic earnings per share in 2019?",
+      "gold": "3.59",
+      "baseline_prediction": "106.2",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -4.77789306640625,
+      "top_mask_prediction": "The basic earnings per share in 2019 was 114.3 cents per share.",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -5.732392311096191,
+      "top_mask_gold_logprob_delta": -0.9544992446899414,
+      "random_mask_prediction": "106.2",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -5.043766021728516,
+      "random_mask_gold_logprob_delta": -0.2658729553222656,
+      "bottom_mask_prediction": "1,305.7",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -5.260950565338135,
+      "bottom_mask_gold_logprob_delta": -0.48305749893188477
+    },
+    {
+      "qid": "63860d48-e7b3-43d9-a2b7-f4e9f0a96cc8",
+      "question": "What is the sum of cost of hardware for 2019 and 2018?",
+      "gold": "68402",
+      "baseline_prediction": "The sum of the cost of hardware for 2019 and 2018 is $134,335 ($100",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -5.036292552947998,
+      "top_mask_prediction": "The sum of the cost of hardware for 2019 and 2018 is $100,782 + $32",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -6.041348457336426,
+      "top_mask_gold_logprob_delta": -1.0050559043884277,
+      "random_mask_prediction": "The sum of the cost of hardware for 2019 and 2018 is $133,533 + $10",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -4.256241798400879,
+      "random_mask_gold_logprob_delta": 0.7800507545471191,
+      "bottom_mask_prediction": "The sum of the cost of hardware for 2019 and 2018 is $134,475 ($133",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -4.432980537414551,
+      "bottom_mask_gold_logprob_delta": 0.6033120155334473
+    },
+    {
+      "qid": "db05d90b-fee2-4ff8-afde-ffaae85ef0ab",
+      "question": "What was the change in interest expense in 2019?",
+      "gold": "decreased by $8.2 million",
+      "baseline_prediction": "The change in interest expense in 2019 was a decrease of $8.2 million compared to 2018.",
+      "baseline_f1": 0.22222222222222224,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -2.188431978225708,
+      "top_mask_prediction": "The change in interest expense in 2019 was a decrease of $8.2 million compared to 2018.",
+      "top_mask_f1": 0.22222222222222224,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -2.4447803497314453,
+      "top_mask_gold_logprob_delta": -0.2563483715057373,
+      "random_mask_prediction": "The change in interest expense in 2019 was a decrease of $8.2 million compared to 2018.",
+      "random_mask_f1": 0.22222222222222224,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 1.0,
+      "random_mask_gold_logprob": -2.432499885559082,
+      "random_mask_gold_logprob_delta": -0.24406790733337402,
+      "bottom_mask_prediction": "The change in interest expense in 2019 was a decrease of $8.2 million compared to 2018.",
+      "bottom_mask_f1": 0.22222222222222224,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -2.221727132797241,
+      "bottom_mask_gold_logprob_delta": -0.0332951545715332
+    },
+    {
+      "qid": "de36bbad-4f1c-4e48-892a-bfa130e7436d",
+      "question": "In which year is the net deferred tax liabilities higher?",
+      "gold": "2019",
+      "baseline_prediction": "2019",
+      "baseline_f1": 1.0,
+      "baseline_em": 1.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -0.0010065945098176599,
+      "top_mask_prediction": "2019",
+      "top_mask_f1": 1.0,
+      "top_mask_em": 1.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -0.014591265469789505,
+      "top_mask_gold_logprob_delta": -0.013584670959971845,
+      "random_mask_prediction": "2019",
+      "random_mask_f1": 1.0,
+      "random_mask_em": 1.0,
+      "random_mask_numerical_accuracy": 1.0,
+      "random_mask_gold_logprob": -0.0008362303487956524,
+      "random_mask_gold_logprob_delta": 0.00017036416102200747,
+      "bottom_mask_prediction": "2019",
+      "bottom_mask_f1": 1.0,
+      "bottom_mask_em": 1.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -0.0037110052071511745,
+      "bottom_mask_gold_logprob_delta": -0.0027044106973335147
+    },
+    {
+      "qid": "7d2815cd-b299-4bb2-8058-0d368e069dcb",
+      "question": "In which year were the pension expenses larger?",
+      "gold": "2018",
+      "baseline_prediction": "2018/19",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -0.07873135805130005,
+      "top_mask_prediction": "In 2018/19 (corresponding to 2017/18), the pension expenses were €36 million.",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -0.23094123601913452,
+      "top_mask_gold_logprob_delta": -0.15220987796783447,
+      "random_mask_prediction": "2018/19",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 1.0,
+      "random_mask_gold_logprob": -0.02386591024696827,
+      "random_mask_gold_logprob_delta": 0.05486544780433178,
+      "bottom_mask_prediction": "2018/2019",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -0.011901629157364368,
+      "bottom_mask_gold_logprob_delta": 0.06682972889393568
+    },
+    {
+      "qid": "1538ad85-dec0-4047-8242-0d194ff30942",
+      "question": "What is the average expected life over 2018 and 2019?",
+      "gold": "4",
+      "baseline_prediction": "The average expected life of options over 2018 and 2019 is 6.2 years.",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -13.52495288848877,
+      "top_mask_prediction": "The average expected life of options over 2018 and 2019 is 6.2 years.",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -14.558600425720215,
+      "top_mask_gold_logprob_delta": -1.0336475372314453,
+      "random_mask_prediction": "The average expected life over 2018 and 2019 is 6.2 years.",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -12.379664421081543,
+      "random_mask_gold_logprob_delta": 1.1452884674072266,
+      "bottom_mask_prediction": "The average expected life over 2018 and 2019 is 6.2 years.",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -10.255867004394531,
+      "bottom_mask_gold_logprob_delta": 3.2690858840942383
+    },
+    {
+      "qid": "7bf374f2-55d4-4d8c-896e-74e740e092fe",
+      "question": "What was the average Net additions (losses) for video service customers?",
+      "gold": "1124",
+      "baseline_prediction": "5,294",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -6.280152797698975,
+      "top_mask_prediction": "The average Net additions (losses) for video service customers was (3,046).",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -4.383403778076172,
+      "top_mask_gold_logprob_delta": 1.8967490196228027,
+      "random_mask_prediction": "The average net additions (losses) for video service customers was -1,370. This can be calculated by taking the sum of net additions (",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -5.270969867706299,
+      "random_mask_gold_logprob_delta": 1.0091829299926758,
+      "bottom_mask_prediction": "The average Net additions (losses) for video service customers was (1,483) [(5,294 + (-3,04",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -6.138118743896484,
+      "bottom_mask_gold_logprob_delta": 0.14203405380249023
+    },
+    {
+      "qid": "7d971d93-8a67-4b3d-b5f9-e132bf19723f",
+      "question": "Which year has the highest Weighted average number of common shares outstanding - basic and diluted?",
+      "gold": "2019",
+      "baseline_prediction": "2019",
+      "baseline_f1": 1.0,
+      "baseline_em": 1.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -0.005097572226077318,
+      "top_mask_prediction": "2019",
+      "top_mask_f1": 1.0,
+      "top_mask_em": 1.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -0.019165977835655212,
+      "top_mask_gold_logprob_delta": -0.014068405609577894,
+      "random_mask_prediction": "2019",
+      "random_mask_f1": 1.0,
+      "random_mask_em": 1.0,
+      "random_mask_numerical_accuracy": 1.0,
+      "random_mask_gold_logprob": -0.001042403164319694,
+      "random_mask_gold_logprob_delta": 0.004055169061757624,
+      "bottom_mask_prediction": "2019",
+      "bottom_mask_f1": 1.0,
+      "bottom_mask_em": 1.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -0.005057504400610924,
+      "bottom_mask_gold_logprob_delta": 4.0067825466394424e-05
+    },
+    {
+      "qid": "e224a10b-a9e2-4727-aa6e-cea97fef9b3d",
+      "question": "What are the recognised income tax expenses in 2019?",
+      "gold": "€298 million",
+      "baseline_prediction": "$15.1 million",
+      "baseline_f1": 0.5,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -4.019637107849121,
+      "top_mask_prediction": "The recognised income tax expenses in 2019 were $15.1 million.",
+      "top_mask_f1": 0.1818181818181818,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -5.225966453552246,
+      "top_mask_gold_logprob_delta": -1.206329345703125,
+      "random_mask_prediction": "The recognised income tax expenses in 2019 were $15.1 million.",
+      "random_mask_f1": 0.1818181818181818,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -5.564366817474365,
+      "random_mask_gold_logprob_delta": -1.5447297096252441,
+      "bottom_mask_prediction": "The recognised income tax expenses in 2019 were $15.1 million.",
+      "bottom_mask_f1": 0.1818181818181818,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -3.480473279953003,
+      "bottom_mask_gold_logprob_delta": 0.5391638278961182
+    },
+    {
+      "qid": "edfade0f-df94-4bdb-85b2-0b9862dae1ee",
+      "question": "What was the average increase / (decrease) in the internet service customers between 2018 and 2019?",
+      "gold": "10069.5",
+      "baseline_prediction": "-3.8%",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -6.230902671813965,
+      "top_mask_prediction": "The average increase in internet service customers between 2018 and 2019 was a loss of 5,966 customers.",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -6.536946773529053,
+      "top_mask_gold_logprob_delta": -0.3060441017150879,
+      "random_mask_prediction": "The average increase in internet service customers between 2018 and 2019 was -5,966.",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -6.150582790374756,
+      "random_mask_gold_logprob_delta": 0.08031988143920898,
+      "bottom_mask_prediction": "The average increase in internet service customers between 2018 and 2019 was a loss of 5,966 customers.",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -7.006636619567871,
+      "bottom_mask_gold_logprob_delta": -0.7757339477539062
+    },
+    {
+      "qid": "57057d73-cc92-4fc3-bd87-b6e778a81f3b",
+      "question": "How many costs of revenue exceeded $100,000 thousand in 2019?",
+      "gold": "1",
+      "baseline_prediction": "The cost of hardware and other revenue exceeded $100,000 thousand in 2019, amounting to $133,",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -0.932823121547699,
+      "top_mask_prediction": "The cost of hardware and other revenue exceeded $100,000 thousand in 2019, amounting to $133,",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -2.715174436569214,
+      "top_mask_gold_logprob_delta": -1.782351315021515,
+      "random_mask_prediction": "Cost of hardware and other revenue exceeded $100,000 thousand in 2019, amounting to $133,5",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -0.6926648616790771,
+      "random_mask_gold_logprob_delta": 0.24015825986862183,
+      "bottom_mask_prediction": "133,533",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -0.1914089322090149,
+      "bottom_mask_gold_logprob_delta": 0.7414141893386841
+    },
+    {
+      "qid": "bb2de5ba-6926-4ca3-ae67-5fe2264b1b59",
+      "question": "What is the change in Basic earnings(loss) per share between 2018 and 2019?",
+      "gold": "0.06",
+      "baseline_prediction": "The change in Basic earnings per share between 2018 and 2019 is an increase from 132.6 cents per share",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -3.778311252593994,
+      "top_mask_prediction": "The change in Basic earnings per share between 2018 and 2019 is an increase from $(3.27) in 2",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -3.31807541847229,
+      "top_mask_gold_logprob_delta": 0.4602358341217041,
+      "random_mask_prediction": "The change in Basic earnings per share between 2018 and 2019 is an increase from 114.3 cents per share",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -3.3621368408203125,
+      "random_mask_gold_logprob_delta": 0.41617441177368164,
+      "bottom_mask_prediction": "The change in Basic earnings per share between 2018 and 2019 is an increase from 132.6 cents per share",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -4.122377395629883,
+      "bottom_mask_gold_logprob_delta": -0.34406614303588867
+    },
+    {
+      "qid": "f233bb34-c627-4441-9188-1ec20d2e10ea",
+      "question": "What does the table show?",
+      "gold": "selected consolidated financial data as of and for the five-year period ended December 31, 2019",
+      "baseline_prediction": "The table shows summary financial performance for the Group, including quarterly information for fiscal years 2019 and 2018, and selected consolidated financial",
+      "baseline_f1": 0.3529411764705882,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 1.0,
+      "baseline_gold_logprob": -1.6677597761154175,
+      "top_mask_prediction": "The table shows summary financial performance for the Group over a five-year period, from fiscal year 2014 to 2019.",
+      "top_mask_f1": 0.3333333333333333,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 1.0,
+      "top_mask_gold_logprob": -2.014014482498169,
+      "top_mask_gold_logprob_delta": -0.34625470638275146,
+      "random_mask_prediction": "The table shows summary financial performance for the Group, including quarterly information for fiscal years 2019 and 2018, and selected consolidated financial",
+      "random_mask_f1": 0.3529411764705882,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 1.0,
+      "random_mask_gold_logprob": -1.8223552703857422,
+      "random_mask_gold_logprob_delta": -0.1545954942703247,
+      "bottom_mask_prediction": "The table shows summary financial performance for the Group, including quarterly information for fiscal years 2019 and 2018, and selected consolidated financial",
+      "bottom_mask_f1": 0.3529411764705882,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 1.0,
+      "bottom_mask_gold_logprob": -1.9685882329940796,
+      "bottom_mask_gold_logprob_delta": -0.3008284568786621
+    },
+    {
+      "qid": "f86b1035-3bfb-4489-8734-2f6c49e548a1",
+      "question": "How many years did the Weighted-average shares, basic for Classes A and B exceed $400,000 million?",
+      "gold": "3",
+      "baseline_prediction": "2",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -1.0700929164886475,
+      "top_mask_prediction": "4",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -2.8742568492889404,
+      "top_mask_gold_logprob_delta": -1.804163932800293,
+      "random_mask_prediction": "4",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -2.350285291671753,
+      "random_mask_gold_logprob_delta": -1.2801923751831055,
+      "bottom_mask_prediction": "2",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -2.5199718475341797,
+      "bottom_mask_gold_logprob_delta": -1.4498789310455322
+    },
+    {
+      "qid": "53ef0bfa-574b-48d2-bd06-531185c3bc98",
+      "question": "In which year was Foreign largest?",
+      "gold": "2018",
+      "baseline_prediction": "2017",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -0.2078942507505417,
+      "top_mask_prediction": "2017",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -0.24641625583171844,
+      "top_mask_gold_logprob_delta": -0.03852200508117676,
+      "random_mask_prediction": "2017",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -0.3974933326244354,
+      "random_mask_gold_logprob_delta": -0.18959908187389374,
+      "bottom_mask_prediction": "2017",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -0.535787045955658,
+      "bottom_mask_gold_logprob_delta": -0.32789279520511627
+    },
+    {
+      "qid": "ef5ba82d-898b-42ec-ae4e-1bbdb3d08c10",
+      "question": "How many directors are there in the company?",
+      "gold": "4",
+      "baseline_prediction": "8",
+      "baseline_f1": 0.0,
+      "baseline_em": 0.0,
+      "baseline_numerical_accuracy": 0.0,
+      "baseline_gold_logprob": -4.703364372253418,
+      "top_mask_prediction": "There are 8 directors serving in the company.",
+      "top_mask_f1": 0.0,
+      "top_mask_em": 0.0,
+      "top_mask_numerical_accuracy": 0.0,
+      "top_mask_gold_logprob": -4.854079723358154,
+      "top_mask_gold_logprob_delta": -0.15071535110473633,
+      "random_mask_prediction": "There are 8 directors in the company.",
+      "random_mask_f1": 0.0,
+      "random_mask_em": 0.0,
+      "random_mask_numerical_accuracy": 0.0,
+      "random_mask_gold_logprob": -6.1714372634887695,
+      "random_mask_gold_logprob_delta": -1.4680728912353516,
+      "bottom_mask_prediction": "There are 8 directors in the company.",
+      "bottom_mask_f1": 0.0,
+      "bottom_mask_em": 0.0,
+      "bottom_mask_numerical_accuracy": 0.0,
+      "bottom_mask_gold_logprob": -10.058367729187012,
+      "bottom_mask_gold_logprob_delta": -5.355003356933594
+    }
+  ]
+}
