@@ -1,0 +1,86 @@
+from math import isinf
+
+import numpy as np
+
+from research.internal_state_rag import (
+    InterventionOutcome,
+    RetrievalState,
+    Trajectory,
+    calibrate_stop_threshold,
+    derive_retrieval_state,
+)
+from research.internal_state_rag.signals import (
+    InternalTrace,
+    contrast_trace,
+    normalized_chunk_entropy,
+)
+
+
+def test_counterfactual_labels_distinguish_retrieval_from_reasoning_failure():
+    retrieval = InterventionOutcome(False, False, False, True)
+    reasoning = InterventionOutcome(False, False, False, False)
+
+    assert derive_retrieval_state(retrieval) is RetrievalState.RETRIEVAL_INSUFFICIENT
+    assert derive_retrieval_state(reasoning) is RetrievalState.REASONING_FAILURE
+
+
+def test_context_that_breaks_known_answer_is_misleading():
+    outcome = InterventionOutcome(False, True, True, True)
+    assert derive_retrieval_state(outcome) is RetrievalState.CONTEXT_MISLED
+
+
+def test_trajectory_calibration_controls_any_unsafe_round():
+    rows = [
+        Trajectory(scores=[0.10, 0.05], unsafe=[False, False]) for _ in range(18)
+    ]
+    rows += [
+        Trajectory(scores=[0.90, 0.80], unsafe=[True, True]),
+        Trajectory(scores=[0.95, 0.85], unsafe=[True, True]),
+    ]
+
+    result = calibrate_stop_threshold(rows, alpha=0.1)
+
+    assert result.certified
+    # The largest valid threshold admits one failed trajectory:
+    # (1 empirical failure + 1 correction) / (20 + 1) <= 0.1.
+    assert result.threshold == 0.80
+    assert result.corrected_anytime_risk <= 0.1
+
+
+def test_too_small_bank_cannot_certify_requested_alpha():
+    result = calibrate_stop_threshold(
+        [Trajectory(scores=[0.1], unsafe=[False])], alpha=0.1
+    )
+    assert not result.certified
+    assert isinf(result.threshold) and result.threshold < 0
+
+
+def _trace(logprob: float, residual: np.ndarray) -> InternalTrace:
+    return InternalTrace(
+        answer_token_ids=[7, 8],
+        layer_ids=[2, 4],
+        chunk_ids=["a", "b"],
+        residual_mean=residual,
+        target_logprob=np.full((2, 2), logprob, dtype=np.float32),
+        target_margin=np.full((2, 2), logprob, dtype=np.float32),
+        entropy=np.full((2, 2), 0.5, dtype=np.float32),
+        top1_token_id=np.asarray([[7, 8], [7, 8]], dtype=np.int64),
+        attention_mass=np.asarray([[[0.5, 0.5]], [[0.9, 0.1]]], dtype=np.float32),
+    )
+
+
+def test_trace_contrast_exposes_context_logprob_gain():
+    with_context = _trace(-0.2, np.asarray([[1.0, 0.0], [0.0, 1.0]]))
+    without_context = _trace(-1.2, np.asarray([[1.0, 0.0], [1.0, 0.0]]))
+
+    contrast = contrast_trace(with_context, without_context)
+
+    assert np.allclose(contrast["context_logprob_gain_by_layer"], [1.0, 1.0])
+    assert np.allclose(contrast["residual_cosine_by_layer"], [1.0, 0.0])
+
+
+def test_attention_entropy_preserves_layer_and_head_axes():
+    mass = np.asarray([[[0.5, 0.5], [1.0, 0.0]]], dtype=np.float32)
+    entropy = normalized_chunk_entropy(mass)
+    assert entropy.shape == (1, 2)
+    assert np.allclose(entropy, [[1.0, 0.0]], atol=1e-6)
