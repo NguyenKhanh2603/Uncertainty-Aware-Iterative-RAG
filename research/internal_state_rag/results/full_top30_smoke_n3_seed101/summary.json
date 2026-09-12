@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "planned_queries": 3,
+  "completed_queries": 3,
+  "rows": "research/internal_state_rag/results/full_top30_smoke_n3_seed101/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/full_top30_smoke_n3_seed101/manifest.json"
+}

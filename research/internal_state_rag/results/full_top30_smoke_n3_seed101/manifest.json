@@ -1,0 +1,25 @@
+{
+  "dataset": "tatqa",
+  "input_role": "calibration",
+  "source_split": "train",
+  "seed": 101,
+  "top_l": 30,
+  "n_role_queries": 1000,
+  "n_queries_with_support_in_top_l": 810,
+  "conditional_retrieval_ceiling": 0.81,
+  "n_discovery_exclusions": 63,
+  "plan": [
+    {
+      "qid": "48fd0708-24b7-4840-b4c5-9d63921bfcf4",
+      "role": "evaluation"
+    },
+    {
+      "qid": "c992503d-385a-4458-9623-9d5988e17bc9",
+      "role": "conformal_calibration"
+    },
+    {
+      "qid": "1c4216e2-ae51-484b-96bc-eb8b2526b57c",
+      "role": "scorer_train"
+    }
+  ]
+}
