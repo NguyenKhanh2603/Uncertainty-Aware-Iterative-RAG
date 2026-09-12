@@ -1,0 +1,706 @@
+{
+  "n_queries": 150,
+  "seed": 8128,
+  "n_resamples": 20000,
+  "paired_analysis": {
+    "all": {
+      "n_queries": 150,
+      "comparisons": {
+        "fusion_a05_minus_bge_a05": {
+          "em": {
+            "mean_delta": 0.006666666666666667,
+            "ci95": [
+              -0.03333333333333333,
+              0.04666666666666667
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.5551,
+            "wins": 5,
+            "ties": 141,
+            "losses": 4
+          },
+          "f1": {
+            "mean_delta": 0.0030977996828262027,
+            "ci95": [
+              -0.03700453903433707,
+              0.044396467005952844
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.5614,
+            "wins": 10,
+            "ties": 126,
+            "losses": 14
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.0,
+            "ci95": [
+              -0.04,
+              0.04
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.43125,
+            "wins": 5,
+            "ties": 140,
+            "losses": 5
+          },
+          "prediction_change_rate": 0.35333333333333333,
+          "mean_chunk_delta": -2.6866666666666665,
+          "mean_token_delta": -531.96
+        },
+        "fusion_a10_minus_bge_a10": {
+          "em": {
+            "mean_delta": -0.02,
+            "ci95": [
+              -0.04666666666666667,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 147,
+            "losses": 3
+          },
+          "f1": {
+            "mean_delta": -0.012189897248720778,
+            "ci95": [
+              -0.04048750356397415,
+              0.012748447848447841
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.1884,
+            "wins": 9,
+            "ties": 133,
+            "losses": 8
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.006666666666666667,
+            "ci95": [
+              -0.02666666666666667,
+              0.04
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.5759,
+            "wins": 4,
+            "ties": 143,
+            "losses": 3
+          },
+          "prediction_change_rate": 0.25333333333333335,
+          "mean_chunk_delta": 0.35333333333333333,
+          "mean_token_delta": 48.31333333333333
+        },
+        "bge_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.013333333333333334,
+            "ci95": [
+              -0.02,
+              0.05333333333333334
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.70095,
+            "wins": 5,
+            "ties": 142,
+            "losses": 3
+          },
+          "f1": {
+            "mean_delta": 0.002242093644754088,
+            "ci95": [
+              -0.03036967306298326,
+              0.03547703165565957
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.55345,
+            "wins": 10,
+            "ties": 127,
+            "losses": 13
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.006666666666666667,
+            "ci95": [
+              -0.04,
+              0.04666666666666667
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.5529,
+            "wins": 6,
+            "ties": 139,
+            "losses": 5
+          },
+          "prediction_change_rate": 0.42,
+          "mean_chunk_delta": -13.92,
+          "mean_token_delta": -1682.5933333333332
+        },
+        "fusion_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.02,
+            "ci95": [
+              -0.02,
+              0.06
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.79715,
+            "wins": 6,
+            "ties": 141,
+            "losses": 3
+          },
+          "f1": {
+            "mean_delta": 0.0053398933275802885,
+            "ci95": [
+              -0.029548116883678845,
+              0.04283382542859337
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.60775,
+            "wins": 11,
+            "ties": 123,
+            "losses": 16
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.006666666666666667,
+            "ci95": [
+              -0.03333333333333333,
+              0.04666666666666667
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.56615,
+            "wins": 5,
+            "ties": 141,
+            "losses": 4
+          },
+          "prediction_change_rate": 0.5,
+          "mean_chunk_delta": -16.606666666666666,
+          "mean_token_delta": -2214.5533333333333
+        },
+        "bge_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.0,
+            "ci95": [
+              -0.04666666666666667,
+              0.04666666666666667
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.4394,
+            "wins": 6,
+            "ties": 138,
+            "losses": 6
+          },
+          "f1": {
+            "mean_delta": -0.008087164546596588,
+            "ci95": [
+              -0.051132438689895116,
+              0.03573783499508522
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.35625,
+            "wins": 18,
+            "ties": 113,
+            "losses": 19
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.013333333333333334,
+            "ci95": [
+              -0.06,
+              0.03333333333333333
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.23465,
+            "wins": 5,
+            "ties": 138,
+            "losses": 7
+          },
+          "prediction_change_rate": 0.6133333333333333,
+          "mean_chunk_delta": -24.98,
+          "mean_token_delta": -3271.3933333333334
+        },
+        "fusion_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": -0.02,
+            "ci95": [
+              -0.06,
+              0.02
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.11425,
+            "wins": 3,
+            "ties": 141,
+            "losses": 6
+          },
+          "f1": {
+            "mean_delta": -0.020277061795317367,
+            "ci95": [
+              -0.055039735300169534,
+              0.01330606670100139
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.1177,
+            "wins": 15,
+            "ties": 117,
+            "losses": 18
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.006666666666666667,
+            "ci95": [
+              -0.04,
+              0.02666666666666667
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.28455,
+            "wins": 3,
+            "ties": 143,
+            "losses": 4
+          },
+          "prediction_change_rate": 0.5933333333333334,
+          "mean_chunk_delta": -24.626666666666665,
+          "mean_token_delta": -3223.08
+        }
+      }
+    },
+    "easy": {
+      "n_queries": 113,
+      "comparisons": {
+        "fusion_a05_minus_bge_a05": {
+          "em": {
+            "mean_delta": -0.008849557522123894,
+            "ci95": [
+              -0.04424778761061947,
+              0.02654867256637168
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.24785,
+            "wins": 2,
+            "ties": 108,
+            "losses": 3
+          },
+          "f1": {
+            "mean_delta": -0.012836120024137915,
+            "ci95": [
+              -0.05604831204004469,
+              0.02835175289405637
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.2735,
+            "wins": 6,
+            "ties": 96,
+            "losses": 11
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.017699115044247787,
+            "ci95": [
+              -0.05309734513274336,
+              0.017699115044247787
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.09435,
+            "wins": 1,
+            "ties": 109,
+            "losses": 3
+          },
+          "prediction_change_rate": 0.3008849557522124,
+          "mean_chunk_delta": -3.265486725663717,
+          "mean_token_delta": -663.7610619469026
+        },
+        "fusion_a10_minus_bge_a10": {
+          "em": {
+            "mean_delta": -0.02654867256637168,
+            "ci95": [
+              -0.061946902654867256,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 110,
+            "losses": 3
+          },
+          "f1": {
+            "mean_delta": -0.026595545700178705,
+            "ci95": [
+              -0.06295363278054586,
+              0.0025239041714835405
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.03835,
+            "wins": 5,
+            "ties": 102,
+            "losses": 6
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.02654867256637168,
+            "ci95": [
+              -0.061946902654867256,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 110,
+            "losses": 3
+          },
+          "prediction_change_rate": 0.18584070796460178,
+          "mean_chunk_delta": 0.3185840707964602,
+          "mean_token_delta": 49.16814159292036
+        },
+        "bge_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.035398230088495575,
+            "ci95": [
+              0.0,
+              0.07964601769911504
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.93615,
+            "wins": 5,
+            "ties": 107,
+            "losses": 1
+          },
+          "f1": {
+            "mean_delta": 0.031083192080997447,
+            "ci95": [
+              0.0016155919818499848,
+              0.06645947380518874
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.98175,
+            "wins": 9,
+            "ties": 97,
+            "losses": 7
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.02654867256637168,
+            "ci95": [
+              -0.008849557522123894,
+              0.07079646017699115
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.8746,
+            "wins": 4,
+            "ties": 108,
+            "losses": 1
+          },
+          "prediction_change_rate": 0.34513274336283184,
+          "mean_chunk_delta": -13.31858407079646,
+          "mean_token_delta": -1674.9026548672566
+        },
+        "fusion_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.02654867256637168,
+            "ci95": [
+              -0.017699115044247787,
+              0.07079646017699115
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.83655,
+            "wins": 5,
+            "ties": 106,
+            "losses": 2
+          },
+          "f1": {
+            "mean_delta": 0.018247072056859538,
+            "ci95": [
+              -0.02092909641551353,
+              0.059270118511507874
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.819,
+            "wins": 10,
+            "ties": 92,
+            "losses": 11
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.008849557522123894,
+            "ci95": [
+              -0.02654867256637168,
+              0.04424778761061947
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.58875,
+            "wins": 3,
+            "ties": 108,
+            "losses": 2
+          },
+          "prediction_change_rate": 0.48672566371681414,
+          "mean_chunk_delta": -16.58407079646018,
+          "mean_token_delta": -2338.663716814159
+        },
+        "bge_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.008849557522123894,
+            "ci95": [
+              -0.04424778761061947,
+              0.061946902654867256
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.5588,
+            "wins": 6,
+            "ties": 102,
+            "losses": 5
+          },
+          "f1": {
+            "mean_delta": 0.012523440075989939,
+            "ci95": [
+              -0.03952753309290198,
+              0.06479027316737454
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.67765,
+            "wins": 16,
+            "ties": 84,
+            "losses": 13
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.017699115044247787,
+            "ci95": [
+              -0.02654867256637168,
+              0.07079646017699115
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.70455,
+            "wins": 5,
+            "ties": 105,
+            "losses": 3
+          },
+          "prediction_change_rate": 0.5929203539823009,
+          "mean_chunk_delta": -25.663716814159294,
+          "mean_token_delta": -3460.8761061946902
+        },
+        "fusion_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": -0.017699115044247787,
+            "ci95": [
+              -0.07079646017699115,
+              0.02654867256637168
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.187,
+            "wins": 3,
+            "ties": 105,
+            "losses": 5
+          },
+          "f1": {
+            "mean_delta": -0.014072105624188763,
+            "ci95": [
+              -0.057122483915786434,
+              0.02672384273243594
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.25575,
+            "wins": 14,
+            "ties": 85,
+            "losses": 14
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.008849557522123894,
+            "ci95": [
+              -0.04424778761061947,
+              0.02654867256637168
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.2448,
+            "wins": 2,
+            "ties": 108,
+            "losses": 3
+          },
+          "prediction_change_rate": 0.5752212389380531,
+          "mean_chunk_delta": -25.345132743362832,
+          "mean_token_delta": -3411.70796460177
+        }
+      }
+    },
+    "hard": {
+      "n_queries": 37,
+      "comparisons": {
+        "fusion_a05_minus_bge_a05": {
+          "em": {
+            "mean_delta": 0.05405405405405406,
+            "ci95": [
+              -0.05405405405405406,
+              0.16216216216216217
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.7746,
+            "wins": 3,
+            "ties": 33,
+            "losses": 1
+          },
+          "f1": {
+            "mean_delta": 0.05176085176085176,
+            "ci95": [
+              -0.04484344484344484,
+              0.16216216216216217
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.8388,
+            "wins": 4,
+            "ties": 30,
+            "losses": 3
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.05405405405405406,
+            "ci95": [
+              -0.08108108108108109,
+              0.1891891891891892
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.732,
+            "wins": 4,
+            "ties": 31,
+            "losses": 2
+          },
+          "prediction_change_rate": 0.5135135135135135,
+          "mean_chunk_delta": -0.918918918918919,
+          "mean_token_delta": -129.43243243243242
+        },
+        "fusion_a10_minus_bge_a10": {
+          "em": {
+            "mean_delta": 0.0,
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 37,
+            "losses": 0
+          },
+          "f1": {
+            "mean_delta": 0.031805731805731804,
+            "ci95": [
+              0.0006240006240006229,
+              0.07741626991626976
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.9789,
+            "wins": 4,
+            "ties": 31,
+            "losses": 2
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.10810810810810811,
+            "ci95": [
+              0.02702702702702703,
+              0.21621621621621623
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.98595,
+            "wins": 4,
+            "ties": 33,
+            "losses": 0
+          },
+          "prediction_change_rate": 0.4594594594594595,
+          "mean_chunk_delta": 0.4594594594594595,
+          "mean_token_delta": 45.7027027027027
+        },
+        "bge_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": -0.05405405405405406,
+            "ci95": [
+              -0.13513513513513514,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 35,
+            "losses": 2
+          },
+          "f1": {
+            "mean_delta": -0.08584017995782701,
+            "ci95": [
+              -0.17722188251600016,
+              -0.01127330539095245
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0075,
+            "wins": 1,
+            "ties": 30,
+            "losses": 6
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.05405405405405406,
+            "ci95": [
+              -0.1891891891891892,
+              0.08108108108108109
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.14735,
+            "wins": 2,
+            "ties": 31,
+            "losses": 4
+          },
+          "prediction_change_rate": 0.6486486486486487,
+          "mean_chunk_delta": -15.756756756756756,
+          "mean_token_delta": -1706.081081081081
+        },
+        "fusion_a05_minus_full_top30": {
+          "em": {
+            "mean_delta": 0.0,
+            "ci95": [
+              -0.08108108108108109,
+              0.08108108108108109
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.34535,
+            "wins": 1,
+            "ties": 35,
+            "losses": 1
+          },
+          "f1": {
+            "mean_delta": -0.03407932819697525,
+            "ci95": [
+              -0.11320370143899554,
+              0.048447048447048446
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.191,
+            "wins": 1,
+            "ties": 31,
+            "losses": 5
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.0,
+            "ci95": [
+              -0.10810810810810811,
+              0.10810810810810811
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.39735,
+            "wins": 2,
+            "ties": 33,
+            "losses": 2
+          },
+          "prediction_change_rate": 0.5405405405405406,
+          "mean_chunk_delta": -16.675675675675677,
+          "mean_token_delta": -1835.5135135135135
+        },
+        "bge_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": -0.02702702702702703,
+            "ci95": [
+              -0.08108108108108109,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 36,
+            "losses": 1
+          },
+          "f1": {
+            "mean_delta": -0.07103306515071221,
+            "ci95": [
+              -0.15055643879173292,
+              -0.008234108234108233
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0089,
+            "wins": 2,
+            "ties": 29,
+            "losses": 6
+          },
+          "numerical_accuracy": {
+            "mean_delta": -0.10810810810810811,
+            "ci95": [
+              -0.21621621621621623,
+              -0.02702702702702703
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 33,
+            "losses": 4
+          },
+          "prediction_change_rate": 0.6756756756756757,
+          "mean_chunk_delta": -22.89189189189189,
+          "mean_token_delta": -2692.7027027027025
+        },
+        "fusion_a10_minus_full_top30": {
+          "em": {
+            "mean_delta": -0.02702702702702703,
+            "ci95": [
+              -0.08108108108108109,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0,
+            "wins": 0,
+            "ties": 36,
+            "losses": 1
+          },
+          "f1": {
+            "mean_delta": -0.039227333344980395,
+            "ci95": [
+              -0.09429309429309429,
+              0.0
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.0245,
+            "wins": 1,
+            "ties": 32,
+            "losses": 4
+          },
+          "numerical_accuracy": {
+            "mean_delta": 0.0,
+            "ci95": [
+              -0.08108108108108109,
+              0.08108108108108109
+            ],
+            "bootstrap_probability_delta_gt_zero": 0.3445,
+            "wins": 1,
+            "ties": 35,
+            "losses": 1
+          },
+          "prediction_change_rate": 0.6486486486486487,
+          "mean_chunk_delta": -22.43243243243243,
+          "mean_token_delta": -2647.0
+        }
+      }
+    }
+  }
+}
