@@ -33,6 +33,15 @@ measures fidelity to the model's current behavior and can strongly protect a
 distractor. Its defensible use is a set-level veto that restores chunks when a
 proposed pruned context moves generation too far from the full-context output.
 
+The full-Top-30 development and locked test-role validation is reported in
+[`RESULTS_FULL_TOP30_FUSION_VALIDATION.md`](RESULTS_FULL_TOP30_FUSION_VALIDATION.md).
+On 150 frozen test-role queries, BGE plus position-controlled internal attention
+improves mean query average precision by 0.072 (95% paired bootstrap CI
+`[0.028, 0.115]`). At the development-calibrated `alpha = 0.05` threshold, it
+raises all-support coverage from 94.0% to 95.3% while reducing mean retained
+chunks from 16.08 to 13.39. Downstream EM/F1 is statistically indistinguishable
+from BGE at that operating point.
+
 ## Research question
 
 Can the model's internal computation distinguish four cases that look similar
@@ -168,6 +177,12 @@ only when its internal state says the evidence is insufficient.
   context and averages away fixed prompt-position effects.
 - `analyze_position_control.py` evaluates query-held-out fusion and a disjoint
   train/calibration/evaluation pruning pilot.
+- `run_full_topl_validation.py` extracts position-controlled attention for all
+  30 frozen candidates and supports locked test-role evaluation.
+- `analyze_full_topl_validation.py` fits the frozen fusion, calibrates thresholds,
+  and reports ranking plus all-support retention.
+- `run_pruned_answer_validation.py` and `analyze_pruned_answers.py` evaluate final
+  answer quality after BGE or fusion pruning.
 
 Example import:
 
