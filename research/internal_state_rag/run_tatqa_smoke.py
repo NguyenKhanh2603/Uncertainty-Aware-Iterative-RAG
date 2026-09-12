@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import random
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Iterable
@@ -139,8 +140,9 @@ def select_examples(
     *,
     top_k: int,
     limit: int,
+    seed: int,
 ) -> list[tuple[dict[str, Any], list[dict[str, Any]]]]:
-    selected = []
+    eligible = []
     for qid, rows in retrieval.items():
         question = questions.get(qid)
         if question is None or len(question.get("gold_answers", [])) != 1:
@@ -148,12 +150,10 @@ def select_examples(
         support_ranks = [int(row["rank"]) for row in rows if row["support_label"] == "support"]
         if not support_ranks or min(support_ranks) <= top_k:
             continue
-        selected.append((question, rows))
-        if len(selected) >= limit:
-            break
-    if len(selected) < limit:
-        raise ValueError(f"Only found {len(selected)} eligible examples; requested {limit}.")
-    return selected
+        eligible.append((question, rows))
+    if len(eligible) < limit:
+        raise ValueError(f"Only found {len(eligible)} eligible examples; requested {limit}.")
+    return random.Random(seed).sample(eligible, limit)
 
 
 def to_chunk(row: dict[str, Any], corpus: dict[str, dict[str, Any]]) -> ContextChunk:
@@ -230,6 +230,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-answer-tokens", type=int, default=24)
     parser.add_argument("--max-new-tokens", type=int, default=32)
     parser.add_argument("--layers", default="")
+    parser.add_argument("--seed", type=int, default=17)
     return parser.parse_args()
 
 
@@ -241,7 +242,13 @@ def main() -> None:
     corpus = load_rows(args.corpus, "id")
     questions = load_rows(args.questions, "qid")
     retrieval = load_retrieval(args.retrieval)
-    examples = select_examples(questions, retrieval, top_k=args.top_k, limit=args.n)
+    examples = select_examples(
+        questions,
+        retrieval,
+        top_k=args.top_k,
+        limit=args.n,
+        seed=args.seed,
+    )
 
     client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
     layers = [int(value) for value in args.layers.split(",") if value.strip()] or None
@@ -334,11 +341,18 @@ def main() -> None:
         "split_role": "calibration",
         "n": len(results),
         "top_k_missing_support": args.top_k,
+        "seed": args.seed,
         "layers": extractor.layers,
         "mean_missing_em": float(np.mean([row["missing_em"] for row in results])),
         "mean_oracle_em": float(np.mean([row["oracle_em"] for row in results])),
         "mean_missing_f1": float(np.mean([row["missing_f1"] for row in results])),
         "mean_oracle_f1": float(np.mean([row["oracle_f1"] for row in results])),
+        "mean_missing_numerical_accuracy": float(
+            np.mean([row["missing_numerical_accuracy"] for row in results])
+        ),
+        "mean_oracle_numerical_accuracy": float(
+            np.mean([row["oracle_numerical_accuracy"] for row in results])
+        ),
         "mean_gold_logprob_gain": float(np.mean(logprob_gains)),
         "positive_gold_logprob_gain_rate": float(np.mean(np.asarray(logprob_gains) > 0)),
         "logprob_gain_f1_gain_spearman": safe_spearman(logprob_gains, f1_gains),
