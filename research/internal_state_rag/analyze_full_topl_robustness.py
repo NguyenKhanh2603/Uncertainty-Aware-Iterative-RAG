@@ -1,3 +1,4 @@
+import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
@@ -15,8 +16,18 @@ from research.internal_state_rag.analyze_full_topl_validation import (
 from research.internal_state_rag.analyze_position_control import conformal_threshold
 from research.internal_state_rag.ranking import grouped_z_scores
 
-ROOT = Path("research/internal_state_rag/results/full_top30_n420_seed101")
-rows = load_observations(ROOT / "queries.jsonl")
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "--root",
+    type=Path,
+    default=Path("research/internal_state_rag/results/full_top30_n420_seed101"),
+)
+parser.add_argument("--rows", type=Path)
+parser.add_argument("--output", type=Path)
+args = parser.parse_args()
+ROOT = args.root
+rows_path = args.rows or ROOT / "queries.jsonl"
+rows = load_observations(rows_path)
 for row in rows:
     row["log_chunk_tokens"] = float(np.log1p(row["chunk_token_count"]))
 
@@ -209,7 +220,8 @@ out = {
 }
 out["seed"] = 8128
 out["n_bootstrap_resamples"] = 20000
-(ROOT / "robustness_analysis.json").write_text(
+output_path = args.output or ROOT / "robustness_analysis.json"
+output_path.write_text(
     json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8"
 )
 print(json.dumps(out, indent=2))
