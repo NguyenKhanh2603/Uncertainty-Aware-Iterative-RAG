@@ -16,6 +16,7 @@ from research.internal_state_rag.causal import mask_attention_heads, zero_head_s
 from research.internal_state_rag.directer_plausibility import distribution_plausibility
 from research.internal_state_rag.edge_mask import zero_attention_edges
 from research.internal_state_rag.run_causal_head_smoke import layer_matched_controls
+from research.internal_state_rag.run_full_topl_validation import make_split_plan
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -152,3 +153,24 @@ def test_directer_plausibility_scores_intervened_top_token_under_raw_model():
     assert result.rejection_rate == 0.5
     assert result.top1_change_rate == 0.5
     assert result.worst_rejection_score > 0
+
+
+def test_full_topl_validation_plan_keeps_roles_disjoint():
+    plan = make_split_plan(
+        [f"q{index}" for index in range(12)],
+        ["q0", "q1"],
+        {"q2", "q3"},
+        n_calibration=3,
+        n_evaluation=3,
+        seed=4,
+    )
+
+    by_role = {
+        role: {row["qid"] for row in plan if row["role"] == role}
+        for role in ("scorer_train", "conformal_calibration", "evaluation")
+    }
+    assert by_role["scorer_train"] == {"q0", "q1"}
+    assert len(by_role["conformal_calibration"]) == 3
+    assert len(by_role["evaluation"]) == 3
+    assert not by_role["conformal_calibration"] & by_role["evaluation"]
+    assert not ({"q2", "q3"} & set().union(*by_role.values()))
