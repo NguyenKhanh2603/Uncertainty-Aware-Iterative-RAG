@@ -2,9 +2,28 @@
 
 ## Decision
 
-The experiments do **not** support replacing BGE/conformal pruning with a raw
-internal-model score. They do show that internal states contain useful
-information, but the useful target must be specified carefully:
+The experiments now support using a generator-internal signal **with** BGE for
+chunk pruning. The best validated score is:
+
+```text
+z(BGE) + 0.20 z(zero-shot Yes-vs-No LM-head score)
+       + 0.75 z(trained layer-30 relevance probe)
+```
+
+The `z` transformations are computed within each query's Top-30. Qwen remains
+frozen. The only trained component is an L2 logistic probe over the final token
+state of an explicit question--chunk relevance prompt.
+
+On 256 fresh test-role TAT-QA queries, disjoint from all previously used test
+queries, this score improved mean query AP from 0.759 to 0.813 and Top-1 support
+from 67.2% to 73.8%. Both gains were significant under paired query bootstrap.
+At the conformal all-support threshold with `alpha=0.05`, it retained 9.92 of
+30 chunks on average versus 26.76 for BGE while achieving 97.3% all-support
+coverage versus 99.2% for BGE. A 64-query answer-generation check found no
+detectable F1, EM, or numerical-accuracy difference between those two
+`alpha=0.05` keep-sets.
+
+The useful target still must be specified carefully:
 
 - answer hidden states and layerwise LM-head trajectories measure whether the
   model appears to have enough evidence;
@@ -14,13 +33,10 @@ information, but the useful target must be specified carefully:
   task.
 
 These targets are correlated but not equivalent. In particular, a faithful
-attribution method can faithfully identify the distractor that caused a wrong
-answer.
-
-The strongest next method is a **causal-value probe**: freeze the LLM, create
-chunk-removal utility labels on development questions, and train a small probe
-to predict unsafe pruning from query-conditioned chunk states and mechanistic
-features. The conformal bank then calibrates that predicted unsafe-prune score.
+attribution method can identify a distractor that caused a wrong answer while
+ranking annotated support poorly. Raw attention, raw LM-head score, and a
+passive full-context hidden-state probe all failed as standalone replacements
+for BGE. The gain comes from combining BGE with explicit pairwise computation.
 
 ## What was tested
 
@@ -94,7 +110,85 @@ MRR, 95% CI `[-0.033, +0.038]`. The apparent calibration gain did not
 generalize. This is evidence that chunk states encode relevance, but not that a
 small support-label probe is a better deployable ranker.
 
-### 3. Attention heads, LM heads, and MLPs
+### 3. Gold-answer causal-value teacher
+
+`run_causal_value_labels.py` measures each chunk with 30 full-context
+leave-one-out interventions. Its target is the mean gold-token log-likelihood
+drop when that chunk is removed. Positive values mean the model assigns the
+gold answer lower probability without the chunk.
+
+On 32 source-train queries, 82.1% of annotated supports had positive causal
+value versus 54.3% of non-support chunks. Mean causal value was 2.006 for
+support and 0.018 for non-support. It therefore measures a real difference,
+but it is not identical to dataset relevance: four of 32 queries had no support
+chunk with a positive leave-one-out effect. Causal-value ranking produced
+68.8% Top-1 support versus 65.6% for BGE, while its mean query AP was lower,
+0.724 versus 0.749.
+
+A Ridge probe trained to predict within-query causal-value rank from the old
+passive chunk states did not generalize. On eight held-out causal-labelled
+queries, mean per-query Spearman was 0.036 for the internal-only model and
+0.044 after adding BGE. On 64 separate test queries, its BGE/internal score did
+not beat raw BGE for support ranking. The causal teacher is useful, but the
+feature must represent an explicit question--chunk interaction.
+
+### 4. Explicit pairwise LM-head and hidden-state probe
+
+`run_pairwise_relevance_features.py` asks Qwen whether each passage contains
+information needed for the question. It performs three batched forward passes
+for 30 candidates and does not generate an answer. It extracts:
+
+- the next-token logit contrast over `Yes/yes/YES` versus `No/no/NO`;
+- the final prompt-token hidden state at layers 6, 12, 18, 24, 30, and 35;
+- the existing BGE score.
+
+The zero-shot LM-head contrast alone was weaker than BGE. A group-safe
+support-label probe selected layer 30 and `C=0.1` on 96 source-train queries.
+Fusion weights were also selected from those 96 out-of-fold predictions. No
+configuration was selected on the 256-query evaluation set.
+
+| Frozen score on 256 fresh test queries | Mean query AP | MRR | Top-1 support | Top-5 any-support coverage | Top-10 any-support coverage |
+|---|---:|---:|---:|---:|---:|
+| BGE | 0.759 | 0.774 | 67.2% | 92.2% | 96.1% |
+| BGE + zero-shot LM head | 0.779 | 0.797 | 70.3% | 92.6% | 96.1% |
+| BGE + trained hidden probe | 0.777 | 0.794 | 67.6% | 96.5% | 98.8% |
+| Three-signal fusion | **0.813** | **0.830** | **73.8%** | **95.7%** | **98.4%** |
+
+For three-signal fusion minus BGE, the paired improvements were +0.054 AP,
+95% CI `[+0.023, +0.087]`; +0.056 MRR, CI `[+0.024, +0.089]`; and +6.6
+percentage points Top-1 support, CI `[+2.0, +11.3]`. Top-5 any-support
+coverage improved by 3.5 points, CI `[+1.2, +5.9]`, and Top-10 by 2.3 points,
+CI `[+0.8, +4.3]`.
+
+### 5. Conformal keep-sets and answer quality
+
+`analyze_pairwise_conformal_pruning.py` calibrates the critical support score
+under two events: retaining at least one support and retaining every annotated
+support. This experiment uses group-OOF probe predictions on 96 calibration
+queries, then evaluates fixed thresholds on the 256 fresh queries.
+
+| Target and alpha | Score | Mean kept / 30 | Support precision | Mean support recall | Query coverage |
+|---|---|---:|---:|---:|---:|
+| Any support, 0.05 | BGE | 5.00 | 20.2% | 92.3% | 94.5% |
+| Any support, 0.05 | Fusion | **3.49** | **28.6%** | **92.4%** | **95.3%** |
+| All support, 0.10 | BGE | 7.46 | 13.9% | 94.6% | 92.6% |
+| All support, 0.10 | Fusion | **5.05** | **20.6%** | **95.2%** | 92.6% |
+| All support, 0.05 | BGE | 26.76 | 4.1% | 99.4% | 99.2% |
+| All support, 0.05 | Fusion | **9.92** | **10.9%** | 97.9% | 97.3% |
+
+At all-support `alpha=0.10`, fusion removed 2.41 additional chunks per query,
+95% CI `[2.03, 2.80]`, at the same observed all-support coverage. At
+`alpha=0.05`, it removed 16.84 additional chunks, CI `[15.92, 17.76]`; its
+observed 97.3% coverage remained above the 95% nominal target.
+
+Downstream generation on the first 64 queries supports the conservative
+`alpha=0.05` setting. Fusion used 10.83 chunks versus 26.28 for BGE. Fusion
+minus BGE was -0.008 F1, 95% CI `[-0.076, +0.055]`, with zero mean change in EM
+and numerical accuracy. At `alpha=0.10`, fusion numerical accuracy was 6.25
+points lower, CI `[-12.5, -1.6]`; that threshold is too aggressive for the
+current TAT-QA generator.
+
+### 6. Attention heads, LM heads, and MLPs
 
 Previous experiments in this directory establish the following:
 
@@ -141,30 +235,28 @@ removing attributed sources changes response probability. It provides a good
 causal teacher for the proposed probe, although its repeated inference passes
 are too expensive to run for every production query.
 
-## Recommended method: conformal causal-value probe
+## Recommended method
 
-The next experiment should train a probe, but should not fine-tune the LLM.
+Use the three-signal fusion as the candidate conformity score and calibrate the
+all-support event at `alpha=0.05`. This setting fixes the original failure mode
+where a weak score forces the conformal threshold to retain almost every
+candidate. It also leaves enough evidence for the downstream generator in the
+current 64-query check.
 
-1. On development queries, retrieve the complete Top-30 and generate a fixed
-   draft.
-2. Sample chunk subsets or perform leave-one-chunk-out recomputation. Define a
-   chunk's target as the change in gold-answer loss and generated-answer
-   quality when it is removed. Use a binary label such as `unsafe_to_prune` or
-   a continuous utility delta. Random subset ablations capture interactions
-   better than one-at-a-time masking.
-3. From one full forward pass, collect cheap features: BGE score, selected
-   per-head attention value/logit contributions, chunk hidden states at
-   intermediate layers, and answer-level context sensitivity.
-4. Train a group-sparse linear probe or shallow MLP to approximate the causal
-   utility labels. Split by query and dataset; do not split candidate rows.
-5. On the separate 1,000-query development calibration bank for each dataset,
-   calibrate the nonconformity score for the event that any required chunk is
-   pruned. Test queries remain untouched until all feature, layer, and threshold
-   choices are frozen.
+The 96-query OOF calibration above demonstrates compatibility, but it is not a
+formal deployment guarantee because the same 96 labels were used for probe and
+fusion selection. The frozen layer, `C`, prompt, and fusion weights must next be
+run on the separate 1,000-query development calibration bank for each dataset.
+Only the conformal threshold is fitted on that bank. Test queries must remain
+untouched. The probe can be trained on the dataset training split or transferred
+from TAT-QA and evaluated cross-dataset.
 
-This target resolves the main mismatch in all failed variants: the probe learns
-whether pruning a chunk harms the task, rather than whether the model attended
-to it, represented it, or used it while producing a possibly wrong draft.
+Causal-value supervision remains the strongest follow-up for separating
+"annotated support" from "evidence this generator needs." Random-subset
+ablations should replace leave-one-out when redundant chunks or multi-chunk
+interactions matter. A useful test is to add that target to the explicit
+pairwise layer-30 representation, since the passive full-context representation
+was the component that failed here.
 
 Direct-logit attribution is still worth including as an input feature. For an
 attention head it computes the signed contribution of each source token's
@@ -182,6 +274,15 @@ change in MLP contribution under chunk removal or activation patching.
 - Hidden-state extraction: `run_hidden_chunk_features.py`
 - Probe fitting and locked evaluation: `analyze_hidden_chunk_probe.py`
 - Hidden-probe result: `results/hidden_probe_n96_test64_analysis.json`
+- Causal labels: `results/causal_value_train_n32.json`
+- Causal probe result: `results/causal_value_probe_n32_test64.json`
+- Pairwise extractor: `run_pairwise_relevance_features.py`
+- Pairwise analysis: `analyze_pairwise_relevance_probe.py`
+- Fresh 256-query result:
+  `results/pairwise_three_signal_locked_n96_fresh_test256.json`
+- Conformal result: `results/pairwise_conformal_n96_fresh_test256.json`
+- Downstream answer result:
+  `results/pairwise_conformal_answers_fresh_n64_summary.json`
 - Full-Top-30 saliency result:
   `results/full_top30_saliency_test_n64_seed311.json`
 
