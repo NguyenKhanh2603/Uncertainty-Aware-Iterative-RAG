@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 import torch
-from scipy.stats import rankdata, spearmanr
+from scipy.stats import rankdata
 
 from research.internal_state_rag.analyze_hidden_chunk_probe import (
     make_probe,
@@ -74,21 +74,28 @@ def within_query_ranks(values: np.ndarray) -> np.ndarray:
 
 
 def causal_metrics(target: np.ndarray, prediction: np.ndarray) -> dict[str, float]:
-    correlations, reciprocal_ranks, top1, top3 = [], [], [], []
-    for truth, score in zip(target, prediction, strict=True):
-        rho = float(spearmanr(truth, score).statistic)
-        correlations.append(0.0 if np.isnan(rho) else rho)
-        best = int(np.argmax(truth))
-        order = np.argsort(-score, kind="stable")
-        position = int(np.flatnonzero(order == best)[0]) + 1
-        reciprocal_ranks.append(1 / position)
-        top1.append(position == 1)
-        top3.append(position <= 3)
+    target_rank = rankdata(target, axis=1)
+    prediction_rank = rankdata(prediction, axis=1)
+    target_rank -= target_rank.mean(axis=1, keepdims=True)
+    prediction_rank -= prediction_rank.mean(axis=1, keepdims=True)
+    denominator = np.sqrt(
+        np.square(target_rank).sum(axis=1)
+        * np.square(prediction_rank).sum(axis=1)
+    )
+    correlations = np.divide(
+        (target_rank * prediction_rank).sum(axis=1),
+        denominator,
+        out=np.zeros(len(target), dtype=np.float64),
+        where=denominator > 0,
+    )
+    best = np.argmax(target, axis=1)
+    order = np.argsort(-prediction, axis=1, kind="stable")
+    positions = np.argmax(order == best[:, None], axis=1) + 1
     return {
         "mean_query_spearman": float(np.mean(correlations)),
-        "top_causal_chunk_mrr": float(np.mean(reciprocal_ranks)),
-        "top_causal_chunk_top1": float(np.mean(top1)),
-        "top_causal_chunk_top3": float(np.mean(top3)),
+        "top_causal_chunk_mrr": float(np.mean(1 / positions)),
+        "top_causal_chunk_top1": float(np.mean(positions == 1)),
+        "top_causal_chunk_top3": float(np.mean(positions <= 3)),
     }
 
 
@@ -126,15 +133,13 @@ def standardize(
 
 
 def rank_loss(scores: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-    score_difference = scores[:, :, None] - scores[:, None, :]
-    target_difference = target[:, :, None] - target[:, None, :]
-    upper = torch.triu(
-        torch.ones(target.shape[1], target.shape[1], dtype=torch.bool), diagonal=1
-    ).to(target.device)
-    mask = upper[None, :, :].expand_as(target_difference)
-    logits = score_difference[mask]
-    labels = (target_difference[mask] > 0).float()
-    weights = target_difference[mask].abs().clamp_min(1 / (target.shape[1] - 1))
+    left, right = torch.triu_indices(
+        target.shape[1], target.shape[1], offset=1, device=target.device
+    )
+    logits = scores[:, left] - scores[:, right]
+    target_difference = target[:, left] - target[:, right]
+    labels = (target_difference > 0).float()
+    weights = target_difference.abs().clamp_min(1 / (target.shape[1] - 1))
     pairwise = torch.nn.functional.binary_cross_entropy_with_logits(
         logits, labels, reduction="none"
     )
