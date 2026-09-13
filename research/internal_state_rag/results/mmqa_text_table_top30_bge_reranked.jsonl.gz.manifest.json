@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "mmqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/conformal_global_run/official_bundle_role_split_mmqa",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 2000,
+  "corpus_chunks": 20227,
+  "rows": 60000,
+  "top_l": 30,
+  "role_counts": {
+    "development": 477,
+    "calibration": 523,
+    "test": 1000
+  },
+  "source_split_role_counts": {
+    "train": {
+      "development": 477,
+      "calibration": 523,
+      "test": 0
+    },
+    "dev": {
+      "development": 0,
+      "calibration": 0,
+      "test": 1000
+    }
+  },
+  "split_policy": "official_holdout",
+  "split_policy_detail": "official train -> development/calibration; official dev/validation -> test",
+  "retrieved_support_rows": 2585,
+  "retriever_id": "jinaai/jina-clip-v2@e10d47f5691d0454a0fb5d13f46f2199b74cb436#dim=512#dtype=float16",
+  "corpus_revision": "sha256:db8d883e08c86e053d39e3787bd4f4fac54afb2aa8c93084a99f169902e2d6a3",
+  "preprocess_hash": "sha256:90147103ef66e5544da9da80cd188ee44c5377f2a1d80fbe7913beaafca7f267",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "global_corpus",
+    "min_per_modality": null,
+    "available_modalities": [
+      "table",
+      "text"
+    ]
+  },
+  "candidate_scope": "global_corpus",
+  "candidate_pool": {
+    "minimum": 20227,
+    "maximum": 20227,
+    "mean": 20227.0
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.float16",
+  "timings_seconds": {
+    "resolve_bundle": 0.0,
+    "load_records": 0.373,
+    "encode_corpus": 357.779,
+    "encode_queries": 13.437,
+    "rank_candidates": 0.375,
+    "write_log": 3.395,
+    "total": 375.795
+  },
+  "search_stats": {
+    "candidate_pairs": null,
+    "corpus_on_gpu": null
+  },
+  "output": "mmqa_text_table_top30_bge_reranked.jsonl.gz",
+  "selection_score_id": "cross_encoder_sigmoid:/workspace/hf_cache/models--BAAI--bge-reranker-v2-m3/snapshots/953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e@953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e#max_length=512",
+  "selection_score_policy": "rerank frozen dense Top-L; higher is more relevant",
+  "score_diagnostics": {
+    "calibration": {
+      "cosine": {
+        "rows": 15690,
+        "supports": 670,
+        "roc_auc": 0.905291949043067,
+        "average_precision": 0.46996891421067366
+      },
+      "selection": {
+        "rows": 15690,
+        "supports": 670,
+        "roc_auc": 0.9827573186000755,
+        "average_precision": 0.7311550345317268
+      }
+    },
+    "development": {
+      "cosine": {
+        "rows": 14310,
+        "supports": 605,
+        "roc_auc": 0.9162342271174482,
+        "average_precision": 0.49243237790726074
+      },
+      "selection": {
+        "rows": 14310,
+        "supports": 605,
+        "roc_auc": 0.9780307000220105,
+        "average_precision": 0.7156077675783293
+      }
+    },
+    "test": {
+      "cosine": {
+        "rows": 30000,
+        "supports": 1310,
+        "roc_auc": 0.9093077221895546,
+        "average_precision": 0.46709938643300114
+      },
+      "selection": {
+        "rows": 30000,
+        "supports": 1310,
+        "roc_auc": 0.9802125511189631,
+        "average_precision": 0.7312707438378654
+      }
+    }
+  },
+  "rescore_seconds": 334.199
+}
