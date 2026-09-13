@@ -84,11 +84,14 @@ def conditional_metrics(labels: np.ndarray, mask: np.ndarray) -> dict[str, float
     kept = mask.sum(axis=1)
     return {
         "queries": int(len(labels)),
+        "support_chunks_total": int(support_total.sum()),
+        "support_chunks_retained": int(retained.sum()),
         "mean_chunks_kept": float(kept.mean()),
         "median_chunks_kept": float(np.median(kept)),
         "p90_chunks_kept": float(np.quantile(kept, 0.9)),
         "fraction_of_top_l_kept": float(mask.mean()),
         "chunk_precision_among_kept": float((labels & mask).sum() / mask.sum()),
+        "micro_support_recall": float(retained.sum() / support_total.sum()),
         "mean_support_recall": float(np.mean(retained / support_total)),
         "query_any_support_coverage": float(np.mean(retained > 0)),
         "query_all_support_coverage": float(np.mean(retained == support_total)),

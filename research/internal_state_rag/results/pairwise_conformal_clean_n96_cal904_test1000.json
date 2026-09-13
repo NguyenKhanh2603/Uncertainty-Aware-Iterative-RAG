@@ -89,11 +89,14 @@
           "finite_sample_order": 572,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 640,
             "mean_chunks_kept": 2.328125,
             "median_chunks_kept": 2.0,
             "p90_chunks_kept": 4.0,
             "fraction_of_top_l_kept": 0.07760416666666667,
             "chunk_precision_among_kept": 0.3579418344519016,
+            "micro_support_recall": 0.7407407407407407,
             "mean_support_recall": 0.773220486111111,
             "query_any_support_coverage": 0.8125,
             "query_all_support_coverage": 0.734375
@@ -113,11 +116,14 @@
           "finite_sample_order": 572,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 630,
             "mean_chunks_kept": 1.4622395833333333,
             "median_chunks_kept": 1.0,
             "p90_chunks_kept": 2.0,
             "fraction_of_top_l_kept": 0.048741319444444445,
             "chunk_precision_among_kept": 0.5609973285841496,
+            "micro_support_recall": 0.7291666666666666,
             "mean_support_recall": 0.7612847222222223,
             "query_any_support_coverage": 0.8059895833333334,
             "query_all_support_coverage": 0.7174479166666666
@@ -161,11 +167,14 @@
           "finite_sample_order": 644,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 714,
             "mean_chunks_kept": 3.7760416666666665,
             "median_chunks_kept": 3.0,
             "p90_chunks_kept": 7.0,
             "fraction_of_top_l_kept": 0.12586805555555555,
             "chunk_precision_among_kept": 0.24620689655172415,
+            "micro_support_recall": 0.8263888888888888,
             "mean_support_recall": 0.8569878472222222,
             "query_any_support_coverage": 0.8971354166666666,
             "query_all_support_coverage": 0.8177083333333334
@@ -185,11 +194,14 @@
           "finite_sample_order": 644,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 697,
             "mean_chunks_kept": 2.05859375,
             "median_chunks_kept": 2.0,
             "p90_chunks_kept": 3.0,
             "fraction_of_top_l_kept": 0.06861979166666667,
             "chunk_precision_among_kept": 0.44086021505376344,
+            "micro_support_recall": 0.8067129629629629,
             "mean_support_recall": 0.840060763888889,
             "query_any_support_coverage": 0.8815104166666666,
             "query_all_support_coverage": 0.7994791666666666
@@ -233,11 +245,14 @@
           "finite_sample_order": 680,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 760,
             "mean_chunks_kept": 5.421875,
             "median_chunks_kept": 5.0,
             "p90_chunks_kept": 10.0,
             "fraction_of_top_l_kept": 0.18072916666666666,
             "chunk_precision_among_kept": 0.18251681075888568,
+            "micro_support_recall": 0.8796296296296297,
             "mean_support_recall": 0.906032986111111,
             "query_any_support_coverage": 0.9427083333333334,
             "query_all_support_coverage": 0.8684895833333334
@@ -257,11 +272,14 @@
           "finite_sample_order": 680,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 749,
             "mean_chunks_kept": 3.0260416666666665,
             "median_chunks_kept": 3.0,
             "p90_chunks_kept": 5.0,
             "fraction_of_top_l_kept": 0.10086805555555556,
             "chunk_precision_among_kept": 0.32228915662650603,
+            "micro_support_recall": 0.8668981481481481,
             "mean_support_recall": 0.898654513888889,
             "query_any_support_coverage": 0.9348958333333334,
             "query_all_support_coverage": 0.86328125
@@ -307,11 +325,14 @@
           "finite_sample_order": 572,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 697,
             "mean_chunks_kept": 3.1888020833333335,
             "median_chunks_kept": 3.0,
             "p90_chunks_kept": 6.0,
             "fraction_of_top_l_kept": 0.10629340277777778,
             "chunk_precision_among_kept": 0.28460596161698654,
+            "micro_support_recall": 0.8067129629629629,
             "mean_support_recall": 0.8383246527777777,
             "query_any_support_coverage": 0.8763020833333334,
             "query_all_support_coverage": 0.80078125
@@ -331,11 +352,14 @@
           "finite_sample_order": 572,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 682,
             "mean_chunks_kept": 1.86328125,
             "median_chunks_kept": 2.0,
             "p90_chunks_kept": 3.0,
             "fraction_of_top_l_kept": 0.062109375,
             "chunk_precision_among_kept": 0.47658979734451434,
+            "micro_support_recall": 0.7893518518518519,
             "mean_support_recall": 0.8237847222222223,
             "query_any_support_coverage": 0.8658854166666666,
             "query_all_support_coverage": 0.7825520833333334
@@ -379,11 +403,14 @@
           "finite_sample_order": 644,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 764,
             "mean_chunks_kept": 5.733072916666667,
             "median_chunks_kept": 5.0,
             "p90_chunks_kept": 11.0,
             "fraction_of_top_l_kept": 0.19110243055555556,
             "chunk_precision_among_kept": 0.17351805587099706,
+            "micro_support_recall": 0.8842592592592593,
             "mean_support_recall": 0.909939236111111,
             "query_any_support_coverage": 0.9453125,
             "query_all_support_coverage": 0.8736979166666666
@@ -403,11 +430,14 @@
           "finite_sample_order": 644,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 763,
             "mean_chunks_kept": 3.3880208333333335,
             "median_chunks_kept": 3.0,
             "p90_chunks_kept": 5.0,
             "fraction_of_top_l_kept": 0.11293402777777778,
             "chunk_precision_among_kept": 0.2932359723289777,
+            "micro_support_recall": 0.8831018518518519,
             "mean_support_recall": 0.9136284722222223,
             "query_any_support_coverage": 0.94921875,
             "query_all_support_coverage": 0.87890625
@@ -451,11 +481,14 @@
           "finite_sample_order": 680,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 815,
             "mean_chunks_kept": 15.158854166666666,
             "median_chunks_kept": 13.0,
             "p90_chunks_kept": 30.0,
             "fraction_of_top_l_kept": 0.5052951388888889,
             "chunk_precision_among_kept": 0.07000515375365057,
+            "micro_support_recall": 0.9432870370370371,
             "mean_support_recall": 0.9574652777777777,
             "query_any_support_coverage": 0.9765625,
             "query_all_support_coverage": 0.9375
@@ -475,11 +508,14 @@
           "finite_sample_order": 680,
           "conditional_on_retrievable": {
             "queries": 768,
+            "support_chunks_total": 864,
+            "support_chunks_retained": 813,
             "mean_chunks_kept": 6.302083333333333,
             "median_chunks_kept": 6.0,
             "p90_chunks_kept": 10.0,
             "fraction_of_top_l_kept": 0.21006944444444445,
             "chunk_precision_among_kept": 0.16797520661157025,
+            "micro_support_recall": 0.9409722222222222,
             "mean_support_recall": 0.9563802083333334,
             "query_any_support_coverage": 0.9778645833333334,
             "query_all_support_coverage": 0.93359375
