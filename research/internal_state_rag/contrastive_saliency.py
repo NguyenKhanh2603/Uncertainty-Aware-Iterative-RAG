@@ -123,6 +123,18 @@ def _capture_component_updates(
             handle.remove()
 
 
+@contextmanager
+def _memory_efficient_attention(model: Any) -> Iterator[None]:
+    """Use SDPA because this attribution path never requests attention maps."""
+
+    original = getattr(model.config, "_attn_implementation", None)
+    model.config._attn_implementation = "sdpa"
+    try:
+        yield
+    finally:
+        model.config._attn_implementation = original
+
+
 def _answer_inputs(
     client: Any,
     query: str,
@@ -188,45 +200,46 @@ def extract_contrastive_saliency(
 
     client.model.requires_grad_(False)
     client.model.eval()
-    with torch.inference_mode():
-        no_context_logits = _teacher_forced_logits(client, query, [], answer_ids).float()
+    with _memory_efficient_attention(client.model):
+        with torch.inference_mode():
+            no_context_logits = _teacher_forced_logits(client, query, [], answer_ids).float()
 
-    alignment, full_ids, answer_positions = _answer_inputs(client, query, chunks, answer_ids)
-    spans = alignment.batch_chunk_spans[0]
-    embeddings = core.embed_tokens(full_ids).detach().requires_grad_(True)
-    with torch.enable_grad(), _capture_component_updates(
-        core, layer_ids
-    ) as (attention_updates, mlp_updates):
-        output = core(
-            input_ids=None,
-            inputs_embeds=embeddings,
-            attention_mask=torch.ones_like(full_ids),
-            use_cache=False,
-            output_hidden_states=True,
-            return_dict=True,
-        )
-        contextual_logits = client.model.lm_head(
-            output.last_hidden_state[:, answer_positions, :]
-        )[0].float()
-        cti = jensen_shannon_from_logits(contextual_logits, no_context_logits).detach()
-        selected = select_context_sensitive_tokens(cti)
+        alignment, full_ids, answer_positions = _answer_inputs(client, query, chunks, answer_ids)
+        spans = alignment.batch_chunk_spans[0]
+        embeddings = core.embed_tokens(full_ids).detach().requires_grad_(True)
+        with torch.enable_grad(), _capture_component_updates(
+            core, layer_ids
+        ) as (attention_updates, mlp_updates):
+            output = core(
+                input_ids=None,
+                inputs_embeds=embeddings,
+                attention_mask=torch.ones_like(full_ids),
+                use_cache=False,
+                output_hidden_states=True,
+                return_dict=True,
+            )
+            contextual_logits = client.model.lm_head(
+                output.last_hidden_state[:, answer_positions, :]
+            )[0].float()
+            cti = jensen_shannon_from_logits(contextual_logits, no_context_logits).detach()
+            selected = select_context_sensitive_tokens(cti)
 
-        no_context_top2 = no_context_logits.topk(k=2, dim=-1).indices
-        alternatives = no_context_top2[:, 0].clone()
-        target_ids = torch.tensor(answer_ids, device=alternatives.device)
-        same = alternatives == target_ids
-        alternatives[same] = no_context_top2[same, 1]
-        log_probs = torch.log_softmax(contextual_logits, dim=-1)
-        target_logp = log_probs.gather(-1, target_ids[:, None]).squeeze(-1)
-        alternative_logp = log_probs.gather(-1, alternatives[:, None]).squeeze(-1)
-        weights = cti / cti[selected].mean().clamp_min(1e-8)
-        objective = (weights[selected] * (target_logp - alternative_logp)[selected]).mean()
+            no_context_top2 = no_context_logits.topk(k=2, dim=-1).indices
+            alternatives = no_context_top2[:, 0].clone()
+            target_ids = torch.tensor(answer_ids, device=alternatives.device)
+            same = alternatives == target_ids
+            alternatives[same] = no_context_top2[same, 1]
+            log_probs = torch.log_softmax(contextual_logits, dim=-1)
+            target_logp = log_probs.gather(-1, target_ids[:, None]).squeeze(-1)
+            alternative_logp = log_probs.gather(-1, alternatives[:, None]).squeeze(-1)
+            weights = cti / cti[selected].mean().clamp_min(1e-8)
+            objective = (weights[selected] * (target_logp - alternative_logp)[selected]).mean()
 
-        residual_targets = [output.hidden_states[layer] for layer in layer_ids]
-        attention_targets = [attention_updates[layer] for layer in layer_ids]
-        mlp_targets = [mlp_updates[layer] for layer in layer_ids]
-        targets = [*residual_targets, *attention_targets, *mlp_targets]
-        gradients = torch.autograd.grad(objective, targets, allow_unused=False)
+            residual_targets = [output.hidden_states[layer] for layer in layer_ids]
+            attention_targets = [attention_updates[layer] for layer in layer_ids]
+            mlp_targets = [mlp_updates[layer] for layer in layer_ids]
+            targets = [*residual_targets, *attention_targets, *mlp_targets]
+            gradients = torch.autograd.grad(objective, targets, allow_unused=False)
 
     features: dict[str, list[np.ndarray]] = {
         f"{component}_{metric}": []
