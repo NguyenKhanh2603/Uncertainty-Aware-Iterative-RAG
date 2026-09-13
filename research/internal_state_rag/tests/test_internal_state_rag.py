@@ -27,6 +27,9 @@ from research.internal_state_rag.run_full_topl_validation import (
 from research.internal_state_rag.run_full_topl_saliency import grouped_z
 from research.internal_state_rag.analyze_hidden_chunk_probe import query_metrics
 from research.internal_state_rag.analyze_causal_ranknet_probe import rank_loss
+from research.internal_state_rag.analyze_hard_negative_calibration_curve import (
+    hard_negative_mask,
+)
 from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
     conformal_threshold,
     end_to_end_metrics,
@@ -108,6 +111,15 @@ def test_causal_rank_loss_prefers_the_teacher_order():
     reversed_scores = torch.tensor([[-2.0, 0.0, 2.0]])
 
     assert rank_loss(aligned, target) < rank_loss(reversed_scores, target)
+
+
+def test_hard_negative_mask_keeps_support_and_highest_scoring_negatives():
+    labels = np.asarray([[False, True, False, False]])
+    scores = np.asarray([[0.8, 0.7, 0.9, 0.1]])
+
+    mask = hard_negative_mask(labels, scores, hard_negatives=2)
+
+    assert mask.tolist() == [[True, True, True, False]]
 
 
 def test_attention_entropy_preserves_layer_and_head_axes():
