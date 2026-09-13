@@ -36,7 +36,10 @@ def excluded_qids(paths: list[Path]) -> set[str]:
             continue
         payload = json.loads(path.read_text(encoding="utf-8"))
         if "plan" in payload:
-            excluded.update(str(row["qid"]) for row in payload["plan"])
+            excluded.update(
+                str(row["qid"] if isinstance(row, dict) else row)
+                for row in payload["plan"]
+            )
         for row in payload.get("observations", []):
             excluded.add(str(row["qid"]))
     return excluded
