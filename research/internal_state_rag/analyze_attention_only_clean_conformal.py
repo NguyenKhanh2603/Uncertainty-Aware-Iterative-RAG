@@ -18,6 +18,7 @@ from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
     end_to_end_metrics,
     fixed_k_metrics,
     keep_mask,
+    probe_predictions,
 )
 
 
@@ -244,6 +245,121 @@ def learned_attention_rows(
     return output, details
 
 
+def subset_attention(data: dict[str, Any], qids: list[str]) -> dict[str, Any]:
+    positions = {str(qid): index for index, qid in enumerate(data["qids"])}
+    indices = np.asarray([positions[qid] for qid in qids], dtype=int)
+    return {
+        "qids": data["qids"][indices],
+        "labels": data["labels"][indices],
+        "scores": {name: values[indices] for name, values in data["scores"].items()},
+        "probe_features": data["probe_features"][indices],
+    }
+
+
+def conformal_score_rows(
+    calibration_labels: np.ndarray,
+    test_labels: np.ndarray,
+    calibration_scores: dict[str, np.ndarray],
+    test_scores: dict[str, np.ndarray],
+    *,
+    alphas: list[float],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    cal_retrievable = calibration_labels.any(axis=1)
+    test_retrievable = test_labels.any(axis=1)
+    rows, details = [], {}
+    for method in calibration_scores:
+        details[method] = {
+            "ranking_on_retrievable_test_queries": fixed_k_metrics(
+                test_labels, test_scores[method]
+            )
+        }
+        for alpha in alphas:
+            threshold, order = conformal_threshold(
+                calibration_scores[method][cal_retrievable],
+                calibration_labels[cal_retrievable],
+                alpha=alpha,
+                coverage_target="all_support",
+            )
+            mask = keep_mask(test_scores[method], threshold)
+            conditional = conditional_metrics(
+                test_labels[test_retrievable], mask[test_retrievable]
+            )
+            end_to_end = end_to_end_metrics(test_labels, mask)
+            rows.append(
+                {
+                    "method": method,
+                    "selection_rule": "query-level conformal all-support",
+                    "alpha": alpha,
+                    "evaluation_scope": "matched retrievable test queries",
+                    "n_queries": conditional["queries"],
+                    "mean_chunks_kept": conditional["mean_chunks_kept"],
+                    "chunk_precision": conditional["chunk_precision_among_kept"],
+                    "micro_support_recall": conditional["micro_support_recall"],
+                    "mean_support_recall": conditional["mean_support_recall"],
+                    "query_all_support_coverage": conditional[
+                        "query_all_support_coverage"
+                    ],
+                    "empty_context_rate": 0.0,
+                    "end_to_end_query_all_support_coverage": end_to_end[
+                        "query_all_support_coverage"
+                    ],
+                    "calibrated_threshold": threshold,
+                    "finite_sample_order": order,
+                }
+            )
+            details[method][str(alpha)] = {
+                "calibrated_threshold": threshold,
+                "finite_sample_order": order,
+                "conditional_on_retrievable": conditional,
+                "end_to_end_all_test_queries": end_to_end,
+            }
+    return rows, details
+
+
+def matched_pairwise_scores(
+    probe_train_path: Path,
+    calibration_path: Path,
+    test_path: Path,
+    fusion_analysis_path: Path,
+    calibration_qids: list[str],
+    test_qids: list[str],
+) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray], np.ndarray, np.ndarray]:
+    train = np.load(probe_train_path)
+    calibration = np.load(calibration_path)
+    test = np.load(test_path)
+    analysis = json.loads(fusion_analysis_path.read_text(encoding="utf-8"))
+    layer = int(analysis["selected_layer"])
+    c = float(analysis["selected_c"])
+    weights = analysis["selected_three_signal_weights"]
+    calibration_probe, test_probe = probe_predictions(
+        train, [calibration, test], layer=layer, c=c
+    )
+
+    def select(data: Any, qids: list[str]) -> np.ndarray:
+        positions = {str(qid): index for index, qid in enumerate(data["qids"].tolist())}
+        return np.asarray([positions[qid] for qid in qids], dtype=int)
+
+    cal_indices = select(calibration, calibration_qids)
+    test_indices = select(test, test_qids)
+
+    def scores(data: Any, probe: np.ndarray, indices: np.ndarray) -> dict[str, np.ndarray]:
+        bge = query_z(data["bge_scores"].astype(np.float64))
+        fusion = (
+            bge
+            + float(weights["lm_head"])
+            * query_z(data["lm_relevance_scores"].astype(np.float64))
+            + float(weights["hidden_probe"]) * query_z(probe)
+        )
+        return {"bge_matched": bge[indices], "three_signal_fusion_matched": fusion[indices]}
+
+    return (
+        scores(calibration, calibration_probe, cal_indices),
+        scores(test, test_probe, test_indices),
+        calibration["labels"].astype(bool)[cal_indices],
+        test["labels"].astype(bool)[test_indices],
+    )
+
+
 def internal_rows(path: Path, alphas: list[float]) -> list[dict[str, Any]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     output = []
@@ -286,6 +402,8 @@ def markdown_table(rows: list[dict[str, Any]]) -> str:
         "attention_learned_probe": "Attention-only trained probe",
         "bge": "BGE",
         "three_signal_fusion": "BGE + LM-head + hidden probe",
+        "bge_matched": "BGE (matched)",
+        "three_signal_fusion_matched": "BGE + LM-head + hidden probe (matched)",
     }
     lines = [
         "| Method | Rule | α | Scope (n) | Chunks | Precision | Micro recall | Mean query recall | All-support coverage | Empty |",
@@ -321,6 +439,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--attention-train-rows", type=Path)
     parser.add_argument("--test-rows", type=Path, required=True)
     parser.add_argument("--internal-results", type=Path, required=True)
+    parser.add_argument("--pairwise-probe-train", type=Path)
+    parser.add_argument("--pairwise-calibration", type=Path)
+    parser.add_argument("--pairwise-test", type=Path)
+    parser.add_argument("--fusion-analysis", type=Path)
     parser.add_argument("--by-results", type=Path, required=True)
     parser.add_argument("--output-json", type=Path, required=True)
     parser.add_argument("--output-markdown", type=Path, required=True)
@@ -339,9 +461,24 @@ def main() -> None:
     overlap = len(set(calibration["qids"]) & set(test["qids"]))
     if overlap:
         raise ValueError(f"Calibration/test query overlap: {overlap}")
-    attention_table, attention_details = query_conformal_rows(
-        calibration, test, alphas=alphas
+    pairwise_paths = (
+        args.pairwise_probe_train,
+        args.pairwise_calibration,
+        args.pairwise_test,
+        args.fusion_analysis,
     )
+    use_matched = all(pairwise_paths)
+    if any(pairwise_paths) and not use_matched:
+        raise ValueError("All four pairwise feature arguments must be supplied together")
+    matched_details: dict[str, Any] = {}
+    if use_matched:
+        pairwise_calibration = np.load(args.pairwise_calibration)
+        pairwise_cal_qids = {str(qid) for qid in pairwise_calibration["qids"].tolist()}
+        common_cal_qids = [
+            str(qid) for qid in calibration["qids"] if str(qid) in pairwise_cal_qids
+        ]
+        calibration = subset_attention(calibration, common_cal_qids)
+    attention_table, attention_details = query_conformal_rows(calibration, test, alphas=alphas)
     learned_table: list[dict[str, Any]] = []
     if args.attention_train_rows:
         attention_train = load_attention(
@@ -351,11 +488,32 @@ def main() -> None:
             attention_train, calibration, test, alphas=alphas
         )
         attention_details["attention_learned_probe"] = learned_details
+    matched_table: list[dict[str, Any]] = []
+    if use_matched:
+        cal_scores, test_scores, cal_labels, test_labels = matched_pairwise_scores(
+            args.pairwise_probe_train,
+            args.pairwise_calibration,
+            args.pairwise_test,
+            args.fusion_analysis,
+            calibration["qids"].tolist(),
+            test["qids"].tolist(),
+        )
+        if not np.array_equal(cal_labels, calibration["labels"]):
+            raise ValueError("Matched calibration labels disagree")
+        if not np.array_equal(test_labels, test["labels"]):
+            raise ValueError("Matched test labels disagree")
+        matched_table, matched_details = conformal_score_rows(
+            cal_labels,
+            test_labels,
+            cal_scores,
+            test_scores,
+            alphas=alphas,
+        )
     rows = [
         *by_rows(args.by_results, alphas),
         *attention_table,
         *learned_table,
-        *internal_rows(args.internal_results, alphas),
+        *(matched_table if use_matched else internal_rows(args.internal_results, alphas)),
     ]
     output = {
         "status": "complete",
@@ -375,6 +533,10 @@ def main() -> None:
         },
         "table": rows,
         "attention_details": attention_details,
+        "matched_internal_details": matched_details,
+        "large_internal_validation_reference": internal_rows(
+            args.internal_results, alphas
+        ),
     }
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(output, indent=2), encoding="utf-8")
