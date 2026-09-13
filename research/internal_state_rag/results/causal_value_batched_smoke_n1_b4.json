@@ -1,0 +1,489 @@
+{
+  "status": "complete",
+  "method": "batched_full_top_l_leave_one_chunk_out_gold_log_likelihood",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "plan": "research/internal_state_rag/results/causal_value_n128_plan.json",
+  "input_role": "calibration",
+  "source_split": "train",
+  "top_l": 30,
+  "requested_queries": 1,
+  "batch_size": 4,
+  "max_answer_tokens": 12,
+  "completed_queries": 1,
+  "queries": [
+    {
+      "qid": "7b7108df-3586-4bb4-9d65-67a3a408d543",
+      "question": "What was the percentage change in the Total non-current trade and other payables in 2019 from 2018?",
+      "gold_answer": "23.17",
+      "answer_token_ids": [
+        17,
+        18,
+        13,
+        16,
+        22
+      ],
+      "full_mean_gold_logprob": -3.859729766845703,
+      "full_token_logprobs": [
+        -5.312042236328125,
+        -4.957218170166016,
+        -1.6006765365600586,
+        -1.6874955892562866,
+        -5.74121618270874
+      ],
+      "elapsed_seconds": 14.756113816052675,
+      "chunks": [
+        {
+          "chunk_id": "tatqa-table:cc63905770dd71659fc5ed07",
+          "rank": 1,
+          "is_support": true,
+          "bge_score": 0.9840936064720154,
+          "ablated_mean_gold_logprob": -2.573389768600464,
+          "gold_logprob_drop": -1.2863398790359497,
+          "token_logprob_drops": [
+            -1.94456148147583,
+            -2.6681201457977295,
+            -0.14602863788604736,
+            0.515067458152771,
+            -2.1880569458007812
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:516bcb8078248148d9c89770",
+          "rank": 2,
+          "is_support": false,
+          "bge_score": 0.793105959892273,
+          "ablated_mean_gold_logprob": -3.5923335552215576,
+          "gold_logprob_drop": -0.2673962712287903,
+          "token_logprob_drops": [
+            0.7466449737548828,
+            -1.8508901596069336,
+            -1.2954673767089844,
+            0.3540531396865845,
+            0.7086782455444336
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:a3908fc857701337ad2a876a",
+          "rank": 3,
+          "is_support": false,
+          "bge_score": 0.7839884757995605,
+          "ablated_mean_gold_logprob": -3.518367052078247,
+          "gold_logprob_drop": -0.34136295318603516,
+          "token_logprob_drops": [
+            1.074716567993164,
+            -1.1926584243774414,
+            -1.5601845979690552,
+            0.24931204319000244,
+            -0.2780003547668457
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:eed396e4b492057e9c75e489",
+          "rank": 4,
+          "is_support": false,
+          "bge_score": 0.6584175229072571,
+          "ablated_mean_gold_logprob": -3.4925529956817627,
+          "gold_logprob_drop": -0.36717692017555237,
+          "token_logprob_drops": [
+            0.814002513885498,
+            -1.9334607124328613,
+            -1.4659197330474854,
+            0.1606847047805786,
+            0.588808536529541
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:cf937155d1771be21c81c43f",
+          "rank": 5,
+          "is_support": false,
+          "bge_score": 0.39466747641563416,
+          "ablated_mean_gold_logprob": -3.573432445526123,
+          "gold_logprob_drop": -0.28629741072654724,
+          "token_logprob_drops": [
+            0.7700991630554199,
+            -1.6733489036560059,
+            -1.1142609119415283,
+            0.20959210395812988,
+            0.3764314651489258
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:259e710bff3077fa9798a6ee",
+          "rank": 6,
+          "is_support": false,
+          "bge_score": 0.2901756167411804,
+          "ablated_mean_gold_logprob": -3.352700710296631,
+          "gold_logprob_drop": -0.5070287585258484,
+          "token_logprob_drops": [
+            -0.4481010437011719,
+            -1.8261466026306152,
+            -1.5631988048553467,
+            0.2271420955657959,
+            1.0751605033874512
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:ad74f136502577dd55721dbf",
+          "rank": 7,
+          "is_support": false,
+          "bge_score": 0.2523840367794037,
+          "ablated_mean_gold_logprob": -3.537848711013794,
+          "gold_logprob_drop": -0.3218812048435211,
+          "token_logprob_drops": [
+            -0.6706819534301758,
+            -1.7486004829406738,
+            0.00037491321563720703,
+            0.14325237274169922,
+            0.6662492752075195
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:21f2aa5241fb906f9677dd58",
+          "rank": 8,
+          "is_support": false,
+          "bge_score": 0.23651622235774994,
+          "ablated_mean_gold_logprob": -3.4363415241241455,
+          "gold_logprob_drop": -0.4233880043029785,
+          "token_logprob_drops": [
+            -0.10337686538696289,
+            -1.7975244522094727,
+            -0.20545542240142822,
+            0.231270432472229,
+            -0.2418537139892578
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:626b16f4e5f1200a097216a2",
+          "rank": 9,
+          "is_support": false,
+          "bge_score": 0.21601155400276184,
+          "ablated_mean_gold_logprob": -3.5609962940216064,
+          "gold_logprob_drop": -0.29873350262641907,
+          "token_logprob_drops": [
+            -0.09192276000976562,
+            -1.5485448837280273,
+            -0.36538660526275635,
+            0.17676174640655518,
+            0.33542490005493164
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:8cd72548cfb0db2de9c50f58",
+          "rank": 10,
+          "is_support": false,
+          "bge_score": 0.19072403013706207,
+          "ablated_mean_gold_logprob": -3.6352553367614746,
+          "gold_logprob_drop": -0.224474236369133,
+          "token_logprob_drops": [
+            1.1016693115234375,
+            -1.636117935180664,
+            -1.3036329746246338,
+            0.31175684928894043,
+            0.40395355224609375
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:b43a896638f79974cd65ac3a",
+          "rank": 11,
+          "is_support": false,
+          "bge_score": 0.1710611879825592,
+          "ablated_mean_gold_logprob": -3.6377339363098145,
+          "gold_logprob_drop": -0.22199591994285583,
+          "token_logprob_drops": [
+            0.5657916069030762,
+            -1.6797821521759033,
+            -1.2871310710906982,
+            0.4002915620803833,
+            0.8908505439758301
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:3e3a552670fa42b5939c0c01",
+          "rank": 12,
+          "is_support": false,
+          "bge_score": 0.169956237077713,
+          "ablated_mean_gold_logprob": -3.485870838165283,
+          "gold_logprob_drop": -0.3738590180873871,
+          "token_logprob_drops": [
+            0.8176279067993164,
+            -1.8386106491088867,
+            -1.3113739490509033,
+            0.22183740139007568,
+            0.2412242889404297
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:36a1e40681a9c5b482a8233d",
+          "rank": 13,
+          "is_support": false,
+          "bge_score": 0.11920291930437088,
+          "ablated_mean_gold_logprob": -3.623945713043213,
+          "gold_logprob_drop": -0.23578397929668427,
+          "token_logprob_drops": [
+            1.1017565727233887,
+            -1.752884864807129,
+            -1.102005958557129,
+            0.15979373455047607,
+            0.41442060470581055
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:e9597ab1365ea7c2528ae690",
+          "rank": 14,
+          "is_support": false,
+          "bge_score": 0.08756384253501892,
+          "ablated_mean_gold_logprob": -3.6243882179260254,
+          "gold_logprob_drop": -0.2353416234254837,
+          "token_logprob_drops": [
+            0.2629098892211914,
+            -1.7884068489074707,
+            -0.11032164096832275,
+            0.07036566734313965,
+            0.3887448310852051
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:9de1acc6efc90d787a0a47c7",
+          "rank": 15,
+          "is_support": false,
+          "bge_score": 0.08632347732782364,
+          "ablated_mean_gold_logprob": -3.548175096511841,
+          "gold_logprob_drop": -0.31155461072921753,
+          "token_logprob_drops": [
+            0.931488037109375,
+            -1.9079093933105469,
+            -1.3448727130889893,
+            0.25375378131866455,
+            0.5097670555114746
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:ca49471fd42946397f2b7c48",
+          "rank": 16,
+          "is_support": false,
+          "bge_score": 0.08509904146194458,
+          "ablated_mean_gold_logprob": -3.6678364276885986,
+          "gold_logprob_drop": -0.1918932944536209,
+          "token_logprob_drops": [
+            1.1795578002929688,
+            -1.674555778503418,
+            -1.2742506265640259,
+            0.22308838367462158,
+            0.5866937637329102
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:eef8269ae86ab41ec3b10ba8",
+          "rank": 17,
+          "is_support": false,
+          "bge_score": 0.07807816565036774,
+          "ablated_mean_gold_logprob": -3.8192665576934814,
+          "gold_logprob_drop": -0.04046285152435303,
+          "token_logprob_drops": [
+            0.9580225944519043,
+            -1.4893484115600586,
+            -1.3379020690917969,
+            0.40170300006866455,
+            1.2652106285095215
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:e0fb4cb49cc7e9f33ef5db98",
+          "rank": 18,
+          "is_support": false,
+          "bge_score": 0.07055959850549698,
+          "ablated_mean_gold_logprob": -3.4656901359558105,
+          "gold_logprob_drop": -0.39403945207595825,
+          "token_logprob_drops": [
+            -0.3303518295288086,
+            -1.7208833694458008,
+            -0.7113954424858093,
+            0.2413243055343628,
+            0.5511093139648438
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:13f5fc8921e134235799671d",
+          "rank": 19,
+          "is_support": false,
+          "bge_score": 0.06465348601341248,
+          "ablated_mean_gold_logprob": -3.5015087127685547,
+          "gold_logprob_drop": -0.35822102427482605,
+          "token_logprob_drops": [
+            0.9934015274047852,
+            -1.6851778030395508,
+            -1.1493728160858154,
+            0.12964856624603271,
+            -0.0796046257019043
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:8ce58cefe9e34d2b36e8a993",
+          "rank": 20,
+          "is_support": false,
+          "bge_score": 0.052618950605392456,
+          "ablated_mean_gold_logprob": -3.5295186042785645,
+          "gold_logprob_drop": -0.33021116256713867,
+          "token_logprob_drops": [
+            -0.09907007217407227,
+            -1.7451612949371338,
+            -0.7296684980392456,
+            0.1919856071472168,
+            0.730858325958252
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:cb8cf9e33b4d05676e2aea2a",
+          "rank": 21,
+          "is_support": false,
+          "bge_score": 0.04336579889059067,
+          "ablated_mean_gold_logprob": -3.550525665283203,
+          "gold_logprob_drop": -0.3092041015625,
+          "token_logprob_drops": [
+            -0.008563995361328125,
+            -1.7117786407470703,
+            -0.32093381881713867,
+            0.22140741348266602,
+            0.2738485336303711
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:58c590c0ba3597e9be93bcd5",
+          "rank": 22,
+          "is_support": false,
+          "bge_score": 0.03676946833729744,
+          "ablated_mean_gold_logprob": -3.693173885345459,
+          "gold_logprob_drop": -0.16655579209327698,
+          "token_logprob_drops": [
+            0.6767559051513672,
+            -1.7572791576385498,
+            -0.9601330757141113,
+            0.17479252815246582,
+            1.0330848693847656
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:cd4df3bfb5288766eb46dce4",
+          "rank": 23,
+          "is_support": false,
+          "bge_score": 0.02843603305518627,
+          "ablated_mean_gold_logprob": -3.5045135021209717,
+          "gold_logprob_drop": -0.3552164137363434,
+          "token_logprob_drops": [
+            0.24040889739990234,
+            -1.7594068050384521,
+            -1.311539888381958,
+            0.3170534372329712,
+            0.7374024391174316
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:6f72d4938d7f057dc8cef3b2",
+          "rank": 24,
+          "is_support": false,
+          "bge_score": 0.026759283617138863,
+          "ablated_mean_gold_logprob": -3.676723003387451,
+          "gold_logprob_drop": -0.18300648033618927,
+          "token_logprob_drops": [
+            0.11516475677490234,
+            -1.5663771629333496,
+            -1.1144500970840454,
+            0.4213188886642456,
+            1.2293109893798828
+          ]
+        },
+        {
+          "chunk_id": "tatqa-table:dcf7f5f92596466598813d18",
+          "rank": 25,
+          "is_support": false,
+          "bge_score": 0.0222861859947443,
+          "ablated_mean_gold_logprob": -3.798656940460205,
+          "gold_logprob_drop": -0.061072636395692825,
+          "token_logprob_drops": [
+            0.7122673988342285,
+            -1.6012382507324219,
+            -0.6925493478775024,
+            0.2069021463394165,
+            1.0692548751831055
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:a677abeab702121bb0b787ae",
+          "rank": 26,
+          "is_support": false,
+          "bge_score": 0.016914913430809975,
+          "ablated_mean_gold_logprob": -3.6040992736816406,
+          "gold_logprob_drop": -0.2556306719779968,
+          "token_logprob_drops": [
+            0.2748250961303711,
+            -1.6811766624450684,
+            -0.4950662851333618,
+            0.10705244541168213,
+            0.516211986541748
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:4f2096cb444822fdd58adaef",
+          "rank": 27,
+          "is_support": false,
+          "bge_score": 0.012431650422513485,
+          "ablated_mean_gold_logprob": -3.9392313957214355,
+          "gold_logprob_drop": 0.07950174808502197,
+          "token_logprob_drops": [
+            0.09279680252075195,
+            -1.2330615520477295,
+            0.9352355003356934,
+            -0.06271898746490479,
+            0.6652569770812988
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:12c987bc11290379a6f72219",
+          "rank": 28,
+          "is_support": false,
+          "bge_score": 0.009412589482963085,
+          "ablated_mean_gold_logprob": -3.5759634971618652,
+          "gold_logprob_drop": -0.2837660312652588,
+          "token_logprob_drops": [
+            0.3265676498413086,
+            -1.8468902111053467,
+            -1.0243680477142334,
+            0.1524507999420166,
+            0.9734096527099609
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:700358382391abf9a729a161",
+          "rank": 29,
+          "is_support": false,
+          "bge_score": 0.008577484637498856,
+          "ablated_mean_gold_logprob": -3.904888868331909,
+          "gold_logprob_drop": 0.045159172266721725,
+          "token_logprob_drops": [
+            -0.2285780906677246,
+            -1.2927069664001465,
+            0.9064846038818359,
+            -0.058318495750427246,
+            0.8989148139953613
+          ]
+        },
+        {
+          "chunk_id": "tatqa-text:f5bbf39cfc33a5dcba31381d",
+          "rank": 30,
+          "is_support": false,
+          "bge_score": 0.00712142838165164,
+          "ablated_mean_gold_logprob": -3.8566412925720215,
+          "gold_logprob_drop": -0.00308818812482059,
+          "token_logprob_drops": [
+            0.22519350051879883,
+            -1.5848963260650635,
+            -1.2830010652542114,
+            0.4729803800582886,
+            2.154282569885254
+          ]
+        }
+      ]
+    }
+  ],
+  "elapsed_seconds_this_invocation": 14.763102229684591
+}
