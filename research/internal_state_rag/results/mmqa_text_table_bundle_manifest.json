@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "data_grade": "official_text_table_subset",
+  "candidate_scope": "selected_query_official_candidate_union",
+  "synthetic_candidates": false,
+  "dataset": "mmqa",
+  "queries_per_source_split": {
+    "train": 1000,
+    "dev": 1000
+  },
+  "questions": 2000,
+  "corpus": 20227,
+  "corpus_modalities": {
+    "text": 19163,
+    "table": 1064
+  },
+  "selection": "first eligible rows in official file order",
+  "eligibility": "all labelled support documents are text or table",
+  "qid_sha256": "00df6c554c9537c4c1169e8ead008e65c2512f857146f6d6691e2d3fb70567c3",
+  "source_files": {
+    "train": "2d7c8f6f1659df69f8dcdb79e4701c48e53e8674ab8573244b3ffe2e4b1da565",
+    "dev": "2e348ca574b2dc368e84671709689070f943a59f2e08e6b6e374705deb712d31",
+    "texts": "cae3808ccc6c258e91131a3ca3dce43e629936e1496c97a288c4abb04a6ef905",
+    "tables": "8d082d254fd0bfa19bca7e2da20369c15ccb25867db3edfe46b33d59e8dbf7b1"
+  }
+}
