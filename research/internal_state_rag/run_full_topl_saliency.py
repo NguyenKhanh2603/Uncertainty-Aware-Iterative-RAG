@@ -79,6 +79,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--internal-weight", type=float, default=3.0)
     parser.add_argument("--max-answer-tokens", type=int, default=12)
     parser.add_argument("--max-new-tokens", type=int, default=24)
+    parser.add_argument(
+        "--max-prompt-tokens",
+        type=int,
+        default=5600,
+        help="Skip resource outliers instead of truncating their Top-L context.",
+    )
     parser.add_argument("--exclude", type=Path, action="append", default=[])
     return parser.parse_args()
 
@@ -96,14 +102,18 @@ def main() -> None:
     plan = random.Random(args.seed).sample(available, args.n)
 
     observations: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
     output: dict[str, Any] = {}
     if args.output.exists():
         previous = json.loads(args.output.read_text(encoding="utf-8"))
         if previous.get("plan") != plan:
             raise ValueError("Existing output has a different frozen query plan")
         observations = previous.get("observations", [])
+        skipped = previous.get("skipped", [])
         output = previous
-    completed = {str(row["qid"]) for row in observations}
+    completed = {str(row["qid"]) for row in observations} | {
+        str(row["qid"]) for row in skipped
+    }
     client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
 
     for index, qid in enumerate(plan, start=1):
@@ -116,6 +126,23 @@ def main() -> None:
             "Answer using only the supplied context. Return only the short answer.\n"
             f"Question: {question['question']}"
         )
+        prompt_tokens = int(
+            client.align_and_prepare_inputs(prompt, chunks).inputs["input_ids"].shape[1]
+        )
+        if prompt_tokens > args.max_prompt_tokens:
+            skipped.append(
+                {
+                    "qid": qid,
+                    "reason": "prompt_token_resource_limit",
+                    "prompt_tokens": prompt_tokens,
+                }
+            )
+            completed.add(qid)
+            print(
+                f"[{index}/{len(plan)}] skip {qid}: {prompt_tokens} prompt tokens",
+                flush=True,
+            )
+            continue
         draft = generate_answer(client, prompt, chunks, max_new_tokens=args.max_new_tokens)
         if not draft:
             continue
@@ -174,9 +201,11 @@ def main() -> None:
             "top_l": args.top_l,
             "layer": args.layer,
             "internal_weight": args.internal_weight,
+            "max_prompt_tokens": args.max_prompt_tokens,
             "excluded_queries": len(excluded),
             "plan": plan,
             "completed_queries": len(observations),
+            "skipped": skipped,
             "metrics": {
                 name: ranking_metrics(flat, np.asarray([row[name] for row in flat]))
                 for name in ("bge_score", "internal_score", "fusion_score")
@@ -191,7 +220,9 @@ def main() -> None:
             flush=True,
         )
 
-    output["status"] = "complete" if len(observations) == len(plan) else "partial"
+    output["completed_queries"] = len(observations)
+    output["skipped"] = skipped
+    output["status"] = "complete" if len(completed) == len(plan) else "partial"
     write_json(args.output, output)
     print(json.dumps({key: value for key, value in output.items() if key != "observations"}, indent=2))
 
