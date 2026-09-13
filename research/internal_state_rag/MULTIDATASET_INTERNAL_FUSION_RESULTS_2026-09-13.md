@@ -22,8 +22,9 @@ zero when the reranker is already near saturation.
 
 - TAT-QA: internal fusion gives a large improvement over BGE.
 - HotpotQA: BGE is already very strong; OOF selects zero internal weight.
-- MMQA text/table pilot: BGE + hidden probe gives a small, statistically positive
-  ranking improvement and a modest conformal efficiency improvement.
+- MMQA text/table pilot: the OOF-selected three-signal fusion gives a small,
+  statistically positive ranking improvement and a modest conformal efficiency
+  improvement. The hidden-only branch is an ablation, not the primary method.
 - A TAT-QA-trained hidden probe transfers poorly to both new domains. The useful
   signal is therefore not yet a dataset-invariant notion of relevance.
 
@@ -99,6 +100,12 @@ the three-signal fusion. MMQA selected layer 24 with C=0.03 from the bounded
 precommitted grid `{layer 24, layer 30} x {0.03, 0.10}`. Hotpot selected layer 24
 with C=0.03 from the full six-layer grid. TAT-QA previously selected layer 30.
 
+The primary cross-dataset method is always the same three-signal form,
+`z(BGE) + w_lm z(LM-head) + w_hidden z(hidden-probe)`, with both weights selected
+by query-grouped OOF validation from a grid that includes zero. Its selected
+weights are TAT-QA `w_lm=0.05, w_hidden=1.50`; HotpotQA `0, 0`; and MMQA
+`0.10, 0.20`. Signal-specific branches remain ablations.
+
 ## Conformal pruning at alpha = 0.10
 
 All values below are conditional on support being present in Top-30. Precision is
@@ -117,13 +124,14 @@ is the fraction of retrievable queries for which a selector returns no chunk.
 | MMQA text/table | **Cosine proposal: false bank + modality BY + K=10** | 0.061 | 66.67% | 3.15% | 2.37% | 95.59% |
 | MMQA text/table | Cosine support coverage 90% + K=10 | 6.708 | 16.12% | 83.73% | 81.36% | 1.02% |
 | MMQA text/table | BGE query all-support | 1.841 | 64.46% | 91.86% | 90.17% | 0% |
-| MMQA text/table | BGE + hidden, query all-support | **1.763** | **67.31%** | **91.86%** | **90.17%** | 0% |
+| MMQA text/table | Three-signal fusion, query all-support | **1.766** | **66.99%** | 91.60% | 89.83% | 0% |
 
-On MMQA, BGE + hidden reduces mean set size by 0.078 chunks/query, paired bootstrap
-95% CI [-0.119, -0.041], while the changes in mean support recall and all-support
-coverage are exactly 0 in the pilot point estimate. This is a real efficiency
-gain, but it is only about 4.2% relative and should not be described as a large
-improvement.
+On MMQA, the primary three-signal method reduces mean set size by 0.075
+chunks/query, paired bootstrap 95% CI [-0.108, -0.041]. Its point estimate loses
+0.34 percentage points of mean support recall and all-support coverage, with both
+95% CIs [-1.02, 0.00] percentage points. The hidden-only ablation reduces 0.078
+chunks with exactly matched point-estimate recall, but selecting that branch from
+test results would not be a valid primary comparison.
 
 ## Full alpha sweep
 
@@ -158,15 +166,15 @@ statistical targets must be named when comparing the rows.
 | MMQA | .20 | Cos-BY | 0.295 | 80.46% | 18.37% | 18.98% | 75.59% |
 | MMQA | .20 | Cos-Cov 80% | 3.529 | 26.90% | 73.49% | 71.19% | 7.46% |
 | MMQA | .20 | BGE | 1.529 | 72.95% | 86.35% | 84.07% | 0% |
-| MMQA | .20 | BGE + hidden | 1.403 | 76.81% | 83.46% | 80.68% | 0% |
+| MMQA | .20 | Three-signal fusion | 1.376 | 78.82% | 83.99% | 81.36% | 0% |
 | MMQA | .10 | Cos-BY | 0.061 | 66.67% | 3.15% | 2.37% | 95.59% |
 | MMQA | .10 | Cos-Cov 90% | 6.708 | 16.12% | 83.73% | 81.36% | 1.02% |
 | MMQA | .10 | BGE | 1.841 | 64.46% | 91.86% | 90.17% | 0% |
-| MMQA | .10 | BGE + hidden | 1.763 | 67.31% | 91.86% | 90.17% | 0% |
+| MMQA | .10 | Three-signal fusion | 1.766 | 66.99% | 91.60% | 89.83% | 0% |
 | MMQA | .05 | Cos-BY | 0.027 | 75.00% | 1.57% | 0.68% | 97.63% |
 | MMQA | .05 | Cos-Cov 95% | 8.136 | 14.25% | 89.76% | 87.80% | 0.34% |
 | MMQA | .05 | BGE | 2.153 | 56.54% | 94.23% | 92.88% | 0% |
-| MMQA | .05 | BGE + hidden | 2.075 | 59.15% | 95.01% | 93.90% | 0% |
+| MMQA | .05 | Three-signal fusion | 2.092 | 58.51% | 94.75% | 93.56% | 0% |
 
 On the full-corpus TAT-QA run, cosine Top-10 itself retains only 73.61% of support
 chunks. That cap explains why Cos-Cov cannot reproduce the earlier 90.18% TAT-QA
