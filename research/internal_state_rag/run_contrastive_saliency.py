@@ -56,6 +56,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n-false", type=int, default=3)
     parser.add_argument("--context-k", type=int, default=10)
     parser.add_argument("--seed", type=int, default=83)
+    parser.add_argument(
+        "--exclude-results",
+        type=Path,
+        action="append",
+        default=[],
+        help="Additional result files whose query IDs must not be sampled.",
+    )
     parser.add_argument("--layers", default="0,3,6,9,12,15,18,21,24,27,30,33")
     parser.add_argument("--max-answer-tokens", type=int, default=12)
     parser.add_argument("--max-new-tokens", type=int, default=24)
@@ -73,6 +80,7 @@ def main() -> None:
             Path("research/internal_state_rag/results/tatqa_smoke_n39_seed17.json"),
             Path("research/internal_state_rag/results/chunk_attribution_n24_all_l14_l18_seed31.json"),
             Path("research/internal_state_rag/results/attention_ranking_n120_balanced_seed47.json"),
+            *args.exclude_results,
         ]
     )
     cases = stratified_cases(
