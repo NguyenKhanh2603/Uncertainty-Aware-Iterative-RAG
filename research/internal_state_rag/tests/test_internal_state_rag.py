@@ -25,6 +25,7 @@ from research.internal_state_rag.run_full_topl_validation import (
     make_split_plan,
 )
 from research.internal_state_rag.run_full_topl_saliency import grouped_z
+from research.internal_state_rag.analyze_hidden_chunk_probe import query_metrics
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -212,3 +213,12 @@ def test_full_topl_saliency_fusion_uses_query_local_scores():
     values = grouped_z(np.asarray([1.0, 2.0, 3.0]))
     assert np.isclose(values.mean(), 0.0)
     assert np.isclose(values.std(), 1.0)
+
+
+def test_hidden_probe_metrics_average_over_queries():
+    labels = np.asarray([[True, False, False], [False, True, False]])
+    scores = np.asarray([[0.9, 0.2, 0.1], [0.8, 0.7, 0.1]])
+    metrics = query_metrics(labels, scores)
+    assert metrics["mean_query_ap"] == 0.75
+    assert metrics["mrr"] == 0.75
+    assert metrics["top1_support_rate"] == 0.5
