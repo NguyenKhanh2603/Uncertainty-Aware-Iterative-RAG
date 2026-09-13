@@ -25,13 +25,15 @@ ATTENTION_SIGNALS = {
 }
 
 
-def load_attention(path: Path) -> dict[str, Any]:
+def load_attention(path: Path, *, role: str = "") -> dict[str, Any]:
     rows = []
     for line in path.read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         row = json.loads(line)
         if row.get("status") != "complete":
+            continue
+        if role and row.get("role") != role:
             continue
         rows.append(row)
     if not rows:
@@ -217,14 +219,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-json", type=Path, required=True)
     parser.add_argument("--output-markdown", type=Path, required=True)
     parser.add_argument("--alphas", default="0.2,0.1,0.05")
+    parser.add_argument("--calibration-role", default="")
+    parser.add_argument("--test-role", default="")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     alphas = [float(value) for value in args.alphas.split(",")]
-    calibration = load_attention(args.calibration_rows)
-    test = load_attention(args.test_rows)
+    calibration = load_attention(args.calibration_rows, role=args.calibration_role)
+    test = load_attention(args.test_rows, role=args.test_role)
     overlap = len(set(calibration["qids"]) & set(test["qids"]))
     if overlap:
         raise ValueError(f"Calibration/test query overlap: {overlap}")
