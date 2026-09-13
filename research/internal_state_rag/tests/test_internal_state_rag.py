@@ -26,6 +26,11 @@ from research.internal_state_rag.run_full_topl_validation import (
 )
 from research.internal_state_rag.run_full_topl_saliency import grouped_z
 from research.internal_state_rag.analyze_hidden_chunk_probe import query_metrics
+from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
+    conformal_threshold,
+    end_to_end_metrics,
+    keep_mask,
+)
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -222,3 +227,26 @@ def test_hidden_probe_metrics_average_over_queries():
     assert metrics["mean_query_ap"] == 0.75
     assert metrics["mrr"] == 0.75
     assert metrics["top1_support_rate"] == 0.5
+
+
+def test_query_conformal_any_support_threshold_uses_best_support():
+    scores = np.asarray([[0.8, 0.7, 0.1], [0.6, 0.5, 0.2]])
+    labels = np.asarray([[False, True, False], [True, True, False]])
+
+    threshold, order = conformal_threshold(
+        scores, labels, alpha=0.5, coverage_target="any_support"
+    )
+
+    assert order == 2
+    assert threshold == 0.6
+
+
+def test_end_to_end_coverage_counts_unretrievable_queries_as_failures():
+    labels = np.asarray([[True, False], [False, False]])
+    mask = keep_mask(np.asarray([[0.9, 0.1], [0.2, 0.1]]), threshold=0.5)
+
+    metrics = end_to_end_metrics(labels, mask)
+
+    assert metrics["retrieval_query_coverage_ceiling"] == 0.5
+    assert metrics["query_any_support_coverage"] == 0.5
+    assert metrics["query_all_support_coverage"] == 0.5
