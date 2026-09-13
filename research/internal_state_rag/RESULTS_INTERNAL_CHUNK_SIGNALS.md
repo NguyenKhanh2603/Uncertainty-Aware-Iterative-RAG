@@ -38,6 +38,154 @@ ranking annotated support poorly. Raw attention, raw LM-head score, and a
 passive full-context hidden-state probe all failed as standalone replacements
 for BGE. The gain comes from combining BGE with explicit pairwise computation.
 
+## Why cosine plus BY has high precision and low recall
+
+The original method constructs one conformal p-value per candidate and applies
+Benjamini--Yekutieli (BY) across all `L` candidates. Here, `alpha=0.10` is the
+target false-discovery level; it is not a cosine threshold of 0.10.
+
+The benchmark metrics separate retrieval from statistical selection:
+
+- **conditional reserve support recall** is selected support divided by support
+  already present in Top-L. Low values therefore mean conformal selection
+  discarded retrievable support;
+- **empty-query rate** is the fraction of queries for which BY certified no
+  candidate;
+- **evidence precision** is support divided by labelled support plus false
+  chunks among the selected candidates.
+
+On 1,000 TAT-QA evaluation queries from the labelled official-dev source, with
+a separate 1,000-query official-train calibration role, the frozen Top-30
+diagnostic produced:
+
+| Candidate score and bank | BY alpha | Precision | Conditional recall | Empty queries | AUROC | AUPRC |
+|---|---:|---:|---:|---:|---:|---:|
+| Jina cosine | 0.10 | 0.522 | **0.069** | **0.933** | 0.762 | 0.186 |
+| BGE reranker, modality bank | 0.10 | 0.491 | 0.097 | 0.912 | 0.906 | 0.378 |
+| BGE reranker, pooled bank | 0.10 | 0.508 | 0.116 | 0.894 | 0.906 | 0.378 |
+| BGE plus metadata/rank fusion, five-split mean | 0.10 | **0.702** | 0.145 | 0.866 | 0.929 | 0.455 |
+| BGE reranker, pooled bank | 0.20 | 0.437 | 0.163 | 0.850 | 0.906 | 0.378 |
+
+The cosine result is the clearest statement of the failure: among support rows
+that retrieval already placed in Top-30, BY selected only 6.9%, and 93.3% of
+queries received an empty certified context. BGE approximately doubled AUPRC
+and raised recall, but 89.4% of queries were still empty. Raising alpha to 0.20
+traded precision for recall without removing the failure.
+
+The reported precision must be read together with the empty rate. A selector
+can appear precise by returning evidence only for a small subset of easy
+queries. Precision 0.522 alongside an empty rate of 0.933 does not describe a
+usable RAG context builder: it means the metric ignores the absence of evidence
+on most queries.
+
+### Why increasing L does not fix it
+
+BY rejects ordered p-values only when
+
+```text
+p_(i) <= i * alpha / (L * H_L),
+H_L = 1 + 1/2 + ... + 1/L.
+```
+
+At `alpha=0.10`, the first BY cutoff is approximately 0.00341 for `L=10` and
+0.000834 for `L=30`. Increasing L from 10 to 30 makes the first cutoff about
+4.1 times stricter. A larger reserve helps only when support is missing from
+the smaller reserve; it hurts power once candidates enter the simultaneous
+test.
+
+The measured retrieval headroom is small on this TAT-QA slice. Top-10 already
+contains 793 of the 864 support rows present in Top-30 and covers 738 of the 768
+queries for which Top-30 finds any support. Moving from Top-10 to Top-30 adds 71
+support rows and 30 covered queries, while adding 20 hypotheses to every query.
+`L=30` is a reasonable reserve; increasing it further is not a remedy for the
+6.9--14.5% post-selection recall.
+
+The Top-L/Top-K backfill order does not change this diagnosis. Backfill can move
+a BY-accepted candidate from ranks `K+1..L` into an unused Top-K slot. It never
+adds a BY-rejected candidate merely to fill the context. Increasing L helps
+only when a new support enters the reserve and also survives the stricter BY
+test; it cannot rescue the majority of support already rejected inside Top-10.
+
+### Why full-corpus retrieval does not fix it
+
+Full-corpus retrieval fixes a different problem. It guarantees a real reserve
+of L distinct candidates, removes dependence on short per-query candidate
+lists, and can recover support absent from those lists. It does not change the
+fact that BY later rejects most candidates whose p-values are not extreme
+enough. Once conditional recall is defined relative to support already in
+Top-L, a value such as 0.069 directly identifies statistical selection as the
+bottleneck.
+
+The correct conclusion is therefore not that full-corpus retrieval is useless.
+It repairs candidate construction and makes calibration/test retrieval
+comparable. On this dataset it does not repair the high-precision/low-recall
+behavior of cosine-based candidate-wise BY.
+
+## Resolution options and their statistical claims
+
+### A. Recommended: query-level conformal coverage
+
+If the RAG objective is to keep sufficient evidence, calibrate a prediction set
+for the event that at least one support, or every required support, remains in
+the context. This changes the controlled event from candidate-wise false
+discoveries to query-level evidence coverage.
+
+The new three-signal score demonstrates this operating point on 256 fresh
+queries:
+
+| Coverage target | Alpha | Score | Mean kept | Support recall | Query coverage |
+|---|---:|---|---:|---:|---:|
+| Any support | 0.05 | BGE | 5.00 | 0.923 | 0.945 |
+| Any support | 0.05 | Three-signal fusion | **3.49** | **0.924** | **0.953** |
+| All support | 0.05 | BGE | 26.76 | 0.994 | 0.992 |
+| All support | 0.05 | Three-signal fusion | **9.92** | 0.979 | 0.973 |
+
+This is the cleanest answer to the recall problem. It does not preserve the old
+candidate-wise BY-FDR claim; it makes a coverage claim aligned with the RAG
+failure event. For a formal result, train the probe before calibration, freeze
+the prompt/layer/weights, and fit only the coverage threshold on the separate
+1,000-query development bank for each dataset.
+
+### B. Keep candidate-wise BY and expose a fallback channel
+
+If candidate-level FDR control must remain, return two fields:
+
+- `certified_chunks`: candidates rejected by valid BY;
+- `fallback_chunks`: highest-ranked uncertified candidates used only when the
+  certified set is empty.
+
+In one held-out fusion split, the certified set had precision 0.676, recall
+0.147, and empty rate 0.863. Adding an explicitly unverified Top-1 fallback
+raised recall to 0.653 with zero empty queries and 1.05 chunks per query;
+precision became 0.537. A Top-3 fallback reached recall 0.802 but precision fell
+to 0.250. The conformal guarantee applies only to `certified_chunks`, so the two
+sets must not be merged under one certification label.
+
+### C. Improve the score but retain BY
+
+BGE, metadata/rank fusion, and the pairwise internal score improve candidate
+separation. They can make p-values smaller and recover some power, but no score
+removes BY's `L * H_L` multiplicity factor. The next valid candidate-wise test
+is to train the pairwise layer-30 probe on a training split, construct its
+false-score bank on a disjoint 1,000-query calibration split, and evaluate BY
+once on the 1,000 test-role queries. Until that run is complete, the
+three-signal result supports query-level coverage pruning, not a claim that the
+old BY procedure has been solved.
+
+### Decision for the current system
+
+1. Keep full-corpus Top-30 as the reserve; do not increase L as the primary
+   fix.
+2. Use the three-signal fusion for candidate ordering.
+3. Use all-support query-level calibration at `alpha=0.05` when evidence recall
+   is the product requirement.
+4. If candidate-wise certification is mandatory, use BY plus a separately
+   labelled Top-1 fallback and report certified precision/recall separately
+   from end-to-end RAG recall.
+5. Validate the frozen choice on each dataset's separate 1,000-query bank and
+   untouched test role. Do not train the probe and calibrate its bank on the
+   same examples.
+
 ## What was tested
 
 All runs used Qwen2.5-3B-Instruct in BF16 on an A100 40 GB. The production RAG
@@ -268,6 +416,7 @@ change in MLP contribution under chunk removal or activation patching.
 
 ## Reproducibility
 
+- Vietnamese mentor brief: `MENTOR_BRIEF_CONFORMAL_RECALL.md`
 - Layerwise saliency implementation: `contrastive_saliency.py`
 - Saliency runners: `run_contrastive_saliency.py`,
   `run_full_topl_saliency.py`
