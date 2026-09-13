@@ -26,6 +26,7 @@ from research.internal_state_rag.run_full_topl_validation import (
 )
 from research.internal_state_rag.run_full_topl_saliency import grouped_z
 from research.internal_state_rag.analyze_hidden_chunk_probe import query_metrics
+from research.internal_state_rag.analyze_causal_ranknet_probe import rank_loss
 from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
     conformal_threshold,
     end_to_end_metrics,
@@ -99,6 +100,14 @@ def test_trace_contrast_exposes_context_logprob_gain():
 
     assert np.allclose(contrast["context_logprob_gain_by_layer"], [1.0, 1.0])
     assert np.allclose(contrast["residual_cosine_by_layer"], [1.0, 0.0])
+
+
+def test_causal_rank_loss_prefers_the_teacher_order():
+    target = torch.tensor([[0.5, 0.0, -0.5]])
+    aligned = torch.tensor([[2.0, 0.0, -2.0]])
+    reversed_scores = torch.tensor([[-2.0, 0.0, 2.0]])
+
+    assert rank_loss(aligned, target) < rank_loss(reversed_scores, target)
 
 
 def test_attention_entropy_preserves_layer_and_head_axes():
