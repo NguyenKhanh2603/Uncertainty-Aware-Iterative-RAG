@@ -83,6 +83,25 @@ def summarize(records: list[dict[str, Any]]) -> dict[str, Any]:
                 ]
             )
         )
+    rng = np.random.default_rng(487)
+    draws = rng.integers(0, len(records), size=(10_000, len(records)))
+    for alpha in ("10", "05"):
+        fusion_name, bge_name = f"fusion_a{alpha}", f"bge_a{alpha}"
+        result[fusion_name]["paired_minus_bge"] = {}
+        for metric in ("em", "f1", "numerical_accuracy"):
+            differences = np.asarray(
+                [
+                    row["metrics"][fusion_name][metric]
+                    - row["metrics"][bge_name][metric]
+                    for row in records
+                ]
+            )
+            boot = differences[draws].mean(axis=1)
+            result[fusion_name]["paired_minus_bge"][metric] = {
+                "mean": float(differences.mean()),
+                "ci95_low": float(np.quantile(boot, 0.025)),
+                "ci95_high": float(np.quantile(boot, 0.975)),
+            }
     return result
 
 
