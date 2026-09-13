@@ -46,6 +46,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--predictions-output", type=Path, required=True)
     parser.add_argument("--alphas", default="0.2,0.1,0.05")
+    parser.add_argument(
+        "--candidate-layers",
+        default="",
+        help="Comma-separated subset to tune; empty evaluates every stored layer.",
+    )
+    parser.add_argument(
+        "--c-values",
+        default=",".join(str(value) for value in C_VALUES),
+        help="Comma-separated logistic-probe C values.",
+    )
     parser.add_argument("--seed", type=int, default=733)
     parser.add_argument("--bootstrap-samples", type=int, default=10_000)
     return parser.parse_args()
@@ -72,6 +82,9 @@ def select_probe(
     features: np.ndarray,
     labels: np.ndarray,
     layers: list[int],
+    *,
+    candidate_layers: set[int],
+    c_values: tuple[float, ...],
 ) -> tuple[int, float, np.ndarray, list[dict[str, float]]]:
     """Select a layer and regularization using query-grouped OOF predictions."""
 
@@ -81,8 +94,10 @@ def select_probe(
     candidates: list[tuple[float, float, int, float, np.ndarray]] = []
     audit: list[dict[str, float]] = []
     for layer_index, layer in enumerate(layers):
+        if layer not in candidate_layers:
+            continue
         x = features[:, :, layer_index, :].reshape(-1, features.shape[-1])
-        for c in C_VALUES:
+        for c in c_values:
             oof = np.zeros(labels.size, dtype=np.float64)
             for fit_rows, held_rows in folds:
                 model = make_probe(c).fit(x[fit_rows], labels.ravel()[fit_rows])
@@ -201,10 +216,25 @@ def main() -> None:
     validate_inputs(train, calibration, test)
 
     layers = train["layer_ids"].astype(int).tolist()
+    candidate_layers = (
+        {int(value) for value in args.candidate_layers.split(",") if value.strip()}
+        if args.candidate_layers
+        else set(layers)
+    )
+    unknown_layers = candidate_layers - set(layers)
+    if unknown_layers:
+        raise ValueError(f"Candidate layers absent from features: {sorted(unknown_layers)}")
+    c_values = tuple(float(value) for value in args.c_values.split(",") if value.strip())
+    if not c_values or any(value <= 0 for value in c_values):
+        raise ValueError("--c-values must contain positive values")
     train_features = train["features"].astype(np.float32)
     train_labels = train["labels"].astype(bool)
     layer_index, selected_c, train_hidden_oof, probe_audit = select_probe(
-        train_features, train_labels, layers
+        train_features,
+        train_labels,
+        layers,
+        candidate_layers=candidate_layers,
+        c_values=c_values,
     )
     cal_hidden, test_hidden = fit_predict_probe(
         train, [calibration, test], layer_index=layer_index, c=selected_c
@@ -309,6 +339,8 @@ def main() -> None:
             "selected_layer": layers[layer_index],
             "selected_c": selected_c,
             "selection": "5-fold query-grouped OOF mean AP",
+            "candidate_layers": sorted(candidate_layers),
+            "candidate_c_values": list(c_values),
             "candidate_audit": probe_audit,
         },
         "tatqa_transfer_probe": {
