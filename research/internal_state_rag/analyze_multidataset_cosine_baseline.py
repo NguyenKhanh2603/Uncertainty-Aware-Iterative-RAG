@@ -295,7 +295,14 @@ def main() -> None:
         aligned_cosine(hotpot_test, hotpot_rows),
     )
     hotpot["original_cosine_methods"] = evaluate_original_cosine_methods(
-        aligned_rows(hotpot_cal["qids"].astype(str).tolist(), hotpot_rows),
+        aligned_rows(
+            sorted(
+                qid
+                for qid, rows in hotpot_rows.items()
+                if rows[0]["split_role"] == "calibration"
+            ),
+            hotpot_rows,
+        ),
         aligned_rows(hotpot_test["qids"].astype(str).tolist(), hotpot_rows),
     )
 
