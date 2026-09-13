@@ -14,6 +14,10 @@ from research.internal_state_rag import (
 )
 from research.internal_state_rag.causal import mask_attention_heads, zero_head_slices
 from research.internal_state_rag.directer_plausibility import distribution_plausibility
+from research.internal_state_rag.contrastive_saliency import (
+    jensen_shannon_from_logits,
+    select_context_sensitive_tokens,
+)
 from research.internal_state_rag.edge_mask import zero_attention_edges
 from research.internal_state_rag.run_causal_head_smoke import layer_matched_controls
 from research.internal_state_rag.run_full_topl_validation import (
@@ -156,6 +160,17 @@ def test_directer_plausibility_scores_intervened_top_token_under_raw_model():
     assert result.rejection_rate == 0.5
     assert result.top1_change_rate == 0.5
     assert result.worst_rejection_score > 0
+
+
+def test_context_sensitivity_is_zero_for_equal_distributions():
+    logits = torch.tensor([[2.0, 0.0], [0.0, 2.0]])
+    scores = jensen_shannon_from_logits(logits, logits.clone())
+    assert torch.allclose(scores, torch.zeros(2), atol=1e-7)
+
+
+def test_context_sensitive_selection_keeps_at_least_one_token():
+    assert select_context_sensitive_tokens(torch.zeros(3)) == [0, 1, 2]
+    assert select_context_sensitive_tokens(torch.tensor([0.0, 0.1, 0.9])) == [2]
 
 
 def test_full_topl_validation_plan_keeps_roles_disjoint():
