@@ -49,6 +49,48 @@ def evaluate(labels: np.ndarray, scores: np.ndarray) -> dict[str, object]:
     return output
 
 
+def bootstrap_retention_difference(
+    labels: np.ndarray,
+    left: np.ndarray,
+    right: np.ndarray,
+    *,
+    seed: int,
+    samples: int = 10_000,
+) -> dict[str, dict[str, dict[str, float]]]:
+    """Paired query bootstrap for Top-K support coverage and recall."""
+
+    ks = (1, 3, 5, 10)
+    differences = np.empty((len(labels), len(ks), 2), dtype=np.float64)
+    for query_index, (query_labels, left_scores, right_scores) in enumerate(
+        zip(labels, left, right, strict=True)
+    ):
+        support_total = query_labels.sum()
+        for k_index, k in enumerate(ks):
+            left_kept = np.argsort(-left_scores, kind="stable")[:k]
+            right_kept = np.argsort(-right_scores, kind="stable")[:k]
+            differences[query_index, k_index, 0] = float(
+                query_labels[left_kept].any()
+            ) - float(query_labels[right_kept].any())
+            differences[query_index, k_index, 1] = (
+                query_labels[left_kept].sum() - query_labels[right_kept].sum()
+            ) / support_total
+    rng = np.random.default_rng(seed)
+    draws = rng.integers(0, len(labels), size=(samples, len(labels)))
+    boot = differences[draws].mean(axis=1)
+    output = {}
+    for k_index, k in enumerate(ks):
+        output[f"top_{k}"] = {}
+        for metric_index, name in enumerate(
+            ("query_support_coverage", "mean_support_recall")
+        ):
+            output[f"top_{k}"][name] = {
+                "mean": float(differences[:, k_index, metric_index].mean()),
+                "ci95_low": float(np.quantile(boot[:, k_index, metric_index], 0.025)),
+                "ci95_high": float(np.quantile(boot[:, k_index, metric_index], 0.975)),
+            }
+    return output
+
+
 def main() -> None:
     args = parse_args()
     train = np.load(args.train)
@@ -112,6 +154,24 @@ def main() -> None:
     probe_weight = select_weight(probe_oof)
     lm_fusion_test = query_z(test_bge) + lm_weight * query_z(test_lm)
     probe_fusion_test = query_z(test_bge) + probe_weight * query_z(probe_test)
+    multi_choices = []
+    for lm_candidate in weights:
+        for probe_candidate in weights:
+            score = (
+                query_z(train_bge)
+                + lm_candidate * query_z(train_lm)
+                + probe_candidate * query_z(probe_oof)
+            )
+            metrics = query_metrics(train_labels, score)
+            multi_choices.append(
+                (metrics["mean_query_ap"], metrics["mrr"], lm_candidate, probe_candidate)
+            )
+    _, _, multi_lm_weight, multi_probe_weight = max(multi_choices)
+    multi_fusion_test = (
+        query_z(test_bge)
+        + multi_lm_weight * query_z(test_lm)
+        + multi_probe_weight * query_z(probe_test)
+    )
 
     scores = {
         "bge": test_bge,
@@ -119,6 +179,7 @@ def main() -> None:
         "zero_shot_lm_head_fusion": lm_fusion_test,
         "supervised_hidden_probe": probe_test,
         "supervised_hidden_probe_fusion": probe_fusion_test,
+        "three_signal_fusion": multi_fusion_test,
     }
     test_output = {}
     for offset, (name, values) in enumerate(scores.items()):
@@ -126,6 +187,12 @@ def main() -> None:
         if name != "bge":
             test_output[name]["minus_bge"] = bootstrap_difference(
                 test_labels, values, test_bge, seed=args.seed + offset
+            )
+            test_output[name]["retention_minus_bge"] = bootstrap_retention_difference(
+                test_labels,
+                values,
+                test_bge,
+                seed=args.seed + 100 + offset,
             )
 
     output = {
@@ -137,10 +204,20 @@ def main() -> None:
         "selected_c": selected_c,
         "selected_lm_fusion_weight": lm_weight,
         "selected_probe_fusion_weight": probe_weight,
+        "selected_three_signal_weights": {
+            "lm_head": multi_lm_weight,
+            "hidden_probe": multi_probe_weight,
+        },
         "train_oof": {
             "bge": evaluate(train_labels, train_bge),
             "zero_shot_lm_head": evaluate(train_labels, train_lm),
             "supervised_hidden_probe": evaluate(train_labels, probe_oof),
+            "three_signal_fusion": evaluate(
+                train_labels,
+                query_z(train_bge)
+                + multi_lm_weight * query_z(train_lm)
+                + multi_probe_weight * query_z(probe_oof),
+            ),
         },
         "test": test_output,
         "selection_candidates": [
