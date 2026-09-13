@@ -24,6 +24,7 @@ from research.internal_state_rag.run_full_topl_validation import (
     eligible_qids,
     make_split_plan,
 )
+from research.internal_state_rag.run_full_topl_saliency import grouped_z
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -205,3 +206,9 @@ def test_full_topl_eligibility_selects_requested_source_split():
     }
 
     assert eligible_qids(questions, retrieval, source_split="dev") == ["dev"]
+
+
+def test_full_topl_saliency_fusion_uses_query_local_scores():
+    values = grouped_z(np.asarray([1.0, 2.0, 3.0]))
+    assert np.isclose(values.mean(), 0.0)
+    assert np.isclose(values.std(), 1.0)
