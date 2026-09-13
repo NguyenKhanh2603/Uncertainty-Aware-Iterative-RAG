@@ -1,0 +1,322 @@
+{
+  "status": "complete",
+  "input_role": "test",
+  "source_split": "dev",
+  "seed": 307,
+  "top_l": 30,
+  "layer": 33,
+  "internal_weight": 3.0,
+  "excluded_queries": 150,
+  "plan": [
+    "d7ce6b7c-c539-4c63-a2c1-5b8ed24b345b"
+  ],
+  "completed_queries": 1,
+  "metrics": {
+    "bge_score": {
+      "auroc": 0.9642857142857142,
+      "average_precision": 0.75,
+      "query_mrr": 1.0,
+      "query_top1_support_rate": 1.0
+    },
+    "internal_score": {
+      "auroc": 0.42857142857142855,
+      "average_precision": 0.10714285714285714,
+      "query_mrr": 0.14285714285714285,
+      "query_top1_support_rate": 0.0
+    },
+    "fusion_score": {
+      "auroc": 0.6964285714285714,
+      "average_precision": 0.3055555555555556,
+      "query_mrr": 0.5,
+      "query_top1_support_rate": 0.0
+    }
+  },
+  "observations": [
+    {
+      "qid": "d7ce6b7c-c539-4c63-a2c1-5b8ed24b345b",
+      "stratum": "easy",
+      "question": "What does Vessel Calendar Days refer to?",
+      "gold_answers": [
+        "the total number of days the vessels were in our fleet."
+      ],
+      "draft": "Vessel Calendar Days refers to the total number of days the vessels were in the fleet, including both operational days and off",
+      "draft_em": 0.0,
+      "draft_f1": 0.5714285714285714,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.07984861818468975,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:ac33b146829d3c770a45d0ad",
+          "rank": 1,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.9960545301437378,
+          "internal_score": 0.00041637971298769116,
+          "fusion_score": 6.361315396034531
+        },
+        {
+          "chunk_id": "tatqa-text:ed5265998a0bab62de41e5f8",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.24798744916915894,
+          "internal_score": 0.00021973298862576485,
+          "fusion_score": 0.6233721843547904
+        },
+        {
+          "chunk_id": "tatqa-text:770fb40037e7d2d7296fd95e",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.13296423852443695,
+          "internal_score": 0.00025284799630753696,
+          "fusion_score": 0.2724549907173556
+        },
+        {
+          "chunk_id": "tatqa-table:0bf85ffa441e352f6c8f40bd",
+          "rank": 4,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.08756384253501892,
+          "internal_score": 4.927970439894125e-05,
+          "fusion_score": -1.6830840863276735
+        },
+        {
+          "chunk_id": "tatqa-table:139d2b1c1e2d8204a8ed3fd2",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.07585817575454712,
+          "internal_score": 5.456952567328699e-05,
+          "fusion_score": -1.7026943098629734
+        },
+        {
+          "chunk_id": "tatqa-text:df3de4d860d330c1caff97fb",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01065251138061285,
+          "internal_score": 0.00015152090054471046,
+          "fusion_score": -1.2459126019945113
+        },
+        {
+          "chunk_id": "tatqa-text:064277776b09ee1182d7a318",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006667023408226669,
+          "internal_score": 0.0006485939957201481,
+          "fusion_score": 2.8686417726255407
+        },
+        {
+          "chunk_id": "tatqa-text:9a0d57dca9c4f5dd777e9e40",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0003920417802873999,
+          "internal_score": 8.702484774403274e-05,
+          "fusion_score": -1.8429434619830662
+        },
+        {
+          "chunk_id": "tatqa-table:974536aae4e8104e73a0cd54",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0003799845289904624,
+          "internal_score": 3.216101322323084e-05,
+          "fusion_score": -2.303172234754671
+        },
+        {
+          "chunk_id": "tatqa-text:25f0334703846fc6bb24f849",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0003569706459529698,
+          "internal_score": 7.156255742302164e-05,
+          "fusion_score": -1.9728229803386061
+        },
+        {
+          "chunk_id": "tatqa-text:2abe55e011888d4c4ff48dee",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00033535013790242374,
+          "internal_score": 0.00012553455599118024,
+          "fusion_score": -1.5202584264525885
+        },
+        {
+          "chunk_id": "tatqa-text:7115f839bc0d801597a87cf0",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0002780309587251395,
+          "internal_score": 7.391795952571556e-05,
+          "fusion_score": -1.9534988174291636
+        },
+        {
+          "chunk_id": "tatqa-text:ce1dbae508e5e81d074b570a",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00014883848780300468,
+          "internal_score": 0.00010519791976548731,
+          "fusion_score": -1.6918485565731611
+        },
+        {
+          "chunk_id": "tatqa-text:4a59d9d467d17d30b8e5e5fc",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00012339458044152707,
+          "internal_score": 0.0002226429060101509,
+          "fusion_score": -0.7069339372343083
+        },
+        {
+          "chunk_id": "tatqa-table:5f0ab496c0e228956f317f6e",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 9.610241977497935e-05,
+          "internal_score": 6.994161958573386e-05,
+          "fusion_score": -1.9878441612841005
+        },
+        {
+          "chunk_id": "tatqa-text:67e7be6184d1130572462a7e",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 9.610241977497935e-05,
+          "internal_score": 6.560592737514526e-05,
+          "fusion_score": -2.024209183940339
+        },
+        {
+          "chunk_id": "tatqa-text:ef0d214d95c1e80226b5af9e",
+          "rank": 17,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 9.028038039105013e-05,
+          "internal_score": 0.00013188245065975934,
+          "fusion_score": -1.468355772464903
+        },
+        {
+          "chunk_id": "tatqa-table:b04a5f128186ab7ea399887c",
+          "rank": 18,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 8.481103577651083e-05,
+          "internal_score": 6.934017437743023e-05,
+          "fusion_score": -1.9929504139157554
+        },
+        {
+          "chunk_id": "tatqa-table:4936137005982a638a4b1eca",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 7.031184941297397e-05,
+          "internal_score": 8.254824206233025e-05,
+          "fusion_score": -1.8822488070920564
+        },
+        {
+          "chunk_id": "tatqa-table:789640d98b6776512c8f46b4",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 6.205049430718645e-05,
+          "internal_score": 6.47323249722831e-05,
+          "fusion_score": -2.0317225164551145
+        },
+        {
+          "chunk_id": "tatqa-text:0ee6d4668dcc3bad62d7dd3d",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 5.475977377500385e-05,
+          "internal_score": 0.0001740941806929186,
+          "fusion_score": -1.1145048266005368
+        },
+        {
+          "chunk_id": "tatqa-text:9655f9a78b3e807d91c1c5c0",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 5.144220995134674e-05,
+          "internal_score": 0.0001694617239991203,
+          "fusion_score": -1.1533770528829836
+        },
+        {
+          "chunk_id": "tatqa-table:877a6a0506367e4156068702",
+          "rank": 23,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 4.539786823443137e-05,
+          "internal_score": 4.199317118036561e-05,
+          "fusion_score": -2.2225350600478784
+        },
+        {
+          "chunk_id": "tatqa-text:73e5335d3910ead8f8d8430b",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 4.2647468944778666e-05,
+          "internal_score": 0.0004314298857934773,
+          "fusion_score": 1.0437968394979613
+        },
+        {
+          "chunk_id": "tatqa-table:6be292322389986d126a3a57",
+          "rank": 25,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 3.535625000949949e-05,
+          "internal_score": 0.0009735894855111837,
+          "fusion_score": 5.591046134403921
+        },
+        {
+          "chunk_id": "tatqa-text:930db8af4ec45da9a53c46d0",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 3.535625000949949e-05,
+          "internal_score": 0.0004331890377216041,
+          "fusion_score": 1.0585116340728726
+        },
+        {
+          "chunk_id": "tatqa-text:bbd85b58afaba0cf8b459c6f",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 2.7535690605873242e-05,
+          "internal_score": 0.00031659583328291774,
+          "fusion_score": 0.08055940908137693
+        },
+        {
+          "chunk_id": "tatqa-table:eeaa628a41c0ed8b740cbda0",
+          "rank": 28,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 2.2827996872365475e-05,
+          "internal_score": 0.00022108270786702633,
+          "fusion_score": -0.7205695361703409
+        },
+        {
+          "chunk_id": "tatqa-text:907855b6dfa5bfac7f6a6bec",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 2.1444948288262822e-05,
+          "internal_score": 0.0006317791994661093,
+          "fusion_score": 2.7240832948952516
+        },
+        {
+          "chunk_id": "tatqa-text:92cbdc26749f071ce0cb1635",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 2.1444948288262822e-05,
+          "internal_score": 0.0018089814111590385,
+          "fusion_score": 12.597705088121128
+        }
+      ]
+    }
+  ]
+}
