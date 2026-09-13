@@ -1,0 +1,337 @@
+{
+  "status": "complete",
+  "method": "split_conformal_threshold_on_query_critical_support_score",
+  "calibration_note": "Probe predictions are group-OOF on the 96 calibration queries. A separate held-out calibration bank is required for a formal deployment guarantee.",
+  "calibration_queries": 96,
+  "test_queries": 256,
+  "top_l": 30,
+  "probe_layer": 30,
+  "probe_c": 0.1,
+  "fusion_weights": {
+    "lm_head": 0.2,
+    "hidden_probe": 0.75
+  },
+  "alphas": [
+    0.2,
+    0.1,
+    0.05
+  ],
+  "results": {
+    "any_support": {
+      "0.2": {
+        "bge": {
+          "calibrated_threshold": 1.54232517795549,
+          "finite_sample_order": 78,
+          "test": {
+            "mean_chunks_kept": 2.50390625,
+            "median_chunks_kept": 2.0,
+            "p90_chunks_kept": 5.0,
+            "fraction_of_top_l_kept": 0.08346354166666667,
+            "chunk_precision_among_kept": 0.34009360374414976,
+            "mean_support_recall": 0.796875,
+            "query_any_support_coverage": 0.82421875,
+            "query_all_support_coverage": 0.76953125
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": 3.5288519896933837,
+          "finite_sample_order": 78,
+          "test": {
+            "mean_chunks_kept": 1.54296875,
+            "median_chunks_kept": 1.0,
+            "p90_chunks_kept": 2.0,
+            "fraction_of_top_l_kept": 0.051432291666666664,
+            "chunk_precision_among_kept": 0.5468354430379747,
+            "mean_support_recall": 0.7903645833333334,
+            "query_any_support_coverage": 0.8203125,
+            "query_all_support_coverage": 0.76171875
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -0.9609375,
+            "ci95_low": -1.1171875,
+            "ci95_high": -0.81640625
+          },
+          "mean_support_recall": {
+            "mean": -0.006510416666666668,
+            "ci95_low": -0.04947916666666667,
+            "ci95_high": 0.036458333333333336
+          },
+          "query_any_support_coverage": {
+            "mean": -0.00390625,
+            "ci95_low": -0.046875,
+            "ci95_high": 0.0390625
+          },
+          "query_all_support_coverage": {
+            "mean": -0.0078125,
+            "ci95_low": -0.05078125,
+            "ci95_high": 0.03515625
+          }
+        }
+      },
+      "0.1": {
+        "bge": {
+          "calibrated_threshold": 0.8753473019812534,
+          "finite_sample_order": 88,
+          "test": {
+            "mean_chunks_kept": 4.28125,
+            "median_chunks_kept": 4.0,
+            "p90_chunks_kept": 8.0,
+            "fraction_of_top_l_kept": 0.14270833333333333,
+            "chunk_precision_among_kept": 0.2271897810218978,
+            "mean_support_recall": 0.8990885416666666,
+            "query_any_support_coverage": 0.921875,
+            "query_all_support_coverage": 0.875
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": 2.6120477169673904,
+          "finite_sample_order": 88,
+          "test": {
+            "mean_chunks_kept": 2.17578125,
+            "median_chunks_kept": 2.0,
+            "p90_chunks_kept": 4.0,
+            "fraction_of_top_l_kept": 0.07252604166666667,
+            "chunk_precision_among_kept": 0.4326750448833034,
+            "mean_support_recall": 0.8763020833333334,
+            "query_any_support_coverage": 0.91015625,
+            "query_all_support_coverage": 0.84375
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -2.10546875,
+            "ci95_low": -2.40234375,
+            "ci95_high": -1.81640625
+          },
+          "mean_support_recall": {
+            "mean": -0.022786458333333332,
+            "ci95_low": -0.05208333333333333,
+            "ci95_high": 0.005859374999999999
+          },
+          "query_any_support_coverage": {
+            "mean": -0.01171875,
+            "ci95_low": -0.0390625,
+            "ci95_high": 0.015625
+          },
+          "query_all_support_coverage": {
+            "mean": -0.03125,
+            "ci95_low": -0.06640625,
+            "ci95_high": 0.00390625
+          }
+        }
+      },
+      "0.05": {
+        "bge": {
+          "calibrated_threshold": 0.6967008321128243,
+          "finite_sample_order": 93,
+          "test": {
+            "mean_chunks_kept": 4.99609375,
+            "median_chunks_kept": 5.0,
+            "p90_chunks_kept": 9.0,
+            "fraction_of_top_l_kept": 0.16653645833333333,
+            "chunk_precision_among_kept": 0.20172009382329945,
+            "mean_support_recall": 0.9231770833333333,
+            "query_any_support_coverage": 0.9453125,
+            "query_all_support_coverage": 0.8984375
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": 1.5989316073781108,
+          "finite_sample_order": 93,
+          "test": {
+            "mean_chunks_kept": 3.48828125,
+            "median_chunks_kept": 3.0,
+            "p90_chunks_kept": 6.0,
+            "fraction_of_top_l_kept": 0.11627604166666666,
+            "chunk_precision_among_kept": 0.2855543113101904,
+            "mean_support_recall": 0.9244791666666666,
+            "query_any_support_coverage": 0.953125,
+            "query_all_support_coverage": 0.89453125
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -1.5078125,
+            "ci95_low": -1.79296875,
+            "ci95_high": -1.234375
+          },
+          "mean_support_recall": {
+            "mean": 0.001302083333333333,
+            "ci95_low": -0.014322916666666668,
+            "ci95_high": 0.018880208333333332
+          },
+          "query_any_support_coverage": {
+            "mean": 0.0078125,
+            "ci95_low": -0.0078125,
+            "ci95_high": 0.0234375
+          },
+          "query_all_support_coverage": {
+            "mean": -0.00390625,
+            "ci95_low": -0.02734375,
+            "ci95_high": 0.01953125
+          }
+        }
+      }
+    },
+    "all_support": {
+      "0.2": {
+        "bge": {
+          "calibrated_threshold": 0.8753473019812534,
+          "finite_sample_order": 78,
+          "test": {
+            "mean_chunks_kept": 4.28125,
+            "median_chunks_kept": 4.0,
+            "p90_chunks_kept": 8.0,
+            "fraction_of_top_l_kept": 0.14270833333333333,
+            "chunk_precision_among_kept": 0.2271897810218978,
+            "mean_support_recall": 0.8990885416666666,
+            "query_any_support_coverage": 0.921875,
+            "query_all_support_coverage": 0.875
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": 2.626251667286506,
+          "finite_sample_order": 78,
+          "test": {
+            "mean_chunks_kept": 2.1640625,
+            "median_chunks_kept": 2.0,
+            "p90_chunks_kept": 4.0,
+            "fraction_of_top_l_kept": 0.07213541666666666,
+            "chunk_precision_among_kept": 0.43501805054151627,
+            "mean_support_recall": 0.8763020833333334,
+            "query_any_support_coverage": 0.91015625,
+            "query_all_support_coverage": 0.84375
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -2.1171875,
+            "ci95_low": -2.40234375,
+            "ci95_high": -1.83203125
+          },
+          "mean_support_recall": {
+            "mean": -0.022786458333333332,
+            "ci95_low": -0.052083333333333336,
+            "ci95_high": 0.006510416666666668
+          },
+          "query_any_support_coverage": {
+            "mean": -0.01171875,
+            "ci95_low": -0.0390625,
+            "ci95_high": 0.015625
+          },
+          "query_all_support_coverage": {
+            "mean": -0.03125,
+            "ci95_low": -0.06640625,
+            "ci95_high": 0.00390625
+          }
+        }
+      },
+      "0.1": {
+        "bge": {
+          "calibrated_threshold": 0.05419418997565339,
+          "finite_sample_order": 88,
+          "test": {
+            "mean_chunks_kept": 7.45703125,
+            "median_chunks_kept": 7.0,
+            "p90_chunks_kept": 13.0,
+            "fraction_of_top_l_kept": 0.24856770833333333,
+            "chunk_precision_among_kept": 0.13881613410162388,
+            "mean_support_recall": 0.9459635416666666,
+            "query_any_support_coverage": 0.96484375,
+            "query_all_support_coverage": 0.92578125
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": 0.9425327301996014,
+          "finite_sample_order": 88,
+          "test": {
+            "mean_chunks_kept": 5.05078125,
+            "median_chunks_kept": 5.0,
+            "p90_chunks_kept": 8.0,
+            "fraction_of_top_l_kept": 0.168359375,
+            "chunk_precision_among_kept": 0.205723124516628,
+            "mean_support_recall": 0.9524739583333333,
+            "query_any_support_coverage": 0.9765625,
+            "query_all_support_coverage": 0.92578125
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -2.40625,
+            "ci95_low": -2.80078125,
+            "ci95_high": -2.02734375
+          },
+          "mean_support_recall": {
+            "mean": 0.006510416666666666,
+            "ci95_low": -0.005859375,
+            "ci95_high": 0.021484375
+          },
+          "query_any_support_coverage": {
+            "mean": 0.01171875,
+            "ci95_low": 0.0,
+            "ci95_high": 0.02734375
+          },
+          "query_all_support_coverage": {
+            "mean": 0.0,
+            "ci95_low": -0.01953125,
+            "ci95_high": 0.01953125
+          }
+        }
+      },
+      "0.05": {
+        "bge": {
+          "calibrated_threshold": -0.7456208638170153,
+          "finite_sample_order": 93,
+          "test": {
+            "mean_chunks_kept": 26.7578125,
+            "median_chunks_kept": 30.0,
+            "p90_chunks_kept": 30.0,
+            "fraction_of_top_l_kept": 0.8919270833333334,
+            "chunk_precision_among_kept": 0.04131386861313869,
+            "mean_support_recall": 0.994140625,
+            "query_any_support_coverage": 0.99609375,
+            "query_all_support_coverage": 0.9921875
+          }
+        },
+        "three_signal_fusion": {
+          "calibrated_threshold": -0.21520483807359803,
+          "finite_sample_order": 93,
+          "test": {
+            "mean_chunks_kept": 9.921875,
+            "median_chunks_kept": 10.0,
+            "p90_chunks_kept": 15.0,
+            "fraction_of_top_l_kept": 0.3307291666666667,
+            "chunk_precision_among_kept": 0.1094488188976378,
+            "mean_support_recall": 0.9791666666666666,
+            "query_any_support_coverage": 0.984375,
+            "query_all_support_coverage": 0.97265625
+          }
+        },
+        "fusion_minus_bge": {
+          "mean_chunks_kept": {
+            "mean": -16.8359375,
+            "ci95_low": -17.7578125,
+            "ci95_high": -15.91796875
+          },
+          "mean_support_recall": {
+            "mean": -0.014973958333333334,
+            "ci95_low": -0.03385416666666667,
+            "ci95_high": 0.001953125
+          },
+          "query_any_support_coverage": {
+            "mean": -0.01171875,
+            "ci95_low": -0.03125,
+            "ci95_high": 0.00390625
+          },
+          "query_all_support_coverage": {
+            "mean": -0.01953125,
+            "ci95_low": -0.04296875,
+            "ci95_high": 0.0
+          }
+        }
+      }
+    }
+  }
+}
