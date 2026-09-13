@@ -271,6 +271,74 @@
       }
     }
   },
+  "retuned_452_minus_old_96_paired_bootstrap": {
+    "0.2": {
+      "mean_chunks_kept": {
+        "difference": 0.07291666666666674,
+        "ci95_low": 0.015592447916666698,
+        "ci95_high": 0.13020833333333326
+      },
+      "chunk_precision": {
+        "difference": -0.02198320689394273,
+        "ci95_low": -0.03785467169482446,
+        "ci95_high": -0.005824400063718764
+      },
+      "micro_support_recall": {
+        "difference": -0.00694444444444442,
+        "ci95_low": -0.026901470848839277,
+        "ci95_high": 0.012987012987012991
+      },
+      "query_all_support_coverage": {
+        "difference": -0.00520833333333337,
+        "ci95_low": -0.02604166666666674,
+        "ci95_high": 0.01692708333333326
+      }
+    },
+    "0.1": {
+      "mean_chunks_kept": {
+        "difference": -0.15494791666666696,
+        "ci95_low": -0.24088541666666696,
+        "ci95_high": -0.07161458333333348
+      },
+      "chunk_precision": {
+        "difference": 0.015261812608597825,
+        "ci95_low": 0.006546274075951018,
+        "ci95_high": 0.02391451678838021
+      },
+      "micro_support_recall": {
+        "difference": 0.00347222222222221,
+        "ci95_low": -0.015046296296296283,
+        "ci95_high": 0.021789616227261714
+      },
+      "query_all_support_coverage": {
+        "difference": 0.00520833333333337,
+        "ci95_low": -0.01432291666666663,
+        "ci95_high": 0.02473958333333337
+      }
+    },
+    "0.05": {
+      "mean_chunks_kept": {
+        "difference": -1.328125,
+        "ci95_low": -1.466145833333333,
+        "ci95_high": -1.1965820312500002
+      },
+      "chunk_precision": {
+        "difference": 0.04092531694863916,
+        "ci95_low": 0.03585776716554348,
+        "ci95_high": 0.04618639719272941
+      },
+      "micro_support_recall": {
+        "difference": -0.01736111111111105,
+        "ci95_low": -0.03255813953488362,
+        "ci95_high": -0.0034285714285714475
+      },
+      "query_all_support_coverage": {
+        "difference": -0.01302083333333337,
+        "ci95_low": -0.02864583333333337,
+        "ci95_high": 0.0026041666666666297
+      }
+    }
+  },
   "reference_96_probe_714_conformal": {
     "0.2": {
       "calibrated_threshold": 3.0138849666343517,
