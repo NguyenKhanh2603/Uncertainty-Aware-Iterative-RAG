@@ -1,0 +1,3825 @@
+{
+  "status": "running",
+  "input_role": "test",
+  "source_split": "dev",
+  "seed": 311,
+  "top_l": 30,
+  "layer": 33,
+  "internal_weight": 3.0,
+  "excluded_queries": 151,
+  "plan": [
+    "6cdd6fc8-6173-4515-a307-ee067f99ff2b",
+    "6b289db7-2ee8-48ec-a257-e7e8f9640f1c",
+    "1b8427b0-516c-4fea-b142-3e419a447f89",
+    "b9578d1c-7db1-4837-aeb1-9e345ec0d111",
+    "cad9978d-eabb-461c-8ab8-a46a7819a5b1",
+    "3c4473cb-ee7b-407c-8f80-1b40b06e2a44",
+    "7639efef-c768-4631-95b5-382a0fde501d",
+    "ec2195f1-47f7-4aaf-81ae-34f314ddb8c7",
+    "0fe2da7e-22b8-40b2-9536-d006969da29b",
+    "e4f21617-1a84-40e4-bdf0-671df88cb862",
+    "b51d337b-6e4a-42cf-920e-dff6fe9a9f19",
+    "60f56c75-1fb7-4295-bdfd-40e4e13a02f1",
+    "8bbd76ee-cac2-4d04-b5ec-d0b874b3154e",
+    "81fafa03-6f80-4fdf-b025-4a37d0bd184e",
+    "258ca40e-3191-4132-9405-edb2cad6e57c",
+    "3c057300-4c76-4981-b4d0-b042a065ad7f",
+    "6b554f1e-5807-4db8-81fa-96eb20aa436d",
+    "7b6c7193-cb2b-47b7-86e9-1c01771a9dac",
+    "191c3926-7356-4ab8-a8f9-41e7b7c8a492",
+    "f36e5912-f63c-4837-a9ed-ddbe73e5148b",
+    "611a07d4-b6c0-4c05-b97e-f16b66a366a1",
+    "6c44a1a8-0785-43a0-90ab-7e21df2c57d9",
+    "a0052d66-aa9c-47af-936c-07cd16f817ee",
+    "8453bf02-fffe-42a5-b97b-ba786216f16b",
+    "beabd8a7-9ed5-4121-8415-6198bb1d642f",
+    "c36e2211-e46a-43d1-a0a8-ae87af347ae8",
+    "0d3b0bd9-d68d-4734-af38-b92755c0bc9e",
+    "6b6d818a-7d95-479e-8309-b0b00f7b7719",
+    "2e4a6108-9eaa-4bf8-9fa9-de3395187d9f",
+    "0971c47c-02e3-496c-b492-23caa00bf4d7",
+    "e4a8a42a-15ef-48b4-b08e-a0fd1193da20",
+    "f2b52562-f712-4702-8700-e358153ec402",
+    "f4142349-eb72-49eb-9a76-f3ccb1010cbc",
+    "297b00ae-9c26-4401-82b5-a6de76674ee9",
+    "c4a0f2ab-d7d0-448a-b5f7-85310e5e3427",
+    "576facaf-8bda-4e8f-bd07-531d4a3e9070",
+    "31e7fa5c-155c-4ed5-85ee-10dc8eb5c6bc",
+    "153f3925-277e-4fe8-8edc-50a5089420ea",
+    "baa84e77-dc54-4ef2-9483-75932fa41161",
+    "7f111469-0ffc-4d6f-bde7-0f150bf0c93e",
+    "0747c0e5-2b69-414b-a922-ffa20be13aa1",
+    "54abbf63-d8b0-49a5-85da-b89645bcb90a",
+    "23801627-ff77-4597-8d24-1c99e2452082",
+    "133bf863-37c4-4cec-be3e-85bae4b90460",
+    "f49ceadf-1638-4e15-b2b4-5a201d5e50c0",
+    "505791d5-2826-48a0-88ff-c15d4c305fbc",
+    "da78a862-718e-4270-b857-2c974897ae8c",
+    "ca5ace26-609f-4199-b5a0-68ccf25ba98e",
+    "15cd82e8-7fe9-4529-a44f-eca0ce5137fb",
+    "79f06004-f4fc-4e82-a9fe-3c389a2f81b6",
+    "870c1bda-0cd7-4bd0-bba6-8deb178e24ce",
+    "e35d0769-f5cb-49ae-86f7-a06fc6d64068",
+    "0541e0e0-e031-4c7f-a415-0d2125f21ede",
+    "ee17a223-9e52-4c46-8c7c-a1452cc25a62",
+    "93fc7ba4-3659-46a9-939d-013ddbc10950",
+    "ce0d6bdf-3376-4c28-99ce-1a765f22aa84",
+    "805a22a0-bc6b-42e1-98a3-9f665b8b4eec",
+    "398246d7-5500-4560-8a8f-220a782b05e5",
+    "f1eedc55-cc96-4574-b82b-e6f17cf176af",
+    "4dc8be43-d8d9-4b08-9ffd-9c19012361ce",
+    "25b47723-4c5c-462d-94f6-07c0719372b6",
+    "2d0072b8-5110-4323-ac2e-0d294045da92",
+    "d73b66dd-dec4-4a33-8a98-6ec042c45819",
+    "44f28f4e-ce84-4300-b8d1-1644dda31933"
+  ],
+  "completed_queries": 13,
+  "metrics": {
+    "bge_score": {
+      "auroc": 0.8628444444444445,
+      "average_precision": 0.4955701385114009,
+      "query_mrr": 0.8589743589743589,
+      "query_top1_support_rate": 0.7692307692307693
+    },
+    "internal_score": {
+      "auroc": 0.5674666666666667,
+      "average_precision": 0.05423820242598569,
+      "query_mrr": 0.20721085475610362,
+      "query_top1_support_rate": 0.07692307692307693
+    },
+    "fusion_score": {
+      "auroc": 0.8499555555555556,
+      "average_precision": 0.2090818326218753,
+      "query_mrr": 0.3411172161172161,
+      "query_top1_support_rate": 0.07692307692307693
+    }
+  },
+  "observations": [
+    {
+      "qid": "6cdd6fc8-6173-4515-a307-ee067f99ff2b",
+      "stratum": "easy",
+      "question": "What was the adjustments to the prior period in 2017/18?",
+      "gold_answers": [
+        "£(8.1m)"
+      ],
+      "draft": "The adjustments to prior periods in 2017/18 were £(8.1m).",
+      "draft_em": 0.0,
+      "draft_f1": 0.2222222222222222,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.1482801523499444,
+      "selected_answer_tokens": 3,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:ce64d3018b4257a10809ee8e",
+          "rank": 1,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.9805806875228882,
+          "internal_score": 0.00035496693453751504,
+          "fusion_score": 5.08185074018104
+        },
+        {
+          "chunk_id": "tatqa-table:36b1ec85132b66e46528e648",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.7592254281044006,
+          "internal_score": 0.00014946040755603462,
+          "fusion_score": 1.6304928886773327
+        },
+        {
+          "chunk_id": "tatqa-table:a12ee6f403fad3ace7853320",
+          "rank": 3,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.2538610100746155,
+          "internal_score": 6.041368396836333e-05,
+          "fusion_score": -1.7307460743269407
+        },
+        {
+          "chunk_id": "tatqa-text:8c152306ccb0d68c92266c1c",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.24944725632667542,
+          "internal_score": 0.0002414365444565192,
+          "fusion_score": 0.4008252431304724
+        },
+        {
+          "chunk_id": "tatqa-text:7da15d6e31a5af90f6838bac",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.11436853557825089,
+          "internal_score": 0.00015625180094502866,
+          "fusion_score": -1.2272188824329695
+        },
+        {
+          "chunk_id": "tatqa-text:22af10f27dabb92e114454f9",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.09947021305561066,
+          "internal_score": 0.00011311558773741126,
+          "fusion_score": -1.8078344109278153
+        },
+        {
+          "chunk_id": "tatqa-table:2bcb976309fa8c03386b8dc6",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.048136770725250244,
+          "internal_score": 4.2099625716218725e-05,
+          "fusion_score": -2.8858605451404657
+        },
+        {
+          "chunk_id": "tatqa-table:13f5fc8921e134235799671d",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.04084571450948715,
+          "internal_score": 5.054924622527324e-05,
+          "fusion_score": -2.818649558468768
+        },
+        {
+          "chunk_id": "tatqa-text:1d8756819631c40c5f40ab89",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02595735713839531,
+          "internal_score": 0.0001778335717972368,
+          "fusion_score": -1.373557977754156
+        },
+        {
+          "chunk_id": "tatqa-table:2bd771fc60e74d5befb2677f",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.020964240655303,
+          "internal_score": 0.00010445644147694111,
+          "fusion_score": -2.268489401513794
+        },
+        {
+          "chunk_id": "tatqa-text:84611a7f4f84a9c6cf1dbaec",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01971912756562233,
+          "internal_score": 8.612962847109884e-05,
+          "fusion_score": -2.4920001829330536
+        },
+        {
+          "chunk_id": "tatqa-text:bc2c7f6dc14f96dee27080b7",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.017442485317587852,
+          "internal_score": 0.00015566841466352344,
+          "fusion_score": -1.6758185865913333
+        },
+        {
+          "chunk_id": "tatqa-text:22619c7caca10d9c496c8142",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.014957086183130741,
+          "internal_score": 0.00013361743185669184,
+          "fusion_score": -1.9492474371316781
+        },
+        {
+          "chunk_id": "tatqa-table:0fea83416293eaa70bf18ffb",
+          "rank": 14,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.013222821988165379,
+          "internal_score": 0.00011096399975940585,
+          "fusion_score": -2.226414436667035
+        },
+        {
+          "chunk_id": "tatqa-text:8b9473acedd6b642edd4fb9f",
+          "rank": 15,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.009412589482963085,
+          "internal_score": 0.00021019203995820135,
+          "fusion_score": -1.064326995481308
+        },
+        {
+          "chunk_id": "tatqa-text:b9fceeccff0f417866bd3f54",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.009412589482963085,
+          "internal_score": 0.0002904531720560044,
+          "fusion_score": -0.11032284484664462
+        },
+        {
+          "chunk_id": "tatqa-table:b0e3822567e7b15dcfc057c7",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.008577484637498856,
+          "internal_score": 0.00013863854110240936,
+          "fusion_score": -1.918635355018798
+        },
+        {
+          "chunk_id": "tatqa-table:a2fadd5bd6bca53d854defc0",
+          "rank": 18,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.007345826830714941,
+          "internal_score": 5.7398232456762344e-05,
+          "fusion_score": -2.8898905729971727
+        },
+        {
+          "chunk_id": "tatqa-text:406a471d356cd0f0e2fe2c21",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005730246659368277,
+          "internal_score": 0.00023444159887731075,
+          "fusion_score": -0.7928700207200438
+        },
+        {
+          "chunk_id": "tatqa-text:7592852343feda00dd559838",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005384937860071659,
+          "internal_score": 0.000568605784792453,
+          "fusion_score": 3.177516677582376
+        },
+        {
+          "chunk_id": "tatqa-text:f0b6b7b6348cca412230dcdf",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005220125429332256,
+          "internal_score": 0.00028146884869784117,
+          "fusion_score": -0.2362166973208683
+        },
+        {
+          "chunk_id": "tatqa-text:3cd424ee9704cf659e8a793c",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005060331895947456,
+          "internal_score": 0.0003027122002094984,
+          "fusion_score": 0.015559025540834714
+        },
+        {
+          "chunk_id": "tatqa-text:6d91f2516322da5c294b83f5",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0038244836032390594,
+          "internal_score": 0.0005421595415100455,
+          "fusion_score": 2.8560593675918358
+        },
+        {
+          "chunk_id": "tatqa-text:d39f303059f715b32f680c32",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0038244836032390594,
+          "internal_score": 0.0003026493650395423,
+          "fusion_score": 0.009180729078896
+        },
+        {
+          "chunk_id": "tatqa-text:52c3dbc0d80bcf9fc13ff3b2",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0030753696337342262,
+          "internal_score": 0.0006345540168695152,
+          "fusion_score": 3.9508700033733235
+        },
+        {
+          "chunk_id": "tatqa-table:96cc3e43ab4ee600e29757d6",
+          "rank": 26,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.002889581024646759,
+          "internal_score": 0.00022923701908439398,
+          "fusion_score": -0.8676771089270683
+        },
+        {
+          "chunk_id": "tatqa-text:b6fc7adc56744ff4dc35f275",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001987774157896638,
+          "internal_score": 0.00034153342130593956,
+          "fusion_score": 0.4629970921265956
+        },
+        {
+          "chunk_id": "tatqa-text:fb5102d809985a76fd5880f2",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001987774157896638,
+          "internal_score": 0.00032118160743266344,
+          "fusion_score": 0.22109027620490734
+        },
+        {
+          "chunk_id": "tatqa-table:40b977ba9f497696ae9d8447",
+          "rank": 29,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0019267346942797303,
+          "internal_score": 0.00029266500496305525,
+          "fusion_score": -0.11814342565317149
+        },
+        {
+          "chunk_id": "tatqa-text:e0fb4cb49cc7e9f33ef5db98",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0017546144081279635,
+          "internal_score": 0.001366712967865169,
+          "fusion_score": 12.647478471365464
+        }
+      ]
+    },
+    {
+      "qid": "6b289db7-2ee8-48ec-a257-e7e8f9640f1c",
+      "stratum": "easy",
+      "question": "What is the total assets for year 2019?",
+      "gold_answers": [
+        "5,765.2",
+        "5,765.2 million"
+      ],
+      "draft": "To find the total assets for year 2019, I'll sum up all the assets listed:\n\nCash and",
+      "draft_em": 0.0,
+      "draft_f1": 0.0,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.08806203298045957,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:b31a52088352e1a284e69c93",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.8856314420700073,
+          "internal_score": 9.663485252531245e-05,
+          "fusion_score": 0.6625151138058629
+        },
+        {
+          "chunk_id": "tatqa-text:36a1e40681a9c5b482a8233d",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8679338097572327,
+          "internal_score": 8.69893774506636e-05,
+          "fusion_score": 0.5050536031846884
+        },
+        {
+          "chunk_id": "tatqa-table:358e185a4b988438563f67ae",
+          "rank": 3,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.859663724899292,
+          "internal_score": 5.65254085813649e-05,
+          "fusion_score": 0.15974379560213392
+        },
+        {
+          "chunk_id": "tatqa-table:264038a602961d997f17808c",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.8056321740150452,
+          "internal_score": 2.9844621167285368e-05,
+          "fusion_score": -0.29202350648319664
+        },
+        {
+          "chunk_id": "tatqa-table:ad74f136502577dd55721dbf",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.6984323263168335,
+          "internal_score": 1.6826868886710145e-05,
+          "fusion_score": -0.770461853620054
+        },
+        {
+          "chunk_id": "tatqa-table:a5a69888f10db88e088db401",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.6118459105491638,
+          "internal_score": 2.0785497326869518e-05,
+          "fusion_score": -1.005388135339096
+        },
+        {
+          "chunk_id": "tatqa-table:b7b7dc71227c7bfce6a38c1d",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.6001883149147034,
+          "internal_score": 4.7415465814992785e-05,
+          "fusion_score": -0.7638200727784892
+        },
+        {
+          "chunk_id": "tatqa-table:dde596b84e92e93d13e1c191",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.48328256607055664,
+          "internal_score": 4.6946966904215515e-05,
+          "fusion_score": -1.1418654479151449
+        },
+        {
+          "chunk_id": "tatqa-text:b323decd2aff5aec43f3acc3",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.41869693994522095,
+          "internal_score": 7.783441833453253e-05,
+          "fusion_score": -1.0246639441202285
+        },
+        {
+          "chunk_id": "tatqa-table:516bcb8078248148d9c89770",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.3647775650024414,
+          "internal_score": 6.413087976397946e-05,
+          "fusion_score": -1.3402203551572516
+        },
+        {
+          "chunk_id": "tatqa-table:494b45cee3131db751fd04f6",
+          "rank": 11,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.23651622235774994,
+          "internal_score": 7.266530155902728e-05,
+          "fusion_score": -1.6602631877786511
+        },
+        {
+          "chunk_id": "tatqa-text:7dd4a3a78f5340520e6537cf",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.14414885640144348,
+          "internal_score": 0.00012874143430963159,
+          "fusion_score": -1.3680469896453131
+        },
+        {
+          "chunk_id": "tatqa-text:c277211e0217d87714b971a1",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.06465348601341248,
+          "internal_score": 7.538577483501285e-05,
+          "fusion_score": -2.1803369133025017
+        },
+        {
+          "chunk_id": "tatqa-table:7f62dc8ebeabfc86eaa30c81",
+          "rank": 14,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.06278920918703079,
+          "internal_score": 6.164139631437138e-05,
+          "fusion_score": -2.330170904142166
+        },
+        {
+          "chunk_id": "tatqa-text:85e5928466004196350cc3b9",
+          "rank": 15,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0384661927819252,
+          "internal_score": 0.0001602781267138198,
+          "fusion_score": -1.3752227940718162
+        },
+        {
+          "chunk_id": "tatqa-text:4ec3cde49d34ab5f46045b2c",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.037892427295446396,
+          "internal_score": 0.00016922748181968927,
+          "fusion_score": -1.2833674635175936
+        },
+        {
+          "chunk_id": "tatqa-table:6c72302e76738963b4787d7a",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03308597952127457,
+          "internal_score": 6.619480700464919e-05,
+          "fusion_score": -2.3773103923963026
+        },
+        {
+          "chunk_id": "tatqa-text:d356043ac1255fa0abde4494",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.03210070729255676,
+          "internal_score": 0.00013719184789806604,
+          "fusion_score": -1.6372198409492016
+        },
+        {
+          "chunk_id": "tatqa-text:ff5fcd978e67d38d275ee0c8",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.026759283617138863,
+          "internal_score": 0.00024308086722157896,
+          "fusion_score": -0.5457652278613568
+        },
+        {
+          "chunk_id": "tatqa-text:a677abeab702121bb0b787ae",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02517884224653244,
+          "internal_score": 0.00019022548804059625,
+          "fusion_score": -1.1041283394596797
+        },
+        {
+          "chunk_id": "tatqa-table:9a98de0df77461d1ab1cff65",
+          "rank": 21,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.024053551256656647,
+          "internal_score": 0.00012549494567792863,
+          "fusion_score": -1.785354316899415
+        },
+        {
+          "chunk_id": "tatqa-text:d96b49a87ee7979e32fc8756",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02161533385515213,
+          "internal_score": 0.0003802902065217495,
+          "fusion_score": 0.8741977024964154
+        },
+        {
+          "chunk_id": "tatqa-text:bde6479d0c15f74fd18958f3",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.020645929500460625,
+          "internal_score": 0.00019327255722600967,
+          "fusion_score": -1.0866981680347347
+        },
+        {
+          "chunk_id": "tatqa-text:5c60f65c09a177d86977b744",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.019419347867369652,
+          "internal_score": 0.00020644768665079027,
+          "fusion_score": -0.952688815330798
+        },
+        {
+          "chunk_id": "tatqa-text:2d458b52eafa9096872c546f",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.016914913430809975,
+          "internal_score": 0.0004134144401177764,
+          "fusion_score": 1.2059572158948169
+        },
+        {
+          "chunk_id": "tatqa-text:4b8378557a93d840a3b1d37c",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.013636835850775242,
+          "internal_score": 0.0004480429633986205,
+          "fusion_score": 1.5580042931748266
+        },
+        {
+          "chunk_id": "tatqa-text:9e39a4c59b07af3f830b8179",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.009708477184176445,
+          "internal_score": 0.00033082999289035797,
+          "fusion_score": 0.31841706670187786
+        },
+        {
+          "chunk_id": "tatqa-text:700358382391abf9a729a161",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0015011823270469904,
+          "internal_score": 0.0007813862757757306,
+          "fusion_score": 5.008887352727649
+        },
+        {
+          "chunk_id": "tatqa-text:4f2096cb444822fdd58adaef",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0012448433553799987,
+          "internal_score": 0.0007198341190814972,
+          "fusion_score": 4.363707961630411
+        },
+        {
+          "chunk_id": "tatqa-text:7d152c553cae4bc28ad596f6",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0011335690505802631,
+          "internal_score": 0.0013889990514144301,
+          "fusion_score": 11.368532563584312
+        }
+      ]
+    },
+    {
+      "qid": "1b8427b0-516c-4fea-b142-3e419a447f89",
+      "stratum": "easy",
+      "question": "What was the amount of Finished Goods in 2019?",
+      "gold_answers": [
+        "9,447",
+        "9,447 thousand"
+      ],
+      "draft": "$9,447",
+      "draft_em": 1.0,
+      "draft_f1": 1.0,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.5197482109069824,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:8e6582f45fb020ccb7b695cf",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.985496461391449,
+          "internal_score": 0.0005998775595799088,
+          "fusion_score": 4.494284896710248
+        },
+        {
+          "chunk_id": "tatqa-table:8e62db0ad3d5a262060326b1",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9835969805717468,
+          "internal_score": 0.00030836916994303465,
+          "fusion_score": 0.16904368336807063
+        },
+        {
+          "chunk_id": "tatqa-table:1e166bef4d86d9a229bb276c",
+          "rank": 3,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9653811454772949,
+          "internal_score": 0.0004809573292732239,
+          "fusion_score": 2.6790862298712126
+        },
+        {
+          "chunk_id": "tatqa-table:687238194b048a4711515ab1",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.961533784866333,
+          "internal_score": 0.0005441239918582141,
+          "fusion_score": 3.605148134988508
+        },
+        {
+          "chunk_id": "tatqa-table:fa6a57487df378ab1ac7f7db",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9465966820716858,
+          "internal_score": 0.00010789953375933692,
+          "fusion_score": -2.8990321250071225
+        },
+        {
+          "chunk_id": "tatqa-table:9da5df4408edea296b16992f",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9032942056655884,
+          "internal_score": 0.00045818526996299624,
+          "fusion_score": 2.1787557668883566
+        },
+        {
+          "chunk_id": "tatqa-text:489e73234b4a632061c80370",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.554229199886322,
+          "internal_score": 0.0003153262077830732,
+          "fusion_score": -0.8539874673125133
+        },
+        {
+          "chunk_id": "tatqa-text:a677abeab702121bb0b787ae",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.05033063143491745,
+          "internal_score": 0.0005152247031219304,
+          "fusion_score": 0.786965439760693
+        },
+        {
+          "chunk_id": "tatqa-table:dc7fdd89a71d8596881851ee",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.037326887249946594,
+          "internal_score": 0.0003016265982296318,
+          "fusion_score": -2.4127413343240125
+        },
+        {
+          "chunk_id": "tatqa-table:3dc7e327d4edb5be8fb7d382",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03308597952127457,
+          "internal_score": 0.000461113901110366,
+          "fusion_score": -0.06020504630285445
+        },
+        {
+          "chunk_id": "tatqa-table:dcf7f5f92596466598813d18",
+          "rank": 11,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03308597952127457,
+          "internal_score": 0.00047189713222905993,
+          "fusion_score": 0.09960632146083942
+        },
+        {
+          "chunk_id": "tatqa-table:de0c07d14493d01a746f4b0b",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.02161533385515213,
+          "internal_score": 0.0004034121229778975,
+          "fusion_score": -0.9454511469806778
+        },
+        {
+          "chunk_id": "tatqa-text:4276092def47c27785dfa80f",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.021287351846694946,
+          "internal_score": 0.0003706290735863149,
+          "fusion_score": -1.4321679671958383
+        },
+        {
+          "chunk_id": "tatqa-text:f7897eb75933818702422057",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.019419347867369652,
+          "internal_score": 0.0002634784032125026,
+          "fusion_score": -3.0250788448483057
+        },
+        {
+          "chunk_id": "tatqa-table:9a98de0df77461d1ab1cff65",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.018264278769493103,
+          "internal_score": 0.0004592584737110883,
+          "fusion_score": -0.12657719934927447
+        },
+        {
+          "chunk_id": "tatqa-table:8f128d0e07f11277647794da",
+          "rank": 16,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.015424552373588085,
+          "internal_score": 0.0004180043761152774,
+          "fusion_score": -0.7454257553733753
+        },
+        {
+          "chunk_id": "tatqa-table:7f62dc8ebeabfc86eaa30c81",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.012431650422513485,
+          "internal_score": 0.00028897132142446935,
+          "fusion_score": -2.6655918067144233
+        },
+        {
+          "chunk_id": "tatqa-text:3afad8dc7cc9a0aa6f4623f3",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0120537793263793,
+          "internal_score": 0.0002940646663773805,
+          "fusion_score": -2.5910976731292137
+        },
+        {
+          "chunk_id": "tatqa-text:cb4d0095c212d97f0304b6e5",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.010328153148293495,
+          "internal_score": 0.0001479102356825024,
+          "fusion_score": -4.76168489678188
+        },
+        {
+          "chunk_id": "tatqa-text:c277211e0217d87714b971a1",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.008847354911267757,
+          "internal_score": 0.00027762679383158684,
+          "fusion_score": -2.84312260663987
+        },
+        {
+          "chunk_id": "tatqa-text:65586421b2127965cd2b8142",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.007577241398394108,
+          "internal_score": 0.00075309764361009,
+          "fusion_score": 4.200195356468855
+        },
+        {
+          "chunk_id": "tatqa-text:fa46abc2424c1e233f605769",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.006903838831931353,
+          "internal_score": 0.0003519502351991832,
+          "fusion_score": -1.7467198587238588
+        },
+        {
+          "chunk_id": "tatqa-text:bf5b9e9f7e0a3f61bcc46d09",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.004331501666456461,
+          "internal_score": 0.0004257081891410053,
+          "fusion_score": -0.6603470970366841
+        },
+        {
+          "chunk_id": "tatqa-text:57e87f2f3f1b38297145ddc3",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0025509123224765062,
+          "internal_score": 0.00025685556465759873,
+          "fusion_score": -3.167473881550721
+        },
+        {
+          "chunk_id": "tatqa-text:a5aa9b38226ce12a230419b7",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0018675660248845816,
+          "internal_score": 0.0005420067464001477,
+          "fusion_score": 1.0567770361623607
+        },
+        {
+          "chunk_id": "tatqa-text:700358382391abf9a729a161",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0017007222631946206,
+          "internal_score": 0.00032686840859241784,
+          "fusion_score": -2.132088186724228
+        },
+        {
+          "chunk_id": "tatqa-text:12c987bc11290379a6f72219",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001597845577634871,
+          "internal_score": 0.0003333580680191517,
+          "fusion_score": -2.036178920216954
+        },
+        {
+          "chunk_id": "tatqa-text:4f2096cb444822fdd58adaef",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0013250223128125072,
+          "internal_score": 0.0004885277594439685,
+          "fusion_score": 0.2627762215002586
+        },
+        {
+          "chunk_id": "tatqa-text:8691f5cfd463b762b2ccd776",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006070755189284682,
+          "internal_score": 0.0008684056811034679,
+          "fusion_score": 5.890820782400307
+        },
+        {
+          "chunk_id": "tatqa-text:c2938added303e404210a4d9",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00020342698553577065,
+          "internal_score": 0.0011242530308663845,
+          "fusion_score": 9.681511944632096
+        }
+      ]
+    },
+    {
+      "qid": "b9578d1c-7db1-4837-aeb1-9e345ec0d111",
+      "stratum": "easy",
+      "question": "In which year was the billed accounts receivable larger?",
+      "gold_answers": [
+        "2018"
+      ],
+      "draft": "2018",
+      "draft_em": 1.0,
+      "draft_f1": 1.0,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.3266151791540324,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:dea764603a86c9eba42b5600",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.5232985615730286,
+          "internal_score": 0.00019328188500367105,
+          "fusion_score": 2.318112534825694
+        },
+        {
+          "chunk_id": "tatqa-table:e30c2921af4d8225619add56",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.5056454539299011,
+          "internal_score": 0.00014390800788532943,
+          "fusion_score": 1.9164195835727742
+        },
+        {
+          "chunk_id": "tatqa-text:1a31d05832c8061ac0e9233b",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.39140594005584717,
+          "internal_score": 8.277958113467321e-05,
+          "fusion_score": 0.7910287334342714
+        },
+        {
+          "chunk_id": "tatqa-table:80b5aa276f3d8b8ad95425d8",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.3065270483493805,
+          "internal_score": 6.034697435097769e-05,
+          "fusion_score": 0.08600521694986063
+        },
+        {
+          "chunk_id": "tatqa-table:7e660288566f89b8c0819ad7",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.10818895697593689,
+          "internal_score": 5.317184695741162e-05,
+          "fusion_score": -1.3033207666334867
+        },
+        {
+          "chunk_id": "tatqa-table:516bcb8078248148d9c89770",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.05749328061938286,
+          "internal_score": 7.156431092880666e-05,
+          "fusion_score": -1.5430433605558338
+        },
+        {
+          "chunk_id": "tatqa-table:7642dff40dc942368673a3eb",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.04742587357759476,
+          "internal_score": 5.7253801060141996e-05,
+          "fusion_score": -1.6931279369682855
+        },
+        {
+          "chunk_id": "tatqa-text:1b3666db3c86e91f6c091793",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04672495648264885,
+          "internal_score": 0.00013960695650894195,
+          "fusion_score": -1.2280663290137346
+        },
+        {
+          "chunk_id": "tatqa-text:406a471d356cd0f0e2fe2c21",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.03963883966207504,
+          "internal_score": 0.00011575216194614768,
+          "fusion_score": -1.4123331279757185
+        },
+        {
+          "chunk_id": "tatqa-table:cf937155d1771be21c81c43f",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.014503579586744308,
+          "internal_score": 0.0001139440355473198,
+          "fusion_score": -1.5935293558930335
+        },
+        {
+          "chunk_id": "tatqa-table:a3908fc857701337ad2a876a",
+          "rank": 11,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.014063628390431404,
+          "internal_score": 7.57482266635634e-05,
+          "fusion_score": -1.814428362575194
+        },
+        {
+          "chunk_id": "tatqa-text:189f151db2656a6a99e27b23",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.008061991073191166,
+          "internal_score": 0.00013180929818190634,
+          "fusion_score": -1.5354004183125924
+        },
+        {
+          "chunk_id": "tatqa-text:623300787e3eed83b9bc6e01",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.007345826830714941,
+          "internal_score": 0.00011340885976096615,
+          "fusion_score": -1.6452441749756048
+        },
+        {
+          "chunk_id": "tatqa-text:eed396e4b492057e9c75e489",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00712142838165164,
+          "internal_score": 0.00018113739497493953,
+          "fusion_score": -1.2603767933017793
+        },
+        {
+          "chunk_id": "tatqa-text:4ec554d4d3f5ca1f75e13c7d",
+          "rank": 15,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0064882696606218815,
+          "internal_score": 0.00041193427750840783,
+          "fusion_score": 0.05202054608971762
+        },
+        {
+          "chunk_id": "tatqa-text:98b64364a1f852065261bdcd",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0060975621454417706,
+          "internal_score": 0.00010112244490301237,
+          "fusion_score": -1.7238247368083552
+        },
+        {
+          "chunk_id": "tatqa-text:c5d073aff307503c0a4df9f7",
+          "rank": 17,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005060331895947456,
+          "internal_score": 0.00021709637076128274,
+          "fusion_score": -1.0692422229324088
+        },
+        {
+          "chunk_id": "tatqa-text:b2d2d9538bcf05e745b30cfb",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0034834241960197687,
+          "internal_score": 0.00019480778428260237,
+          "fusion_score": -1.2071196808243294
+        },
+        {
+          "chunk_id": "tatqa-table:13f5fc8921e134235799671d",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0029810327105224133,
+          "internal_score": 0.00010863345232792199,
+          "fusion_score": -1.7021618277227095
+        },
+        {
+          "chunk_id": "tatqa-text:3e34fb5cce0588cb9a630671",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0025509123224765062,
+          "internal_score": 0.00019226928998250514,
+          "fusion_score": -1.2279414885129833
+        },
+        {
+          "chunk_id": "tatqa-text:700358382391abf9a729a161",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0025509123224765062,
+          "internal_score": 0.0003975550353061408,
+          "fusion_score": -0.05678131016216137
+        },
+        {
+          "chunk_id": "tatqa-text:d18e14b7f28b6fad3d629007",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0025509123224765062,
+          "internal_score": 0.0003029171784874052,
+          "fusion_score": -0.5966925889303749
+        },
+        {
+          "chunk_id": "tatqa-text:62a6328afed6364c9dc7ea30",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.002323162741959095,
+          "internal_score": 0.00013984522956889123,
+          "fusion_score": -1.5285703746168668
+        },
+        {
+          "chunk_id": "tatqa-table:a12ee6f403fad3ace7853320",
+          "rank": 24,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.002251847181469202,
+          "internal_score": 0.00011440934758866206,
+          "fusion_score": -1.6741675363080892
+        },
+        {
+          "chunk_id": "tatqa-text:38595746ca45268606b9b202",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006878511630930007,
+          "internal_score": 0.0005154692335054278,
+          "fusion_score": 0.6032561340831176
+        },
+        {
+          "chunk_id": "tatqa-text:c9fb3e5d6d497ea4cf497171",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006878511630930007,
+          "internal_score": 0.0003153056313749403,
+          "fusion_score": -0.5386820925624434
+        },
+        {
+          "chunk_id": "tatqa-text:309d7f2ad736ffaeb646fc93",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0004728544445242733,
+          "internal_score": 0.0002895193756558001,
+          "fusion_score": -0.6872549542187536
+        },
+        {
+          "chunk_id": "tatqa-text:8c152306ccb0d68c92266c1c",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0004442183708306402,
+          "internal_score": 0.0007044354570098221,
+          "fusion_score": 1.67965671737907
+        },
+        {
+          "chunk_id": "tatqa-text:c062e03d7042ccac80369cde",
+          "rank": 29,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.0003920417802873999,
+          "internal_score": 0.00153535814024508,
+          "fusion_score": 6.419736148641552
+        },
+        {
+          "chunk_id": "tatqa-text:17f5ddb04d89f62eb8374327",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.000191104321856983,
+          "internal_score": 0.002719700802117586,
+          "fusion_score": 13.175073824828688
+        }
+      ]
+    },
+    {
+      "qid": "cad9978d-eabb-461c-8ab8-a46a7819a5b1",
+      "stratum": "hard",
+      "question": "What was the gross profit in 2018?",
+      "gold_answers": [
+        "365,607",
+        "365,607 thousand"
+      ],
+      "draft": "The gross profit in 2018 was NT$365,607 million (US$1",
+      "draft_em": 0.0,
+      "draft_f1": 0.0,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.13733313202542616,
+      "selected_answer_tokens": 2,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:bf5b9e9f7e0a3f61bcc46d09",
+          "rank": 1,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.9940890073776245,
+          "internal_score": 0.0010073031298816204,
+          "fusion_score": 5.961139294260927
+        },
+        {
+          "chunk_id": "tatqa-text:4276092def47c27785dfa80f",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.9603611826896667,
+          "internal_score": 0.00022763613378629088,
+          "fusion_score": 0.946842320151035
+        },
+        {
+          "chunk_id": "tatqa-table:18a32e1e748b49588f91790a",
+          "rank": 3,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.9005298018455505,
+          "internal_score": 8.506241283612326e-05,
+          "fusion_score": -0.14060540806026145
+        },
+        {
+          "chunk_id": "tatqa-text:d781109d45b10a44c9b17762",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8311430811882019,
+          "internal_score": 0.00014857659698463976,
+          "fusion_score": 0.038678986670641846
+        },
+        {
+          "chunk_id": "tatqa-table:07feb18519cfdd756278895a",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.7839884757995605,
+          "internal_score": 4.619758692570031e-05,
+          "fusion_score": -0.755509360496869
+        },
+        {
+          "chunk_id": "tatqa-text:7ef325ce132f7b07698cb4a5",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.7563575506210327,
+          "internal_score": 0.0002590758667793125,
+          "fusion_score": 0.49652799670269365
+        },
+        {
+          "chunk_id": "tatqa-text:268250695b869ec6f3c8a672",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.7341195344924927,
+          "internal_score": 0.00012446916662156582,
+          "fusion_score": -0.4213287235734402
+        },
+        {
+          "chunk_id": "tatqa-table:c29b6bc29eb64500cfef2924",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.7017130851745605,
+          "internal_score": 4.02899895561859e-05,
+          "fusion_score": -1.054109329091897
+        },
+        {
+          "chunk_id": "tatqa-table:d4643fb2aa27b072b02e0bed",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.6048657894134521,
+          "internal_score": 6.135831790743396e-05,
+          "fusion_score": -1.229226157187525
+        },
+        {
+          "chunk_id": "tatqa-table:63728cf569701dc5858fabf5",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.5803520083427429,
+          "internal_score": 6.484868936240673e-05,
+          "fusion_score": -1.2851471957835612
+        },
+        {
+          "chunk_id": "tatqa-text:27c672c2d6780a5053e1083d",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.5520567893981934,
+          "internal_score": 0.0001346155331702903,
+          "fusion_score": -0.9359469503735671
+        },
+        {
+          "chunk_id": "tatqa-text:76259e7b4ab56556fc41148b",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.37937837839126587,
+          "internal_score": 0.00010897943866439164,
+          "fusion_score": -1.6459583699475695
+        },
+        {
+          "chunk_id": "tatqa-table:0cee3f4c2b6a34e16dcb89ce",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.35756751894950867,
+          "internal_score": 8.877561776898801e-05,
+          "fusion_score": -1.8424197006876082
+        },
+        {
+          "chunk_id": "tatqa-text:8a9130592532bde5e2c07cce",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.3250918686389923,
+          "internal_score": 0.0001840239274315536,
+          "fusion_score": -1.3461248508019699
+        },
+        {
+          "chunk_id": "tatqa-table:26ba8e0d8a5b8c2d442d5b5c",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.3132096529006958,
+          "internal_score": 8.392181189265102e-05,
+          "fusion_score": -2.0139097355880606
+        },
+        {
+          "chunk_id": "tatqa-text:c277211e0217d87714b971a1",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.28616926074028015,
+          "internal_score": 0.0003063419135287404,
+          "fusion_score": -0.6999409492524726
+        },
+        {
+          "chunk_id": "tatqa-text:c2f439c4bac5be14188086a6",
+          "rank": 17,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.22953522205352783,
+          "internal_score": 0.0002956480602733791,
+          "fusion_score": -0.9471933275635189
+        },
+        {
+          "chunk_id": "tatqa-table:d566e12795d757ef90807727",
+          "rank": 18,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.17328819632530212,
+          "internal_score": 0.00014266306243371218,
+          "fusion_score": -2.0887796241414893
+        },
+        {
+          "chunk_id": "tatqa-text:27179bc3b7a8903d31d7d69a",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.1710611879825592,
+          "internal_score": 0.0003403355658520013,
+          "fusion_score": -0.8517283198146024
+        },
+        {
+          "chunk_id": "tatqa-text:a677abeab702121bb0b787ae",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.169956237077713,
+          "internal_score": 0.00033032873761840165,
+          "fusion_score": -0.918220933471108
+        },
+        {
+          "chunk_id": "tatqa-text:cb4d0095c212d97f0304b6e5",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.15713684260845184,
+          "internal_score": 0.00034964809310622513,
+          "fusion_score": -0.8373589871457449
+        },
+        {
+          "chunk_id": "tatqa-text:c454690ce6d5ef5e6efa3315",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.13117322325706482,
+          "internal_score": 0.00017346799722872674,
+          "fusion_score": -2.02871130164712
+        },
+        {
+          "chunk_id": "tatqa-table:8fe7441aac6c381ac4eeed89",
+          "rank": 23,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.1225232183933258,
+          "internal_score": 0.0001449240808142349,
+          "fusion_score": -2.235847477469325
+        },
+        {
+          "chunk_id": "tatqa-table:330f6555bf2827f7184876b5",
+          "rank": 24,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.07369627058506012,
+          "internal_score": 0.00017532226047478616,
+          "fusion_score": -2.199665560456504
+        },
+        {
+          "chunk_id": "tatqa-text:309f902b5470cb7e8089bc40",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.07263670116662979,
+          "internal_score": 0.0003251209273003042,
+          "fusion_score": -1.260217138837077
+        },
+        {
+          "chunk_id": "tatqa-text:2b9917ff1b53d86e955cfd8b",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04742587357759476,
+          "internal_score": 0.0003365417942404747,
+          "fusion_score": -1.2684393442708584
+        },
+        {
+          "chunk_id": "tatqa-text:8c4e9b6333c4ea324905fc88",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0427221953868866,
+          "internal_score": 0.0007888394757173955,
+          "fusion_score": 1.5633233836221863
+        },
+        {
+          "chunk_id": "tatqa-text:3afad8dc7cc9a0aa6f4623f3",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.035678550601005554,
+          "internal_score": 0.0008739873883314431,
+          "fusion_score": 2.0768540810692
+        },
+        {
+          "chunk_id": "tatqa-text:57e87f2f3f1b38297145ddc3",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.035678550601005554,
+          "internal_score": 0.001578312017954886,
+          "fusion_score": 6.509789807312989
+        },
+        {
+          "chunk_id": "tatqa-text:a5538314b9af00ce15537c3c",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01640303246676922,
+          "internal_score": 0.002208239398896694,
+          "fusion_score": 10.413232875872472
+        }
+      ]
+    },
+    {
+      "qid": "3c4473cb-ee7b-407c-8f80-1b40b06e2a44",
+      "stratum": "easy",
+      "question": "What is the percentage change in the total investment in associates from 31 December 2018 to 31 December  2019?",
+      "gold_answers": [
+        "-18.14",
+        "-18.14 percent"
+      ],
+      "draft": "To determine the percentage change in the total investment in associates from 31 December 2018 to 3",
+      "draft_em": 0.0,
+      "draft_f1": 0.0,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.07108224953152369,
+      "selected_answer_tokens": 2,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:24b946f2a972429f95dea954",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.6522414088249207,
+          "internal_score": 5.850398520124145e-05,
+          "fusion_score": 3.7848595802410805
+        },
+        {
+          "chunk_id": "tatqa-table:516bcb8078248148d9c89770",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.10818895697593689,
+          "internal_score": 2.354266143811401e-05,
+          "fusion_score": -1.345227819512737
+        },
+        {
+          "chunk_id": "tatqa-text:0b0505f2573b81253da7c157",
+          "rank": 3,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.10230471193790436,
+          "internal_score": 0.00010154731717193499,
+          "fusion_score": -0.41378838964411485
+        },
+        {
+          "chunk_id": "tatqa-table:b43a896638f79974cd65ac3a",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.09268777817487717,
+          "internal_score": 5.693839557352476e-05,
+          "fusion_score": -1.0583638315117487
+        },
+        {
+          "chunk_id": "tatqa-table:188cd2dc6f7d0617e2d50498",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.08509904146194458,
+          "internal_score": 4.474506204132922e-05,
+          "fusion_score": -1.277308198642197
+        },
+        {
+          "chunk_id": "tatqa-table:e4c377bd498ab4c042d4b02d",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.07807816565036774,
+          "internal_score": 7.423645001836121e-05,
+          "fusion_score": -0.9665015508996984
+        },
+        {
+          "chunk_id": "tatqa-text:4f2096cb444822fdd58adaef",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.05184546485543251,
+          "internal_score": 6.035489059286192e-05,
+          "fusion_score": -1.3674187708677252
+        },
+        {
+          "chunk_id": "tatqa-text:8f1cd2f634ee47a007af77ee",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0384661927819252,
+          "internal_score": 6.278248474700376e-05,
+          "fusion_score": -1.452185843811653
+        },
+        {
+          "chunk_id": "tatqa-table:a2fadd5bd6bca53d854defc0",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.035678550601005554,
+          "internal_score": 3.416855543036945e-05,
+          "fusion_score": -1.8364965405030578
+        },
+        {
+          "chunk_id": "tatqa-table:d7cf7ab3c3f0c728b8d777e5",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03308597952127457,
+          "internal_score": 4.100256410310976e-05,
+          "fusion_score": -1.7727976506851817
+        },
+        {
+          "chunk_id": "tatqa-table:1bcc8ae5da1acaf5e03c6510",
+          "rank": 11,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.028870904818177223,
+          "internal_score": 4.3432784877950326e-05,
+          "fusion_score": -1.778533672089372
+        },
+        {
+          "chunk_id": "tatqa-text:e6ae366dd24244e756e405c2",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.023689469322562218,
+          "internal_score": 0.0001153718403656967,
+          "fusion_score": -0.9174083160634924
+        },
+        {
+          "chunk_id": "tatqa-table:cf937155d1771be21c81c43f",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.021948253735899925,
+          "internal_score": 4.1612311179051176e-05,
+          "fusion_score": -1.8611306271124195
+        },
+        {
+          "chunk_id": "tatqa-text:d366f0daea1d7586ec503069",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02161533385515213,
+          "internal_score": 9.998908353736624e-05,
+          "fusion_score": -1.1289735584204599
+        },
+        {
+          "chunk_id": "tatqa-table:a12ee6f403fad3ace7853320",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.021287351846694946,
+          "internal_score": 3.52018432749901e-05,
+          "fusion_score": -1.9475425383011102
+        },
+        {
+          "chunk_id": "tatqa-text:a94408cc10e0356df340438d",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.021287351846694946,
+          "internal_score": 0.00014269132225308567,
+          "fusion_score": -0.5941333172633946
+        },
+        {
+          "chunk_id": "tatqa-text:fb5102d809985a76fd5880f2",
+          "rank": 17,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.020332353189587593,
+          "internal_score": 8.866180723998696e-05,
+          "fusion_score": -1.2826559199383245
+        },
+        {
+          "chunk_id": "tatqa-text:4ec3cde49d34ab5f46045b2c",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.017442485317587852,
+          "internal_score": 7.589263987028971e-05,
+          "fusion_score": -1.4683450785396335
+        },
+        {
+          "chunk_id": "tatqa-table:6ab7c557a9560fc323b08cf1",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.01590639166533947,
+          "internal_score": 8.623545727459714e-05,
+          "fusion_score": -1.3513593429972546
+        },
+        {
+          "chunk_id": "tatqa-table:7f4c9bed40086a5202cdc3a0",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.011687257327139378,
+          "internal_score": 6.0522455896716565e-05,
+          "fusion_score": -1.7114840762062595
+        },
+        {
+          "chunk_id": "tatqa-text:938d2bef946a8c64b38c367a",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.010013571009039879,
+          "internal_score": 0.00020198867423459888,
+          "fusion_score": 0.05530152481835898
+        },
+        {
+          "chunk_id": "tatqa-text:906c368fb7c7603eb6dc9f0c",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0060975621454417706,
+          "internal_score": 0.00025695154909044504,
+          "fusion_score": 0.7135866752437865
+        },
+        {
+          "chunk_id": "tatqa-text:309f902b5470cb7e8089bc40",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005384937860071659,
+          "internal_score": 0.00016212805348914117,
+          "fusion_score": -0.4864870894327913
+        },
+        {
+          "chunk_id": "tatqa-text:36a1e40681a9c5b482a8233d",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005220125429332256,
+          "internal_score": 0.0001256506802747026,
+          "fusion_score": -0.9471975445678305
+        },
+        {
+          "chunk_id": "tatqa-table:4174661746e50f3689ee33d9",
+          "rank": 25,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0037072531413286924,
+          "internal_score": 0.0001275199610972777,
+          "fusion_score": -0.9367026579388946
+        },
+        {
+          "chunk_id": "tatqa-text:1ef09523dffec929cf7b9e9b",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0024726230185478926,
+          "internal_score": 0.0002536368847358972,
+          "fusion_score": 0.6406034499211088
+        },
+        {
+          "chunk_id": "tatqa-text:8029bfa8739be042331e5eb8",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0018102108733728528,
+          "internal_score": 0.0001933665480464697,
+          "fusion_score": -0.12397569343552323
+        },
+        {
+          "chunk_id": "tatqa-text:ce64d3018b4257a10809ee8e",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0017007222631946206,
+          "internal_score": 0.000452404870884493,
+          "fusion_score": 3.1366541564394654
+        },
+        {
+          "chunk_id": "tatqa-text:df5baf810b74dfc48fb6281c",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.000503335555549711,
+          "internal_score": 0.0008434107876382768,
+          "fusion_score": 8.04952127557298
+        },
+        {
+          "chunk_id": "tatqa-text:f657a26036e5bc39c03fb65e",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00036829791497439146,
+          "internal_score": 0.0011290997499600053,
+          "fusion_score": 11.645491366148095
+        }
+      ]
+    },
+    {
+      "qid": "7639efef-c768-4631-95b5-382a0fde501d",
+      "stratum": "hard",
+      "question": "What is the average incentive schemes between 2018 and 2019?",
+      "gold_answers": [
+        "2.5",
+        "2.5 million"
+      ],
+      "draft": "The average incentive schemes between 2018 and 2019 is 1.5 million euros ($",
+      "draft_em": 0.0,
+      "draft_f1": 0.15384615384615385,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.08365096203747163,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:d1546afe5424eb59dde2b277",
+          "rank": 1,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.3268083333969116,
+          "internal_score": 0.0003427700721658766,
+          "fusion_score": 3.8976443410638044
+        },
+        {
+          "chunk_id": "tatqa-text:65586421b2127965cd2b8142",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04535258188843727,
+          "internal_score": 0.00034382325247861445,
+          "fusion_score": -1.01903466712894
+        },
+        {
+          "chunk_id": "tatqa-table:737b2b9f8efa90ea811e210e",
+          "rank": 3,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.03258974477648735,
+          "internal_score": 0.00033176023862324655,
+          "fusion_score": -1.2809220434181918
+        },
+        {
+          "chunk_id": "tatqa-text:3052a702c034ab7ab43eb7ca",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.031618766486644745,
+          "internal_score": 0.000535127823241055,
+          "fusion_score": -0.6440605118774131
+        },
+        {
+          "chunk_id": "tatqa-text:21f2aa5241fb906f9677dd58",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.028007520362734795,
+          "internal_score": 0.0004133411275688559,
+          "fusion_score": -1.0987370353760035
+        },
+        {
+          "chunk_id": "tatqa-table:5941c19a1e4d1d146040fde3",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.02595735713839531,
+          "internal_score": 0.0001713008969090879,
+          "fusion_score": -1.9127445824281826
+        },
+        {
+          "chunk_id": "tatqa-text:f7897eb75933818702422057",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02595735713839531,
+          "internal_score": 0.0005278533208183944,
+          "fusion_score": -0.7664141607838203
+        },
+        {
+          "chunk_id": "tatqa-text:ee475ff40528d73a85a2393c",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.024423090741038322,
+          "internal_score": 0.0003293669724371284,
+          "fusion_score": -1.4313759428856418
+        },
+        {
+          "chunk_id": "tatqa-table:915b17b0ae371ad96f5619fc",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.022977370768785477,
+          "internal_score": 0.00040245454874821007,
+          "fusion_score": -1.2216687450263335
+        },
+        {
+          "chunk_id": "tatqa-text:13d0ec283e27aa638d4dfc2f",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.022977370768785477,
+          "internal_score": 0.0004427434178069234,
+          "fusion_score": -1.0921384062635913
+        },
+        {
+          "chunk_id": "tatqa-text:c02ee129a8e43511198e3bf7",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.019419347867369652,
+          "internal_score": 0.00025908148381859064,
+          "fusion_score": -1.7448159329608497
+        },
+        {
+          "chunk_id": "tatqa-table:b48b99207d947c5b83174418",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.014957086183130741,
+          "internal_score": 0.0002145511971320957,
+          "fusion_score": -1.9659863986550028
+        },
+        {
+          "chunk_id": "tatqa-text:83a13fa6720d9e3e4916ff89",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.014063628390431404,
+          "internal_score": 0.0004603218112606555,
+          "fusion_score": -1.191442298772097
+        },
+        {
+          "chunk_id": "tatqa-text:89b69b0c8267c32a5cbfb30a",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.012821214273571968,
+          "internal_score": 0.0005371152656152844,
+          "fusion_score": -0.966266609380013
+        },
+        {
+          "chunk_id": "tatqa-table:91943cc658e917fd136af723",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.011687257327139378,
+          "internal_score": 0.00021865041344426572,
+          "fusion_score": -2.0099663996129316
+        },
+        {
+          "chunk_id": "tatqa-text:eaf798b95348eda636eab48b",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.011687257327139378,
+          "internal_score": 0.00044366487418301404,
+          "fusion_score": -1.2865358341252078
+        },
+        {
+          "chunk_id": "tatqa-table:0724ebe2395ce583b3dbf2d0",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.01065251138061285,
+          "internal_score": 0.00018508575158193707,
+          "fusion_score": -2.1359663034703846
+        },
+        {
+          "chunk_id": "tatqa-text:1f640bad10989ab17912cc79",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01065251138061285,
+          "internal_score": 0.0008075787918642163,
+          "fusion_score": -0.134626075535278
+        },
+        {
+          "chunk_id": "tatqa-text:543d946e3eb86a806ba493e0",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.008315778337419033,
+          "internal_score": 0.0004487447440624237,
+          "fusion_score": -1.329139917564147
+        },
+        {
+          "chunk_id": "tatqa-table:8e58ef23fb2e481dd9b1047b",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.008061991073191166,
+          "internal_score": 0.0003253901959396899,
+          "fusion_score": -1.7301661627166296
+        },
+        {
+          "chunk_id": "tatqa-table:78bd3a291dad993d1bdfba34",
+          "rank": 21,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.007345826830714941,
+          "internal_score": 0.00028957295580767095,
+          "fusion_score": -1.8578391410554007
+        },
+        {
+          "chunk_id": "tatqa-table:96cc3e43ab4ee600e29757d6",
+          "rank": 22,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.005730246659368277,
+          "internal_score": 0.0003722279507201165,
+          "fusion_score": -1.6203415947046564
+        },
+        {
+          "chunk_id": "tatqa-table:dbb023523cc9c1eccea834c0",
+          "rank": 23,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0044683837331831455,
+          "internal_score": 0.000312011077767238,
+          "fusion_score": -1.8359996131396283
+        },
+        {
+          "chunk_id": "tatqa-text:8ee1d0aafd2ab9fa2419cab1",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.003273064736276865,
+          "internal_score": 0.000706246355548501,
+          "fusion_score": -0.5894124006217608
+        },
+        {
+          "chunk_id": "tatqa-text:cb4d0095c212d97f0304b6e5",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0030753696337342262,
+          "internal_score": 0.0014368273550644517,
+          "fusion_score": 1.7559791112793337
+        },
+        {
+          "chunk_id": "tatqa-text:1ef09523dffec929cf7b9e9b",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0029810327105224133,
+          "internal_score": 0.0012043686583638191,
+          "fusion_score": 1.0069659443188583
+        },
+        {
+          "chunk_id": "tatqa-text:b0ed5cf419d6bc6ddd4aeb94",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001987774157896638,
+          "internal_score": 0.0016742425505071878,
+          "fusion_score": 2.5002665257295
+        },
+        {
+          "chunk_id": "tatqa-text:58c590c0ba3597e9be93bcd5",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0012065897462889552,
+          "internal_score": 0.0016992405289784074,
+          "fusion_score": 2.5669803246797906
+        },
+        {
+          "chunk_id": "tatqa-text:df5baf810b74dfc48fb6281c",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0007096704212017357,
+          "internal_score": 0.003386793425306678,
+          "fusion_score": 7.983844405177494
+        },
+        {
+          "chunk_id": "tatqa-text:116d22fb6e7dec0a93e3d759",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006070755189284682,
+          "internal_score": 0.004373365547508001,
+          "fusion_score": 11.153920125253329
+        }
+      ]
+    },
+    {
+      "qid": "ec2195f1-47f7-4aaf-81ae-34f314ddb8c7",
+      "stratum": "easy",
+      "question": "What is the Prozone pre-impairment carrying value at 31 December 2019?",
+      "gold_answers": [
+        "£41.5 million"
+      ],
+      "draft": "The Prozone pre-impairment carrying value at 31 December 2019 is £41",
+      "draft_em": 0.0,
+      "draft_f1": 0.0,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.03837262916022351,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:49647067aff41b380ad4e10f",
+          "rank": 1,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.999841570854187,
+          "internal_score": 0.0006244148244149983,
+          "fusion_score": 5.023868091810378
+        },
+        {
+          "chunk_id": "tatqa-table:d401b9c621dd227f07430873",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.35667070746421814,
+          "internal_score": 0.0001751086238073185,
+          "fusion_score": -0.2543892003090198
+        },
+        {
+          "chunk_id": "tatqa-text:a1db6d85aa2ffedfdee0e89a",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.3442229926586151,
+          "internal_score": 0.000282407010672614,
+          "fusion_score": 0.14617909184432354
+        },
+        {
+          "chunk_id": "tatqa-text:7dcad7cb244dfabb5cb268f5",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.3015677034854889,
+          "internal_score": 0.00030311819864436984,
+          "fusion_score": 0.015032315621567038
+        },
+        {
+          "chunk_id": "tatqa-text:c36e2056387f5d70f3a48ee0",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.19436779618263245,
+          "internal_score": 0.0002136152470484376,
+          "fusion_score": -0.9280592847355593
+        },
+        {
+          "chunk_id": "tatqa-text:7c5fd7f1ebbd60b79c642c10",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.15713684260845184,
+          "internal_score": 0.0004017014289274812,
+          "fusion_score": -0.30570547813279536
+        },
+        {
+          "chunk_id": "tatqa-table:cf485f0036ed7ef19399fc35",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.14128141105175018,
+          "internal_score": 0.00016994343604892492,
+          "fusion_score": -1.3922660389490928
+        },
+        {
+          "chunk_id": "tatqa-text:e37846bd25a94949c0281448",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.1276526302099228,
+          "internal_score": 0.00014975160593166947,
+          "fusion_score": -1.5503608299192781
+        },
+        {
+          "chunk_id": "tatqa-text:a0860f329d66366c8f1e3a64",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.10669060051441193,
+          "internal_score": 0.00016574042092543095,
+          "fusion_score": -1.5896261684731943
+        },
+        {
+          "chunk_id": "tatqa-text:b323decd2aff5aec43f3acc3",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.06656918674707413,
+          "internal_score": 0.00018178224854636937,
+          "fusion_score": -1.727887273268555
+        },
+        {
+          "chunk_id": "tatqa-text:665b6022386684c900927aaa",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04401864856481552,
+          "internal_score": 0.00035494574694894254,
+          "fusion_score": -1.094179659371874
+        },
+        {
+          "chunk_id": "tatqa-table:40a0c6900688725122e18cf2",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.04023794084787369,
+          "internal_score": 8.832693856675178e-05,
+          "fusion_score": -2.2692936218601805
+        },
+        {
+          "chunk_id": "tatqa-table:1a1b83266583df9f11cfd5d3",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03963883966207504,
+          "internal_score": 0.00012052375677740201,
+          "fusion_score": -2.132854368479077
+        },
+        {
+          "chunk_id": "tatqa-text:9168169a3ccfdfe5a9af90d4",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0384661927819252,
+          "internal_score": 0.0002559890563134104,
+          "fusion_score": -1.5518168054281187
+        },
+        {
+          "chunk_id": "tatqa-table:62dbd52bd2ee57534785a9b9",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.035678550601005554,
+          "internal_score": 0.00023849145509302616,
+          "fusion_score": -1.6420889946745159
+        },
+        {
+          "chunk_id": "tatqa-text:cb974c2af7fea0f50e8a9129",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.034100424498319626,
+          "internal_score": 0.0006590659031644464,
+          "fusion_score": 0.17252015610686794
+        },
+        {
+          "chunk_id": "tatqa-table:13f5fc8921e134235799671d",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03210070729255676,
+          "internal_score": 0.00014599236601497978,
+          "fusion_score": -2.061512280551443
+        },
+        {
+          "chunk_id": "tatqa-text:85e5928466004196350cc3b9",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02843603305518627,
+          "internal_score": 0.0004477924376260489,
+          "fusion_score": -0.7724809484134156
+        },
+        {
+          "chunk_id": "tatqa-table:2525a824d311e9fa4d045e5c",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.027169233188033104,
+          "internal_score": 0.000185280034202151,
+          "fusion_score": -1.9167782221445904
+        },
+        {
+          "chunk_id": "tatqa-table:7e1b564675976704052eef4f",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.02595735713839531,
+          "internal_score": 0.000248726544668898,
+          "fusion_score": -1.6480754028085691
+        },
+        {
+          "chunk_id": "tatqa-text:bfc221765b14e9b578e76777",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.020023440942168236,
+          "internal_score": 0.00029343419009819627,
+          "fusion_score": -1.4850426007039177
+        },
+        {
+          "chunk_id": "tatqa-text:9ec83e84cf843d9deffd89d1",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.018546566367149353,
+          "internal_score": 0.0002461589756421745,
+          "fusion_score": -1.6975834508754453
+        },
+        {
+          "chunk_id": "tatqa-table:9a98de0df77461d1ab1cff65",
+          "rank": 23,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.013636835850775242,
+          "internal_score": 0.00035755816497839987,
+          "fusion_score": -1.2402033021377827
+        },
+        {
+          "chunk_id": "tatqa-table:3d4433043520dfcc395dbd0b",
+          "rank": 24,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.008061991073191166,
+          "internal_score": 0.0005572806694544852,
+          "fusion_score": -0.4034718684775831
+        },
+        {
+          "chunk_id": "tatqa-text:00f5863efd77baff6c3febaf",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005060331895947456,
+          "internal_score": 0.0006073671975173056,
+          "fusion_score": -0.2019408113184013
+        },
+        {
+          "chunk_id": "tatqa-text:80dac579938a86b7b34afbda",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005060331895947456,
+          "internal_score": 0.001163160428404808,
+          "fusion_score": 2.206883612096859
+        },
+        {
+          "chunk_id": "tatqa-text:e08db9881077eb59a55edaf4",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.004755199886858463,
+          "internal_score": 0.0006997056771069765,
+          "fusion_score": 0.19667664666140583
+        },
+        {
+          "chunk_id": "tatqa-text:5d785d382cc9f6103c0c90bc",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0023967307060956955,
+          "internal_score": 0.0010696274694055319,
+          "fusion_score": 1.7877143189420783
+        },
+        {
+          "chunk_id": "tatqa-text:c3c9149b37337e0e62a9e7d6",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0007321811863221228,
+          "internal_score": 0.0018766431603580713,
+          "fusion_score": 5.276723748303426
+        },
+        {
+          "chunk_id": "tatqa-text:ed22766481a0ca02d80259bb",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.000503335555549711,
+          "internal_score": 0.0036681583151221275,
+          "fusion_score": 13.0400186296455
+        }
+      ]
+    },
+    {
+      "qid": "0fe2da7e-22b8-40b2-9536-d006969da29b",
+      "stratum": "easy",
+      "question": "How IMFT’s capital requirements were generally determined?",
+      "gold_answers": [
+        "an annual plan approved by the members, and capital contributions to IMFT are requested as needed"
+      ],
+      "draft": "IMFT's capital requirements are generally determined based on an annual plan approved by the members, and capital contributions are requested as",
+      "draft_em": 0.0,
+      "draft_f1": 0.6666666666666667,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.1915312666757624,
+      "selected_answer_tokens": 3,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:6b980490f2a43916b7234aea",
+          "rank": 1,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.99935382604599,
+          "internal_score": 0.00019072656868956983,
+          "fusion_score": 5.542659924209844
+        },
+        {
+          "chunk_id": "tatqa-text:a01c34859842f9616af46c9b",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04336579889059067,
+          "internal_score": 7.607945735799149e-05,
+          "fusion_score": -0.901723404597513
+        },
+        {
+          "chunk_id": "tatqa-text:80457ff93e65c6f0dc2e779f",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01065251138061285,
+          "internal_score": 6.17238474660553e-05,
+          "fusion_score": -1.2229315528251665
+        },
+        {
+          "chunk_id": "tatqa-text:36fd09b8278c667abc3415b6",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.006903838831931353,
+          "internal_score": 6.606489478144795e-05,
+          "fusion_score": -1.201966604775449
+        },
+        {
+          "chunk_id": "tatqa-text:5ac7c2b8632c1cc288ca87c8",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005384937860071659,
+          "internal_score": 5.2508508815662935e-05,
+          "fusion_score": -1.3412827328730563
+        },
+        {
+          "chunk_id": "tatqa-text:402cacfe331111f734cf40d9",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00407013762742281,
+          "internal_score": 7.709948840783909e-05,
+          "fusion_score": -1.1112921587167757
+        },
+        {
+          "chunk_id": "tatqa-text:933a143e46d15dd717ceecb8",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0018102108733728528,
+          "internal_score": 3.239514262531884e-05,
+          "fusion_score": -1.5553604694399152
+        },
+        {
+          "chunk_id": "tatqa-text:0720868c4cf3ee5db3d5423b",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0005193048855289817,
+          "internal_score": 3.184469460393302e-05,
+          "fusion_score": -1.567880910601115
+        },
+        {
+          "chunk_id": "tatqa-table:69d6956cdb170dfe4c467365",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0003150386910419911,
+          "internal_score": 2.9994042051839642e-05,
+          "fusion_score": -1.5868824418294099
+        },
+        {
+          "chunk_id": "tatqa-text:f657a26036e5bc39c03fb65e",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0003150386910419911,
+          "internal_score": 0.00013242362183518708,
+          "fusion_score": -0.5983161744847684
+        },
+        {
+          "chunk_id": "tatqa-text:3f4f44de3e14f837a9ff88f5",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0002959570847451687,
+          "internal_score": 6.125262734713033e-05,
+          "fusion_score": -1.2853067671992358
+        },
+        {
+          "chunk_id": "tatqa-text:aa5a11656dacebd62e47c8f2",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0002780309587251395,
+          "internal_score": 8.964812877820805e-05,
+          "fusion_score": -1.0113567772561334
+        },
+        {
+          "chunk_id": "tatqa-text:7dd4a3a78f5340520e6537cf",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00024536947603337467,
+          "internal_score": 9.113804117077962e-05,
+          "fusion_score": -0.9971597355373855
+        },
+        {
+          "chunk_id": "tatqa-table:086b4b866504f91393fab297",
+          "rank": 14,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.00023050670279189944,
+          "internal_score": 6.777089583920315e-05,
+          "fusion_score": -1.2227632396121277
+        },
+        {
+          "chunk_id": "tatqa-table:a552a8eaba4bc7e7f13270ea",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.00020342698553577065,
+          "internal_score": 3.1404135370394215e-05,
+          "fusion_score": -1.5738965788146089
+        },
+        {
+          "chunk_id": "tatqa-text:60f0abe2b166f0c377e60473",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.000191104321856983,
+          "internal_score": 0.00014816044131293893,
+          "fusion_score": -0.4471293101695998
+        },
+        {
+          "chunk_id": "tatqa-table:3fe824f5ab599fe59225aa07",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.00017952796770259738,
+          "internal_score": 5.892956323805265e-05,
+          "fusion_score": -1.3083771756107117
+        },
+        {
+          "chunk_id": "tatqa-text:800e9ece013f8b7d3db9d979",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00017952796770259738,
+          "internal_score": 0.00015549620729871094,
+          "fusion_score": -0.37639515370883686
+        },
+        {
+          "chunk_id": "tatqa-text:f2caac26ac43cea424273605",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00015843621804378927,
+          "internal_score": 0.00041715422412380576,
+          "fusion_score": 2.148795582548557
+        },
+        {
+          "chunk_id": "tatqa-table:cd6f4e0722ef1778a686e01a",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.00014883848780300468,
+          "internal_score": 0.00011214002734050155,
+          "fusion_score": -0.7950047911193102
+        },
+        {
+          "chunk_id": "tatqa-text:45d5a3e2826fd700a0c385c7",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00014883848780300468,
+          "internal_score": 9.950725507223979e-05,
+          "fusion_score": -0.9169259446949176
+        },
+        {
+          "chunk_id": "tatqa-text:bfae9fa429ad91f333b43a50",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00011591933434829116,
+          "internal_score": 8.622601308161393e-05,
+          "fusion_score": -1.0452894050670483
+        },
+        {
+          "chunk_id": "tatqa-text:d551e1fe048a3a46e6b0a633",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00011591933434829116,
+          "internal_score": 0.0002279272594023496,
+          "fusion_score": 0.3222947678804917
+        },
+        {
+          "chunk_id": "tatqa-table:2691a66f3da9b3e1daabe2fa",
+          "rank": 24,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.00010229986219201237,
+          "internal_score": 0.00015669915592297912,
+          "fusion_score": -0.36521649531340306
+        },
+        {
+          "chunk_id": "tatqa-table:188cd2dc6f7d0617e2d50498",
+          "rank": 25,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 5.475977377500385e-05,
+          "internal_score": 0.00013892435526940972,
+          "fusion_score": -0.5370297354289422
+        },
+        {
+          "chunk_id": "tatqa-table:4174661746e50f3689ee33d9",
+          "rank": 26,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 5.475977377500385e-05,
+          "internal_score": 0.00010876733722398058,
+          "fusion_score": -0.828080531756251
+        },
+        {
+          "chunk_id": "tatqa-table:683eac5173429ac51c9d6f80",
+          "rank": 27,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 3.7636447814293206e-05,
+          "internal_score": 5.794243043055758e-05,
+          "fusion_score": -1.3186964443131899
+        },
+        {
+          "chunk_id": "tatqa-text:964c676efb747a4a98b9f9ae",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 3.535625000949949e-05,
+          "internal_score": 0.0002961448044516146,
+          "fusion_score": 0.980224708549438
+        },
+        {
+          "chunk_id": "tatqa-table:e4c377bd498ab4c042d4b02d",
+          "rank": 29,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 2.586742994026281e-05,
+          "internal_score": 0.0002798103669192642,
+          "fusion_score": 0.8225251365580664
+        },
+        {
+          "chunk_id": "tatqa-text:897eca7b78bd7483ac93c4c3",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 2.2827996872365475e-05,
+          "internal_score": 0.0017798608168959618,
+          "fusion_score": 15.299764415998476
+        }
+      ]
+    },
+    {
+      "qid": "e4f21617-1a84-40e4-bdf0-671df88cb862",
+      "stratum": "easy",
+      "question": "What is the percentage change in the working capital adjustment at June 30 and December 31, 2019?",
+      "gold_answers": [
+        "-52.63",
+        "-52.63 percent"
+      ],
+      "draft": "The percentage change in the working capital adjustment at June 30 and December 31, 2019",
+      "draft_em": 0.0,
+      "draft_f1": 0.0,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.031349447294757894,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:af1b82008759b892b83baf87",
+          "rank": 1,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.9196425676345825,
+          "internal_score": 0.0003955754800699651,
+          "fusion_score": 3.4787967579626105
+        },
+        {
+          "chunk_id": "tatqa-table:494b45cee3131db751fd04f6",
+          "rank": 2,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.8509646654129028,
+          "internal_score": 0.0002296922612003982,
+          "fusion_score": 2.507307873548485
+        },
+        {
+          "chunk_id": "tatqa-text:bf3d9ba331b72506046c45f1",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.2436424344778061,
+          "internal_score": 0.00013579752703662962,
+          "fusion_score": -0.6452326908881109
+        },
+        {
+          "chunk_id": "tatqa-table:3e3a552670fa42b5939c0c01",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.18952108919620514,
+          "internal_score": 8.793493907433003e-05,
+          "fusion_score": -1.0826067504333305
+        },
+        {
+          "chunk_id": "tatqa-table:13f5fc8921e134235799671d",
+          "rank": 5,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.14223189651966095,
+          "internal_score": 4.391773836687207e-05,
+          "fusion_score": -1.4734685256328541
+        },
+        {
+          "chunk_id": "tatqa-text:bfae9fa429ad91f333b43a50",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.13386748731136322,
+          "internal_score": 0.0001463819353375584,
+          "fusion_score": -1.105915078331146
+        },
+        {
+          "chunk_id": "tatqa-table:2421d5aeb40068fdc2efa00d",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.11757213622331619,
+          "internal_score": 6.210534775163978e-05,
+          "fusion_score": -1.514334355647979
+        },
+        {
+          "chunk_id": "tatqa-text:c6bdbfd658280c5f7fcc42ff",
+          "rank": 8,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.11124119907617569,
+          "internal_score": 0.00016805397171992809,
+          "fusion_score": -1.1236691757623212
+        },
+        {
+          "chunk_id": "tatqa-text:36a1e40681a9c5b482a8233d",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0792103186249733,
+          "internal_score": 0.00020858176867477596,
+          "fusion_score": -1.109796626182971
+        },
+        {
+          "chunk_id": "tatqa-text:2c1a2f2ed64fc7e6c3822a34",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.06754669547080994,
+          "internal_score": 0.0001725992769934237,
+          "fusion_score": -1.305721589025607
+        },
+        {
+          "chunk_id": "tatqa-text:34140c20e6e9addd0e674820",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.04401864856481552,
+          "internal_score": 0.00017756693705450743,
+          "fusion_score": -1.3937686957791149
+        },
+        {
+          "chunk_id": "tatqa-table:a12ee6f403fad3ace7853320",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.04023794084787369,
+          "internal_score": 0.00015145406359806657,
+          "fusion_score": -1.5145090906114484
+        },
+        {
+          "chunk_id": "tatqa-table:b43a896638f79974cd65ac3a",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.034100424498319626,
+          "internal_score": 0.000125005841255188,
+          "fusion_score": -1.6473684486394367
+        },
+        {
+          "chunk_id": "tatqa-text:ca49471fd42946397f2b7c48",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.020332353189587593,
+          "internal_score": 0.0001977153733605519,
+          "fusion_score": -1.422410871884717
+        },
+        {
+          "chunk_id": "tatqa-table:96cc3e43ab4ee600e29757d6",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.014957086183130741,
+          "internal_score": 0.0001247183099621907,
+          "fusion_score": -1.7361553715425915
+        },
+        {
+          "chunk_id": "tatqa-text:cb8cf9e33b4d05676e2aea2a",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.013636835850775242,
+          "internal_score": 0.0003572904388420284,
+          "fusion_score": -0.8210061784070786
+        },
+        {
+          "chunk_id": "tatqa-table:74b976fcfe75f6de422e1a65",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.013222821988165379,
+          "internal_score": 0.00018076780543196946,
+          "fusion_score": -1.5220895109220316
+        },
+        {
+          "chunk_id": "tatqa-table:9a98de0df77461d1ab1cff65",
+          "rank": 18,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.006903838831931353,
+          "internal_score": 0.00015985980280674994,
+          "fusion_score": -1.633835484024442
+        },
+        {
+          "chunk_id": "tatqa-table:d7cf7ab3c3f0c728b8d777e5",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.006903838831931353,
+          "internal_score": 9.67296800808981e-05,
+          "fusion_score": -1.8838873244838
+        },
+        {
+          "chunk_id": "tatqa-text:25dd653a91a535cc154b4af2",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0064882696606218815,
+          "internal_score": 0.0002167349011870101,
+          "fusion_score": -1.4104618327175666
+        },
+        {
+          "chunk_id": "tatqa-text:d96b49a87ee7979e32fc8756",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005730246659368277,
+          "internal_score": 0.0007265875465236604,
+          "fusion_score": 0.605540770133538
+        },
+        {
+          "chunk_id": "tatqa-text:4f2096cb444822fdd58adaef",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0027149852830916643,
+          "internal_score": 0.00041370000690221786,
+          "fusion_score": -0.6475796000756731
+        },
+        {
+          "chunk_id": "tatqa-table:4174661746e50f3689ee33d9",
+          "rank": 23,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.0018102108733728528,
+          "internal_score": 0.0002750388812273741,
+          "fusion_score": -1.2009443981284242
+        },
+        {
+          "chunk_id": "tatqa-text:7c07e4b9b89d5d753a2e3e6f",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0017007222631946206,
+          "internal_score": 0.0004395910946186632,
+          "fusion_score": -0.5496715158353982
+        },
+        {
+          "chunk_id": "tatqa-text:906c368fb7c7603eb6dc9f0c",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0017007222631946206,
+          "internal_score": 0.0006279638037085533,
+          "fusion_score": 0.19645316389619294
+        },
+        {
+          "chunk_id": "tatqa-text:e4759d3c41c656b3a39b384e",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001597845577634871,
+          "internal_score": 0.0004933088785037398,
+          "fusion_score": -0.33737199147083025
+        },
+        {
+          "chunk_id": "tatqa-text:22af10f27dabb92e114454f9",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.001098731067031622,
+          "internal_score": 0.0003953225677832961,
+          "fusion_score": -0.7277707646890799
+        },
+        {
+          "chunk_id": "tatqa-text:177c95599fe02553a706796f",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0010322310263291001,
+          "internal_score": 0.0007100312504917383,
+          "fusion_score": 0.5184530759786399
+        },
+        {
+          "chunk_id": "tatqa-text:700358382391abf9a729a161",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0006462032906711102,
+          "internal_score": 0.0026495244819670916,
+          "fusion_score": 8.198816314125052
+        },
+        {
+          "chunk_id": "tatqa-text:f657a26036e5bc39c03fb65e",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.000552778656128794,
+          "internal_score": 0.0036861130502074957,
+          "fusion_score": 12.304207915471435
+        }
+      ]
+    },
+    {
+      "qid": "b51d337b-6e4a-42cf-920e-dff6fe9a9f19",
+      "stratum": "easy",
+      "question": "What is the final dividend per share proposed for 2019?",
+      "gold_answers": [
+        "3.45 cents per Ordinary share"
+      ],
+      "draft": "2.70 pence per Ordinary Share",
+      "draft_em": 0.0,
+      "draft_f1": 0.6,
+      "draft_numerical_accuracy": 0.0,
+      "cti_js_mean": 0.3951555906258161,
+      "selected_answer_tokens": 2,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-text:8f36a2d31a59879d5a3f4e3d",
+          "rank": 1,
+          "modality": "text",
+          "is_support": true,
+          "bge_score": 0.998793363571167,
+          "internal_score": 0.0015317724319174886,
+          "fusion_score": 16.398468257912395
+        },
+        {
+          "chunk_id": "tatqa-text:02e02be04ca711ace2b010b9",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.9879462122917175,
+          "internal_score": 0.00038489632424898446,
+          "fusion_score": 4.3878212495027356
+        },
+        {
+          "chunk_id": "tatqa-table:3a440024fb7b200edfa0b4bb",
+          "rank": 3,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9343951344490051,
+          "internal_score": 8.612842066213489e-05,
+          "fusion_score": 1.1000661565562972
+        },
+        {
+          "chunk_id": "tatqa-text:f56a6f1cb56339003919b315",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8255897164344788,
+          "internal_score": 9.719291119836271e-05,
+          "fusion_score": 0.8747469619339063
+        },
+        {
+          "chunk_id": "tatqa-text:d3dfc8ffad86599304b236fa",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.6379335522651672,
+          "internal_score": 0.00020284102356527,
+          "fusion_score": 1.390128645331332
+        },
+        {
+          "chunk_id": "tatqa-table:7dd55eb519d563e2ef5cbfcf",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.2538610100746155,
+          "internal_score": 4.3550309783313423e-05,
+          "fusion_score": -1.4765389202666819
+        },
+        {
+          "chunk_id": "tatqa-table:bc32e8210926565841661fe3",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.15102779865264893,
+          "internal_score": 4.109200745006092e-05,
+          "fusion_score": -1.8243650847204165
+        },
+        {
+          "chunk_id": "tatqa-table:b72a15a317b4b54869908d79",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.12852513790130615,
+          "internal_score": 2.4381673938478343e-05,
+          "fusion_score": -2.069364761268322
+        },
+        {
+          "chunk_id": "tatqa-table:0ece91bec2e22d98b7cce266",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.10230471193790436,
+          "internal_score": 7.507235568482429e-05,
+          "fusion_score": -1.6221521188219996
+        },
+        {
+          "chunk_id": "tatqa-text:c02ee129a8e43511198e3bf7",
+          "rank": 10,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.07696083933115005,
+          "internal_score": 0.00010459736949997023,
+          "fusion_score": -1.3932235028450182
+        },
+        {
+          "chunk_id": "tatqa-text:13d0ec283e27aa638d4dfc2f",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.07159119844436646,
+          "internal_score": 0.00012483581667765975,
+          "fusion_score": -1.1986981941213077
+        },
+        {
+          "chunk_id": "tatqa-table:0874ad0c0f85b80bba665b4e",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.06187598779797554,
+          "internal_score": 5.57654129806906e-05,
+          "fusion_score": -1.9504263415037295
+        },
+        {
+          "chunk_id": "tatqa-text:f2619d65a284bb0380e4f06a",
+          "rank": 13,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.05921025574207306,
+          "internal_score": 7.36627698643133e-05,
+          "fusion_score": -1.7718779399224782
+        },
+        {
+          "chunk_id": "tatqa-text:9a757003b157fdbed89b109f",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.034100424498319626,
+          "internal_score": 0.00014652499521616846,
+          "fusion_score": -1.0896517434442259
+        },
+        {
+          "chunk_id": "tatqa-text:bf8716fbd775013dca6fb451",
+          "rank": 15,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.034100424498319626,
+          "internal_score": 8.361233631148934e-05,
+          "fusion_score": -1.7466397543562968
+        },
+        {
+          "chunk_id": "tatqa-table:79c03bf1e166f9042cd46750",
+          "rank": 16,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.02931223064661026,
+          "internal_score": 6.439907156163827e-05,
+          "fusion_score": -1.962281551760217
+        },
+        {
+          "chunk_id": "tatqa-table:b1af3c1bcdb60949201a0f40",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.028870904818177223,
+          "internal_score": 0.0001194020442198962,
+          "fusion_score": -1.3892758565671102
+        },
+        {
+          "chunk_id": "tatqa-text:00f5863efd77baff6c3febaf",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.027585282921791077,
+          "internal_score": 0.00011208969226572663,
+          "fusion_score": -1.4696652936693209
+        },
+        {
+          "chunk_id": "tatqa-table:63bc86b9de816b3515633544",
+          "rank": 19,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.025565214455127716,
+          "internal_score": 7.373962580459192e-05,
+          "fusion_score": -1.8764780635224316
+        },
+        {
+          "chunk_id": "tatqa-text:3142c8aceb43a452c9884e1c",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0120537793263793,
+          "internal_score": 0.0001319678995059803,
+          "fusion_score": -1.3107368624729656
+        },
+        {
+          "chunk_id": "tatqa-text:ac74ecf71db0000367cc8877",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.008061991073191166,
+          "internal_score": 0.00011108609032817185,
+          "fusion_score": -1.5413080652382232
+        },
+        {
+          "chunk_id": "tatqa-text:eaf798b95348eda636eab48b",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.007345826830714941,
+          "internal_score": 0.00018281601660419255,
+          "fusion_score": -0.7944861659717828
+        },
+        {
+          "chunk_id": "tatqa-text:70162f001e32b73faead9155",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005384937860071659,
+          "internal_score": 0.0003366052405908704,
+          "fusion_score": 0.8053699325237473
+        },
+        {
+          "chunk_id": "tatqa-text:5ef8d4d01c05006c822648cc",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.004755199886858463,
+          "internal_score": 0.00010841433686437085,
+          "fusion_score": -1.579568278918241
+        },
+        {
+          "chunk_id": "tatqa-table:7f4c9bed40086a5202cdc3a0",
+          "rank": 25,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.004609572235494852,
+          "internal_score": 0.000146598627907224,
+          "fusion_score": -1.1812713411451412
+        },
+        {
+          "chunk_id": "tatqa-text:c69668a3a8d26a60436c9b12",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0038244836032390594,
+          "internal_score": 0.0001775837008608505,
+          "fusion_score": -0.8601581155359872
+        },
+        {
+          "chunk_id": "tatqa-text:c889f3771a330c9ae4b3f4ec",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.003172682598233223,
+          "internal_score": 0.0001241121644852683,
+          "fusion_score": -1.4205957705381307
+        },
+        {
+          "chunk_id": "tatqa-text:21f2aa5241fb906f9677dd58",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0025509123224765062,
+          "internal_score": 0.00021881633438169956,
+          "fusion_score": -0.43356137400408534
+        },
+        {
+          "chunk_id": "tatqa-text:4f234a1728f45281431d4154",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0018675660248845816,
+          "internal_score": 0.0004120077646803111,
+          "fusion_score": 1.5817686676765508
+        },
+        {
+          "chunk_id": "tatqa-text:a677abeab702121bb0b787ae",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0002959570847451687,
+          "internal_score": 0.0007804040214978158,
+          "fusion_score": 5.423955229177149
+        }
+      ]
+    },
+    {
+      "qid": "60f56c75-1fb7-4295-bdfd-40e4e13a02f1",
+      "stratum": "easy",
+      "question": "How much is the 2019 United Kingdom corporation current year tax expense?",
+      "gold_answers": [
+        "21",
+        "21 million"
+      ],
+      "draft": "21",
+      "draft_em": 1.0,
+      "draft_f1": 1.0,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.6656236946582794,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:43f03159f75b1d6e9b51715e",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.9777138829231262,
+          "internal_score": 0.0003854621318168938,
+          "fusion_score": 3.935931208059802
+        },
+        {
+          "chunk_id": "tatqa-text:062ff31e4f29dc747fdefe8c",
+          "rank": 2,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.2759094536304474,
+          "internal_score": 0.0006405223975889385,
+          "fusion_score": 1.2590110675909587
+        },
+        {
+          "chunk_id": "tatqa-text:358e6268d703b21435650fc7",
+          "rank": 3,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.2146914303302765,
+          "internal_score": 0.0001967492571566254,
+          "fusion_score": -1.2860511370040504
+        },
+        {
+          "chunk_id": "tatqa-text:59047a2e27e6561a84919c6b",
+          "rank": 4,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.19314736127853394,
+          "internal_score": 0.0022543331142514944,
+          "fusion_score": 8.79893590701375
+        },
+        {
+          "chunk_id": "tatqa-text:cac8c8ca7bc48d9b40aaba97",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.17781086266040802,
+          "internal_score": 0.00014502443082164973,
+          "fusion_score": -1.7497757511598617
+        },
+        {
+          "chunk_id": "tatqa-text:efa61978e4cd1144199890b6",
+          "rank": 6,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.13753245770931244,
+          "internal_score": 0.00021132553229108453,
+          "fusion_score": -1.6471554765817606
+        },
+        {
+          "chunk_id": "tatqa-text:e69d38a08356bdf7eff99277",
+          "rank": 7,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.13568955659866333,
+          "internal_score": 0.0004679634002968669,
+          "fusion_score": -0.3845352751236144
+        },
+        {
+          "chunk_id": "tatqa-table:59894a29d0ef6e30070cf9c1",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.13386748731136322,
+          "internal_score": 0.0001023050572257489,
+          "fusion_score": -2.20850374012539
+        },
+        {
+          "chunk_id": "tatqa-text:a24afefcfcb344352d5d6928",
+          "rank": 9,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.12592275440692902,
+          "internal_score": 0.0002823759859893471,
+          "fusion_score": -1.3599441495292874
+        },
+        {
+          "chunk_id": "tatqa-table:36b1ec85132b66e46528e648",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.10970578342676163,
+          "internal_score": 0.00010677015234250575,
+          "fusion_score": -2.322073401567089
+        },
+        {
+          "chunk_id": "tatqa-table:d1831cbf313b9c24a61489d9",
+          "rank": 11,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.08269733935594559,
+          "internal_score": 0.0001468377304263413,
+          "fusion_score": -2.2750383505733316
+        },
+        {
+          "chunk_id": "tatqa-table:7c580bc85d2a65d08bfc824d",
+          "rank": 12,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.06853749603033066,
+          "internal_score": 8.55106845847331e-05,
+          "fusion_score": -2.6587684481389666
+        },
+        {
+          "chunk_id": "tatqa-table:24b946f2a972429f95dea954",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.06465348601341248,
+          "internal_score": 0.00015248979616444558,
+          "fusion_score": -2.3483561760685876
+        },
+        {
+          "chunk_id": "tatqa-table:9de1acc6efc90d787a0a47c7",
+          "rank": 14,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.06097517907619476,
+          "internal_score": 0.00018726984853856266,
+          "fusion_score": -2.1965018208544493
+        },
+        {
+          "chunk_id": "tatqa-table:330f6555bf2827f7184876b5",
+          "rank": 15,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.04023794084787369,
+          "internal_score": 0.00020649877842515707,
+          "fusion_score": -2.217604722139242
+        },
+        {
+          "chunk_id": "tatqa-table:00945cda5fdeb1c51e89bf3c",
+          "rank": 16,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.037326887249946594,
+          "internal_score": 0.00013990714796818793,
+          "fusion_score": -2.56426319087168
+        },
+        {
+          "chunk_id": "tatqa-table:803879bd79a88e3f55d90e00",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.03358950838446617,
+          "internal_score": 0.0006473371759057045,
+          "fusion_score": -0.06830830243344982
+        },
+        {
+          "chunk_id": "tatqa-text:a53dca55713746688065fcf0",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.027169233188033104,
+          "internal_score": 0.00038551969919353724,
+          "fusion_score": -1.403034962583832
+        },
+        {
+          "chunk_id": "tatqa-text:21f2aa5241fb906f9677dd58",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02262919954955578,
+          "internal_score": 0.00033742820960469544,
+          "fusion_score": -1.6670793235907921
+        },
+        {
+          "chunk_id": "tatqa-text:fca59e894486bd2f6298e239",
+          "rank": 20,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02262919954955578,
+          "internal_score": 0.0007060784846544266,
+          "fusion_score": 0.16149503951677474
+        },
+        {
+          "chunk_id": "tatqa-text:ac74ecf71db0000367cc8877",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.02161533385515213,
+          "internal_score": 0.0002820535155478865,
+          "fusion_score": -1.947443099231304
+        },
+        {
+          "chunk_id": "tatqa-table:ecfab8bd7a8d76308b1c930c",
+          "rank": 22,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.01590639166533947,
+          "internal_score": 0.0004826176736969501,
+          "fusion_score": -0.984674719027826
+        },
+        {
+          "chunk_id": "tatqa-text:d781109d45b10a44c9b17762",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.014503579586744308,
+          "internal_score": 0.0007624611025676131,
+          "fusion_score": 0.39552140734814684
+        },
+        {
+          "chunk_id": "tatqa-text:e4759d3c41c656b3a39b384e",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.011331753805279732,
+          "internal_score": 0.000830661621876061,
+          "fusion_score": 0.7159924609910194
+        },
+        {
+          "chunk_id": "tatqa-text:cddd3e678b7f2b8f8feda63e",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00712142838165164,
+          "internal_score": 0.0007596385548822582,
+          "fusion_score": 0.3400551697959189
+        },
+        {
+          "chunk_id": "tatqa-text:3e3779860b9240b30adcf0ca",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.005384937860071659,
+          "internal_score": 0.0005724827642552555,
+          "fusion_score": -0.5980265256975561
+        },
+        {
+          "chunk_id": "tatqa-text:ab55c68668a49e5feb762a6e",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.004198795650154352,
+          "internal_score": 0.0006109298556111753,
+          "fusion_score": -0.4139843703019568
+        },
+        {
+          "chunk_id": "tatqa-text:564c696c357a4f4fe487bf69",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.00407013762742281,
+          "internal_score": 0.0017577053513377905,
+          "fusion_score": 5.273514048227037
+        },
+        {
+          "chunk_id": "tatqa-text:6d91783f873c8404cada0f64",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0015011823270469904,
+          "internal_score": 0.001125337672419846,
+          "fusion_score": 2.1224220663942672
+        },
+        {
+          "chunk_id": "tatqa-text:c09da91e3017baecf148c149",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.0012065897462889552,
+          "internal_score": 0.002572355093434453,
+          "fusion_score": 9.298244567666359
+        }
+      ]
+    },
+    {
+      "qid": "8bbd76ee-cac2-4d04-b5ec-d0b874b3154e",
+      "stratum": "easy",
+      "question": "What were the deferred tax assets accrued expenses for 2019?",
+      "gold_answers": [
+        "2,330",
+        "2,330 thousand"
+      ],
+      "draft": "2,330",
+      "draft_em": 1.0,
+      "draft_f1": 1.0,
+      "draft_numerical_accuracy": 1.0,
+      "cti_js_mean": 0.5787818789482116,
+      "selected_answer_tokens": 1,
+      "candidates": [
+        {
+          "chunk_id": "tatqa-table:cffc0d16f97c8328ab8d951a",
+          "rank": 1,
+          "modality": "table",
+          "is_support": true,
+          "bge_score": 0.9946150183677673,
+          "internal_score": 0.00030270020943135023,
+          "fusion_score": 0.2208280641793824
+        },
+        {
+          "chunk_id": "tatqa-table:2f2cd355914fc30a628aa8ce",
+          "rank": 2,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9911527037620544,
+          "internal_score": 0.00019120053912047297,
+          "fusion_score": -0.8960333701931276
+        },
+        {
+          "chunk_id": "tatqa-table:12a75a6f667c5fd35d671744",
+          "rank": 3,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9759464263916016,
+          "internal_score": 0.00021837619715370238,
+          "fusion_score": -0.6670812097595054
+        },
+        {
+          "chunk_id": "tatqa-table:2ce4f120c98a65c1abe6d257",
+          "rank": 4,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9683812260627747,
+          "internal_score": 0.00016892538405954838,
+          "fusion_score": -1.1786676633895303
+        },
+        {
+          "chunk_id": "tatqa-text:b323decd2aff5aec43f3acc3",
+          "rank": 5,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.9416541457176208,
+          "internal_score": 0.00011719263420673087,
+          "fusion_score": -1.764566438331821
+        },
+        {
+          "chunk_id": "tatqa-table:dde596b84e92e93d13e1c191",
+          "rank": 6,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.937210738658905,
+          "internal_score": 0.0001912897132569924,
+          "fusion_score": -1.0405338816302863
+        },
+        {
+          "chunk_id": "tatqa-table:9de1acc6efc90d787a0a47c7",
+          "rank": 7,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9304582476615906,
+          "internal_score": 0.00016258395044133067,
+          "fusion_score": -1.34386866486629
+        },
+        {
+          "chunk_id": "tatqa-table:b110091c9f7b67e182273443",
+          "rank": 8,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9196425676345825,
+          "internal_score": 0.00022375016123987734,
+          "fusion_score": -0.7654535975866129
+        },
+        {
+          "chunk_id": "tatqa-table:ad74f136502577dd55721dbf",
+          "rank": 9,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.9136765599250793,
+          "internal_score": 0.0003672390594147146,
+          "fusion_score": 0.6437462832088283
+        },
+        {
+          "chunk_id": "tatqa-table:264038a602961d997f17808c",
+          "rank": 10,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.8887587189674377,
+          "internal_score": 0.00022603651450481266,
+          "fusion_score": -0.8259824144940113
+        },
+        {
+          "chunk_id": "tatqa-text:85e5928466004196350cc3b9",
+          "rank": 11,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8872045874595642,
+          "internal_score": 0.000250706885708496,
+          "fusion_score": -0.5851196022894757
+        },
+        {
+          "chunk_id": "tatqa-text:8e574d05b84309678e33cd7f",
+          "rank": 12,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8824278712272644,
+          "internal_score": 0.0002492094354238361,
+          "fusion_score": -0.6128681959310042
+        },
+        {
+          "chunk_id": "tatqa-table:e9e6c44fd1972b668d7442a4",
+          "rank": 13,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.8807970285415649,
+          "internal_score": 0.0002343237429158762,
+          "fusion_score": -0.765123745698352
+        },
+        {
+          "chunk_id": "tatqa-text:21aa869bbca697be61d71ada",
+          "rank": 14,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8791467547416687,
+          "internal_score": 0.00018638736219145358,
+          "fusion_score": -1.2457251776992977
+        },
+        {
+          "chunk_id": "tatqa-text:a1db6d85aa2ffedfdee0e89a",
+          "rank": 15,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.8438951373100281,
+          "internal_score": 0.00028545194072648883,
+          "fusion_score": -0.3567250462703888
+        },
+        {
+          "chunk_id": "tatqa-text:7c5fd7f1ebbd60b79c642c10",
+          "rank": 16,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.7371581792831421,
+          "internal_score": 0.0002937802637461573,
+          "fusion_score": -0.5616807575468279
+        },
+        {
+          "chunk_id": "tatqa-table:516bcb8078248148d9c89770",
+          "rank": 17,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.7248703241348267,
+          "internal_score": 0.00022388657089322805,
+          "fusion_score": -1.2890556349791256
+        },
+        {
+          "chunk_id": "tatqa-text:025b948ca0015b48d0486eca",
+          "rank": 18,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.5765419602394104,
+          "internal_score": 0.0003099353634752333,
+          "fusion_score": -0.8341101317366806
+        },
+        {
+          "chunk_id": "tatqa-text:52728e9a67fbc79c95823590",
+          "rank": 19,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.5421361327171326,
+          "internal_score": 0.00016274230438284576,
+          "fusion_score": -2.388915147532429
+        },
+        {
+          "chunk_id": "tatqa-table:1a9cdc4ca53800acb401ab31",
+          "rank": 20,
+          "modality": "table",
+          "is_support": false,
+          "bge_score": 0.47402241826057434,
+          "internal_score": 0.0009124393691308796,
+          "fusion_score": 4.8742665634131015
+        },
+        {
+          "chunk_id": "tatqa-text:4b8378557a93d840a3b1d37c",
+          "rank": 21,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.4530198276042938,
+          "internal_score": 0.0006941523170098662,
+          "fusion_score": 2.649407585797953
+        },
+        {
+          "chunk_id": "tatqa-text:ac7ed3ff8ba9568295466eaa",
+          "rank": 22,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.39793843030929565,
+          "internal_score": 0.00048104365123435855,
+          "fusion_score": 0.3841352824769929
+        },
+        {
+          "chunk_id": "tatqa-text:cac8c8ca7bc48d9b40aaba97",
+          "rank": 23,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.11436853557825089,
+          "internal_score": 0.0007287068292498589,
+          "fusion_score": 2.0798937582990895
+        },
+        {
+          "chunk_id": "tatqa-text:e61a70bf219688e10cb67c21",
+          "rank": 24,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.06954174488782883,
+          "internal_score": 0.0004453162255231291,
+          "fusion_score": -0.8558526375629159
+        },
+        {
+          "chunk_id": "tatqa-text:177c95599fe02553a706796f",
+          "rank": 25,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.06754669547080994,
+          "internal_score": 0.0004228256002534181,
+          "fusion_score": -1.0846298430358998
+        },
+        {
+          "chunk_id": "tatqa-text:23e8d914fcc2aacf41382975",
+          "rank": 26,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.05184546485543251,
+          "internal_score": 0.00034725063596852124,
+          "fusion_score": -1.8776368153235488
+        },
+        {
+          "chunk_id": "tatqa-text:764c2cb305f84936706384bd",
+          "rank": 27,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.044680867344141006,
+          "internal_score": 0.0003612451546359807,
+          "fusion_score": -1.7579391026045008
+        },
+        {
+          "chunk_id": "tatqa-text:4ae1408acdab0436f061bb12",
+          "rank": 28,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01912403479218483,
+          "internal_score": 0.0005187861970625818,
+          "fusion_score": -0.26196071717304137
+        },
+        {
+          "chunk_id": "tatqa-text:4568c8b78b53b9a95db3f7cb",
+          "rank": 29,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.018264278769493103,
+          "internal_score": 0.0006572531419806182,
+          "fusion_score": 1.111118495291595
+        },
+        {
+          "chunk_id": "tatqa-text:56f11ccec03778bef3cc22ee",
+          "rank": 30,
+          "modality": "text",
+          "is_support": false,
+          "bge_score": 0.01640303246676922,
+          "internal_score": 0.001652924227528274,
+          "fusion_score": 10.996133762967734
+        }
+      ]
+    }
+  ]
+}
