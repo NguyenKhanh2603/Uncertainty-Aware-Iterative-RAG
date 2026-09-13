@@ -1,6 +1,6 @@
 {
   "status": "complete",
-  "note": "original_cosine_methods contains the proposal's false-bank conformal p-values + BY + K=10 and the later support-bank coverage + K=10 baseline. The conformal field is an uncapped query-worst-support ablation and must not be labelled as the original cosine-conformal proposal.",
+  "note": "original_cosine_methods contains the proposal's false-bank conformal p-values + BY + K=10 and the later support-bank coverage + K=10 baseline. The explicitly named uncapped query-worst-support field is an ablation and must not be labelled as the original cosine-conformal proposal.",
   "datasets": {
     "tatqa": {
       "test_ranking": {
@@ -57,7 +57,7 @@
           }
         }
       },
-      "conformal": {
+      "uncapped_query_worst_support_ablation": {
         "0.2": {
           "cosine_raw": {
             "threshold": 0.5103297233581543,
@@ -444,7 +444,7 @@
           }
         }
       },
-      "conformal": {
+      "uncapped_query_worst_support_ablation": {
         "0.2": {
           "cosine_raw": {
             "threshold": 0.4638200104236603,
@@ -825,7 +825,7 @@
           }
         }
       },
-      "conformal": {
+      "uncapped_query_worst_support_ablation": {
         "0.2": {
           "cosine_raw": {
             "threshold": 0.5093180537223816,
