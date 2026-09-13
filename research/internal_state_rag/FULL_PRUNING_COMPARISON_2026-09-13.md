@@ -72,4 +72,24 @@ Ba hướng tiếp theo đã được kiểm tra mà không chạy lại feature
 
 So với baseline 96-query probe, probe 452-query ở α=0.10 giảm 0.155 chunk/query, paired-bootstrap 95% CI `[-0.241, -0.072]`, và tăng precision 1.53 điểm phần trăm, CI `[+0.65, +2.39]`. Recall tăng 0.35 điểm, CI `[-1.50, +2.18]`, và all-support coverage tăng 0.52 điểm, CI `[-1.43, +2.47]`; hai thay đổi coverage này chưa có ý nghĩa thống kê. Vì vậy kết luận chắc nhất là thêm probe-training data cải thiện efficiency/precision ở mức recall không phân biệt được với baseline.
 
-Không có bằng chứng rằng threshold prediction hay cộng attention đơn giản sẽ tạo bước nhảy lớn. Cơ hội còn lại nằm ở việc học score tốt hơn: train relevance probe trên nhiều query tách rời hơn, dùng hard-negative mining, hoặc train một causal-value probe với label là thay đổi answer log-likelihood khi mask từng chunk. Với 768 retrievable test queries chỉ có trung bình 1.125 support chunks/query, trong khi hệ thống đang giữ 3.23 chunks; do đó vẫn còn headroom nếu score phân biệt support tốt hơn.
+Không có bằng chứng rằng threshold prediction hay cộng attention đơn giản sẽ tạo bước nhảy lớn. Với 768 retrievable test queries chỉ có trung bình 1.125 support chunks/query, trong khi hệ thống đang giữ 3.23 chunks; do đó vẫn còn headroom nếu score phân biệt support tốt hơn.
+
+## Follow-up: causal-value, hard negatives, và calibration size
+
+Các hướng còn lại ở trên đã được chạy. Leave-one-out causal teacher trên 128
+queries cho support mean log-probability drop 2.3665, so với 0.0015 cho
+non-support. Tuy nhiên raw causal-value xếp support kém BGE (AP 68.66% so với
+79.24%). Late-4-layer RankNet dự đoán causal order với holdout Spearman 0.1242,
+nhưng support AP trên test chỉ 52.04%; tuning chọn causal fusion weight bằng 0.0.
+Causal usage vì vậy chưa phải một relevance score tốt.
+
+Hard-negative mining cũng không cải thiện: 5-fold OOF chọn lại toàn bộ negatives.
+Learning curve tăng test fusion AP từ 79.39% ở 256 probe-training queries lên
+79.83% ở 452, cho thấy thêm cùng loại labels chỉ còn gain nhỏ.
+
+Calibration-size sweep 200 repeats cho thấy ở α=0.10, 20 retrievable queries làm
+số chunks giữ lại dao động 95% từ 1.70 đến 12.92; 128 queries còn 2.53–4.48;
+256 còn 2.75–3.82. Full bank 363 giữ 3.23 chunks. Vì vậy 256 retrievable queries
+là mức pilot thực dụng cho α=0.10, còn khoảng 500+ phù hợp hơn nếu cần threshold
+ổn định. Chi tiết và raw-log provenance nằm trong
+`CAUSAL_PROBE_AND_CALIBRATION_STUDY_2026-09-13.md`.

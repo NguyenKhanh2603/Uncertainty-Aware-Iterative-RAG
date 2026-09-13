@@ -30,6 +30,14 @@ another 452 for conformal calibration. At `alpha=0.10`, retuned fusion keeps
 96-query probe, paired bootstrap confirms fewer chunks and higher precision;
 the small recall increase is not statistically resolved.
 
+The causal follow-up measures 3,840 leave-one-out answer-likelihood effects on
+128 queries. A late-four-layer RankNet predicts causal order weakly on a 32-query
+holdout (Spearman 0.124), but its support ranking is poor and fusion tuning sets
+its weight to zero. Hard-negative mining also loses to training on every
+negative. A 200-repeat calibration-size sweep shows that 20--64 calibration
+queries give highly unstable thresholds; at alpha 0.10, 256 retrievable queries
+are usable for a pilot and 500+ are preferable for stable reporting.
+
 Top-30 contains support for 768 of 1,000 test queries, setting an unconditional
 end-to-end query coverage ceiling of 76.8%. The observed conditional coverage
 is slightly below its nominal target, so the report does not claim an absolute
@@ -41,6 +49,9 @@ is slightly below its nominal target, so the report does not claim an absolute
   Vietnamese analysis for mentor discussion.
 - `research/internal_state_rag/FULL_PRUNING_COMPARISON_2026-09-13.md`: full
   cosine-BY, attention-only, BGE, and query-level internal-fusion table.
+- `research/internal_state_rag/CAUSAL_PROBE_AND_CALIBRATION_STUDY_2026-09-13.md`:
+  causal teacher/probe analysis, hard-negative result, learning curve, and the
+  logged calibration-size recommendation.
 - `research/internal_state_rag/RESULTS_INTERNAL_CHUNK_SIGNALS.md`: full research
   report, including prior attention, LM-head, hidden-state, causal, and
   generation experiments.
@@ -50,6 +61,11 @@ is slightly below its nominal target, so the report does not claim an absolute
   matched comparison and attention-only probe evaluation.
 - `research/internal_state_rag/analyze_scaled_hidden_probe.py`: larger-probe
   split, retuned fusion, and paired-bootstrap analysis.
+- `research/internal_state_rag/analyze_causal_ranknet_probe.py`: multilayer
+  causal-value distillation and held-out fusion selection.
+- `research/internal_state_rag/analyze_hard_negative_calibration_curve.py`:
+  hard-negative OOF selection, probe learning curve, and 200-repeat calibration
+  sweep.
 - `research/internal_state_rag/results/pairwise_conformal_clean_n96_cal904_test1000.json`:
   complete machine-readable result at alpha 0.20, 0.10, and 0.05.
 - `research/internal_state_rag/results/pairwise_relevance_cal_fresh_n904/` and
@@ -72,6 +88,6 @@ with the repository's uv environment.
 ## Validation and archive scope
 
 `PYTHONPATH=. .venv/bin/pytest -q research/internal_state_rag/tests` passes all
-19 tests. The ZIP is built from Git `HEAD`, so it includes tracked code, reports,
+21 tests. The ZIP is built from Git `HEAD`, so it includes tracked code, reports,
 tests, and result artifacts while excluding `.git`, `.venv`, model/cache data,
 and all untracked user files.
