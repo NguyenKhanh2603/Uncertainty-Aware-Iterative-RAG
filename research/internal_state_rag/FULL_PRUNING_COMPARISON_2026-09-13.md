@@ -25,3 +25,36 @@ BY controls candidate-level false discovery and can return an empty set. Query-l
 | Cosine + BY (pooled) | BY-FDR | 0.05 | 1000 | 0.09 | 54.7% | 5.4% | — | — | 94.5% |
 | Cosine + BY (modality) | BY-FDR | 0.05 | 1000 | 0.06 | 61.0% | 4.2% | — | — | 96.0% |
 | BGE + LM-head + hidden probe (matched) | query conformal | 0.05 | 150 | 6.12 | 17.6% | 94.2% | 95.0% | 93.3% | 0.0% |
+
+## Cách đọc bảng
+
+- Hai dòng cosine dùng candidate-wise Benjamini–Yekutieli (BY). Nó kiểm soát false discovery và được phép trả context rỗng. Kết quả lấy trên toàn bộ 1.000 test queries. Alpha sweep gốc tự đánh dấu là diagnostic vì tái sử dụng p-value từ development smoke, nên chưa phải kết quả paper-ready.
+- Các dòng còn lại dùng split conformal ở query level, với mục tiêu giữ **tất cả** support chunks đang có trong Top-30. Nếu threshold không giữ chunk nào thì dùng deterministic Top-1 fallback.
+- So sánh matched dùng đúng 136 calibration queries chung và đúng cùng 150 locked test queries. Cả 150 test queries này đều có ít nhất một support trong Top-30, nên đây là kết quả conditional on retrievability.
+- Internal fusion gồm `z(BGE) + 0.20 z(Yes-vs-No LM-head) + 0.75 z(layer-30 hidden-state probe)`. Hidden probe được train trên 96 queries tách rời. Attention-only trained probe được train trên 120 queries khác và chỉ nhận attention mass/fraction, không nhận BGE.
+
+## Ranking trên cùng 150 test queries
+
+| Signal | Mean query AP | MRR | Top-1 support |
+|---|---:|---:|---:|
+| BGE | 71.8% | 73.6% | 61.3% |
+| Attention raw | 72.2% | 74.2% | 66.0% |
+| Attention position-controlled | 73.2% | 75.4% | 67.3% |
+| Attention-only trained probe | 76.1% | 78.6% | 70.7% |
+| BGE + LM-head + hidden probe | **77.8%** | **79.8%** | 70.0% |
+
+## Kết luận ở α = 0.10
+
+Candidate-wise BY chính là nguyên nhân của hiện tượng “high precision, almost everything is dropped”: modality-aware BY đạt 52.2% precision nhưng recall chỉ 6.9%, giữ 0.12 chunk/query và để rỗng 93.3% queries. Chỉ tăng alpha từ 0.05 lên 0.20 vẫn không sửa được: recall mới 9.4% và 90.5% queries còn rỗng.
+
+Attention có tín hiệu relevance thật. Attention raw và position-controlled đều nâng recall lên khoảng 87% với query-level conformal. Tuy nhiên, để đạt mức đó, chúng phải giữ lần lượt 8.86 và 7.06 chunks/query, khiến precision chỉ còn 11.4% và 14.1%. Probe được train từ attention giúp ranking, nhưng tail calibration xấu: ở α=0.10 nó phải giữ 17.17 chunks để đạt 95.9% micro recall.
+
+Internal fusion cho trade-off tốt nhất trong matched comparison: giữ 2.70 chunks/query, precision 36.0%, micro recall 84.9%, và all-support coverage 83.3%. So với position-controlled attention, fusion giảm 4.36 chunks/query và tăng precision 21.9 điểm phần trăm, đổi lại micro recall giảm 1.7 điểm phần trăm. Trên validation lớn gồm 768 retrievable test queries, internal fusion ở α=0.10 giữ 3.39 chunks, đạt 29.3% precision, 88.3% micro recall và 87.9% all-support coverage.
+
+Vì thế attention-only không phải lời giải cuối. Tín hiệu internal hữu ích nhất khi bổ sung cho reranker: LM-head và hidden probe sửa thứ tự candidate, còn query-level conformal quyết định mức pruning theo recall target. Nếu mentor muốn ưu tiên recall khoảng 90%, điểm vận hành α=0.10 của internal fusion hợp lý hơn BY; α=0.05 tăng recall lên 94.1% nhưng giữ 6.30 chunks trên validation lớn.
+
+## Provenance
+
+- Fresh A100 smoke rerun: 3/3 queries, Top-30, 12 answer tokens tối đa, cả original và reversed order.
+- Attention numbers: raw traces đã checkpoint từ 120 train + 150 calibration + 150 locked test queries; phép fit/calibration/evaluation trong bảng được chạy lại với code mới.
+- Internal large validation: 96 probe-train + 904 calibration queries (714 retrievable) + 1.000 test queries (768 retrievable), không overlap query ID.
