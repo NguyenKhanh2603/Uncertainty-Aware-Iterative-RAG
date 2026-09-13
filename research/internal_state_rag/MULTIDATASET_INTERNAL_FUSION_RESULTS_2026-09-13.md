@@ -52,6 +52,12 @@ selection.
 | HotpotQA | 500 (494) | 500 (497) | 1,000 | 990 | Official distractor/train to official validation |
 | MMQA text/table | 477 (473) | 523 (521) | 300 | 295 | Exploratory sample from official dev; no image-support queries |
 
+The cosine proposal needs no probe-training split, so its false/support reference
+banks use all 1,000 frozen calibration queries for TAT-QA and HotpotQA. MMQA uses
+the same 523-query calibration partition as internal fusion. This difference in
+calibration-bank size is reported rather than silently discarding labelled
+calibration data available to the original method.
+
 The MMQA corpus contains 20,227 official text/table documents: the union of the
 official candidates attached to 1,000 selected train and 1,000 selected dev
 queries. Retrieval is global within this frozen benchmark corpus. This is not a
@@ -105,8 +111,8 @@ is the fraction of retrievable queries for which a selector returns no chunk.
 | TAT-QA | Cosine support coverage 90% + K=10 | 8.094 | 9.99% | 71.88% | 69.53% | 2.73% |
 | TAT-QA | BGE query all-support | 5.391 | 18.33% | 87.85% | 86.72% | 0% |
 | TAT-QA | BGE + LM-head + hidden, query all-support | **3.233** | **30.85%** | **88.66%** | **88.41%** | 0% |
-| HotpotQA | **Cosine proposal: false bank + BY + K=10** | 0.283 | 73.93% | 11.85% | 5.56% | 79.49% |
-| HotpotQA | Cosine support coverage 90% + K=10 | 6.266 | 24.46% | 86.83% | 77.17% | 0.30% |
+| HotpotQA | **Cosine proposal: false bank + BY + K=10** | 0.292 | 73.01% | 12.08% | 5.76% | 79.09% |
+| HotpotQA | Cosine support coverage 90% + K=10 | 6.141 | 24.92% | 86.72% | 76.97% | 0.30% |
 | HotpotQA | BGE / selected fusion, query all-support | **2.257** | **72.38%** | **92.56%** | **87.47%** | 0% |
 | MMQA text/table | **Cosine proposal: false bank + modality BY + K=10** | 0.061 | 66.67% | 3.15% | 2.37% | 95.59% |
 | MMQA text/table | Cosine support coverage 90% + K=10 | 6.708 | 16.12% | 83.73% | 81.36% | 1.02% |
@@ -140,14 +146,14 @@ statistical targets must be named when comparing the rows.
 | TAT-QA | .05 | Cos-Cov 95% | 8.986 | 9.14% | 73.03% | 70.70% | 1.04% |
 | TAT-QA | .05 | BGE | 15.990 | 6.64% | 94.33% | 93.75% | 0% |
 | TAT-QA | .05 | Fusion | 4.974 | 20.89% | 92.36% | 92.06% | 0% |
-| HotpotQA | .20 | Cos-BY | 0.432 | 64.25% | 15.74% | 7.78% | 74.14% |
-| HotpotQA | .20 | Cos-Cov 80% | 3.615 | 38.28% | 78.42% | 63.94% | 2.32% |
+| HotpotQA | .20 | Cos-BY | 0.458 | 64.24% | 16.66% | 8.59% | 72.73% |
+| HotpotQA | .20 | Cos-Cov 80% | 3.539 | 39.04% | 78.31% | 63.74% | 2.42% |
 | HotpotQA | .20 | BGE / fusion | 1.793 | 85.86% | 87.24% | 78.38% | 0% |
-| HotpotQA | .10 | Cos-BY | 0.283 | 73.93% | 11.85% | 5.56% | 79.49% |
-| HotpotQA | .10 | Cos-Cov 90% | 6.266 | 24.46% | 86.83% | 77.17% | 0.30% |
+| HotpotQA | .10 | Cos-BY | 0.292 | 73.01% | 12.08% | 5.76% | 79.09% |
+| HotpotQA | .10 | Cos-Cov 90% | 6.141 | 24.92% | 86.72% | 76.97% | 0.30% |
 | HotpotQA | .10 | BGE / fusion | 2.257 | 72.38% | 92.56% | 87.47% | 0% |
-| HotpotQA | .05 | Cos-BY | 0.191 | 83.07% | 8.99% | 4.24% | 84.14% |
-| HotpotQA | .05 | Cos-Cov 95% | 8.344 | 19.08% | 90.21% | 83.03% | 0.10% |
+| HotpotQA | .05 | Cos-BY | 0.184 | 81.87% | 8.53% | 4.04% | 85.05% |
+| HotpotQA | .05 | Cos-Cov 95% | 8.316 | 19.14% | 90.21% | 83.03% | 0.10% |
 | HotpotQA | .05 | BGE / fusion | 2.933 | 57.92% | 96.28% | 93.54% | 0% |
 | MMQA | .20 | Cos-BY | 0.295 | 80.46% | 18.37% | 18.98% | 75.59% |
 | MMQA | .20 | Cos-Cov 80% | 3.529 | 26.90% | 73.49% | 71.19% | 7.46% |
