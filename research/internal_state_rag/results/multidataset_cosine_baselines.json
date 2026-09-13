@@ -619,49 +619,49 @@
           "proposal_false_bank_by_pooled": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 275,
-            "mean_chunks_kept": 0.43232323232323233,
-            "chunk_precision_among_kept": 0.6425233644859814,
-            "micro_support_recall": 0.15741270749856898,
-            "mean_support_recall": 0.16464646464646465,
-            "query_any_support_coverage": 0.2515151515151515,
-            "query_all_support_coverage": 0.07777777777777778,
-            "empty_query_rate": 0.7414141414141414
+            "support_chunks_retained": 291,
+            "mean_chunks_kept": 0.4575757575757576,
+            "chunk_precision_among_kept": 0.6423841059602649,
+            "micro_support_recall": 0.16657126502575845,
+            "mean_support_recall": 0.17575757575757575,
+            "query_any_support_coverage": 0.26565656565656565,
+            "query_all_support_coverage": 0.08585858585858586,
+            "empty_query_rate": 0.7272727272727273
           },
           "proposal_false_bank_by_modality": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 275,
-            "mean_chunks_kept": 0.43232323232323233,
-            "chunk_precision_among_kept": 0.6425233644859814,
-            "micro_support_recall": 0.15741270749856898,
-            "mean_support_recall": 0.16464646464646465,
-            "query_any_support_coverage": 0.2515151515151515,
-            "query_all_support_coverage": 0.07777777777777778,
-            "empty_query_rate": 0.7414141414141414
+            "support_chunks_retained": 291,
+            "mean_chunks_kept": 0.4575757575757576,
+            "chunk_precision_among_kept": 0.6423841059602649,
+            "micro_support_recall": 0.16657126502575845,
+            "mean_support_recall": 0.17575757575757575,
+            "query_any_support_coverage": 0.26565656565656565,
+            "query_all_support_coverage": 0.08585858585858586,
+            "empty_query_rate": 0.7272727272727273
           },
           "support_bank_coverage_k10": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 1370,
-            "mean_chunks_kept": 3.6151515151515152,
-            "chunk_precision_among_kept": 0.3827884884045823,
-            "micro_support_recall": 0.7842014882655982,
-            "mean_support_recall": 0.794949494949495,
-            "query_any_support_coverage": 0.9505050505050505,
-            "query_all_support_coverage": 0.6393939393939394,
-            "empty_query_rate": 0.023232323232323233,
+            "support_chunks_retained": 1368,
+            "mean_chunks_kept": 3.5393939393939395,
+            "chunk_precision_among_kept": 0.3904109589041096,
+            "micro_support_recall": 0.7830566685746995,
+            "mean_support_recall": 0.7934343434343434,
+            "query_any_support_coverage": 0.9494949494949495,
+            "query_all_support_coverage": 0.6373737373737374,
+            "empty_query_rate": 0.024242424242424242,
             "calibration": {
               "target_candidate_support_coverage": 0.8,
               "max_context": 10,
               "min_group_size": 30,
-              "pooled_support_count": 855,
-              "pooled_threshold": 0.49857595562934875,
+              "pooled_support_count": 1732,
+              "pooled_threshold": 0.5002815127372742,
               "modality_support_counts": {
-                "text": 855
+                "text": 1732
               },
               "modality_thresholds": {
-                "text": 0.49857595562934875
+                "text": 0.5002815127372742
               }
             }
           }
@@ -670,49 +670,49 @@
           "proposal_false_bank_by_pooled": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 207,
-            "mean_chunks_kept": 0.2828282828282828,
-            "chunk_precision_among_kept": 0.7392857142857143,
-            "micro_support_recall": 0.11848883800801374,
-            "mean_support_recall": 0.12575757575757576,
-            "query_any_support_coverage": 0.19595959595959597,
-            "query_all_support_coverage": 0.05555555555555555,
-            "empty_query_rate": 0.794949494949495
+            "support_chunks_retained": 211,
+            "mean_chunks_kept": 0.2919191919191919,
+            "chunk_precision_among_kept": 0.7301038062283737,
+            "micro_support_recall": 0.12077847738981111,
+            "mean_support_recall": 0.12878787878787878,
+            "query_any_support_coverage": 0.2,
+            "query_all_support_coverage": 0.05757575757575758,
+            "empty_query_rate": 0.7909090909090909
           },
           "proposal_false_bank_by_modality": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 207,
-            "mean_chunks_kept": 0.2828282828282828,
-            "chunk_precision_among_kept": 0.7392857142857143,
-            "micro_support_recall": 0.11848883800801374,
-            "mean_support_recall": 0.12575757575757576,
-            "query_any_support_coverage": 0.19595959595959597,
-            "query_all_support_coverage": 0.05555555555555555,
-            "empty_query_rate": 0.794949494949495
+            "support_chunks_retained": 211,
+            "mean_chunks_kept": 0.2919191919191919,
+            "chunk_precision_among_kept": 0.7301038062283737,
+            "micro_support_recall": 0.12077847738981111,
+            "mean_support_recall": 0.12878787878787878,
+            "query_any_support_coverage": 0.2,
+            "query_all_support_coverage": 0.05757575757575758,
+            "empty_query_rate": 0.7909090909090909
           },
           "support_bank_coverage_k10": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 1517,
-            "mean_chunks_kept": 6.265656565656566,
-            "chunk_precision_among_kept": 0.24455908431404158,
-            "micro_support_recall": 0.8683457355466514,
-            "mean_support_recall": 0.8732323232323232,
-            "query_any_support_coverage": 0.9747474747474747,
-            "query_all_support_coverage": 0.7717171717171717,
+            "support_chunks_retained": 1515,
+            "mean_chunks_kept": 6.141414141414141,
+            "chunk_precision_among_kept": 0.24917763157894737,
+            "micro_support_recall": 0.8672009158557528,
+            "mean_support_recall": 0.8717171717171717,
+            "query_any_support_coverage": 0.9737373737373738,
+            "query_all_support_coverage": 0.7696969696969697,
             "empty_query_rate": 0.0030303030303030303,
             "calibration": {
               "target_candidate_support_coverage": 0.9,
               "max_context": 10,
               "min_group_size": 30,
-              "pooled_support_count": 855,
-              "pooled_threshold": 0.45191943645477295,
+              "pooled_support_count": 1732,
+              "pooled_threshold": 0.4536667764186859,
               "modality_support_counts": {
-                "text": 855
+                "text": 1732
               },
               "modality_thresholds": {
-                "text": 0.45191943645477295
+                "text": 0.4536667764186859
               }
             }
           }
@@ -721,33 +721,33 @@
           "proposal_false_bank_by_pooled": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 157,
-            "mean_chunks_kept": 0.19090909090909092,
-            "chunk_precision_among_kept": 0.8306878306878307,
-            "micro_support_recall": 0.08986834573554665,
-            "mean_support_recall": 0.09696969696969697,
-            "query_any_support_coverage": 0.15151515151515152,
-            "query_all_support_coverage": 0.04242424242424243,
-            "empty_query_rate": 0.8414141414141414
+            "support_chunks_retained": 149,
+            "mean_chunks_kept": 0.18383838383838383,
+            "chunk_precision_among_kept": 0.8186813186813187,
+            "micro_support_recall": 0.08528906697195192,
+            "mean_support_recall": 0.09191919191919191,
+            "query_any_support_coverage": 0.14343434343434344,
+            "query_all_support_coverage": 0.04040404040404041,
+            "empty_query_rate": 0.8505050505050505
           },
           "proposal_false_bank_by_modality": {
             "queries": 990,
             "support_chunks_total": 1747,
-            "support_chunks_retained": 157,
-            "mean_chunks_kept": 0.19090909090909092,
-            "chunk_precision_among_kept": 0.8306878306878307,
-            "micro_support_recall": 0.08986834573554665,
-            "mean_support_recall": 0.09696969696969697,
-            "query_any_support_coverage": 0.15151515151515152,
-            "query_all_support_coverage": 0.04242424242424243,
-            "empty_query_rate": 0.8414141414141414
+            "support_chunks_retained": 149,
+            "mean_chunks_kept": 0.18383838383838383,
+            "chunk_precision_among_kept": 0.8186813186813187,
+            "micro_support_recall": 0.08528906697195192,
+            "mean_support_recall": 0.09191919191919191,
+            "query_any_support_coverage": 0.14343434343434344,
+            "query_all_support_coverage": 0.04040404040404041,
+            "empty_query_rate": 0.8505050505050505
           },
           "support_bank_coverage_k10": {
             "queries": 990,
             "support_chunks_total": 1747,
             "support_chunks_retained": 1576,
-            "mean_chunks_kept": 8.344444444444445,
-            "chunk_precision_among_kept": 0.19077593511681395,
+            "mean_chunks_kept": 8.316161616161617,
+            "chunk_precision_among_kept": 0.19142475403862505,
             "micro_support_recall": 0.9021179164281625,
             "mean_support_recall": 0.9050505050505051,
             "query_any_support_coverage": 0.9797979797979798,
@@ -757,13 +757,13 @@
               "target_candidate_support_coverage": 0.95,
               "max_context": 10,
               "min_group_size": 30,
-              "pooled_support_count": 855,
-              "pooled_threshold": 0.419310986995697,
+              "pooled_support_count": 1732,
+              "pooled_threshold": 0.41971442103385925,
               "modality_support_counts": {
-                "text": 855
+                "text": 1732
               },
               "modality_thresholds": {
-                "text": 0.419310986995697
+                "text": 0.41971442103385925
               }
             }
           }
