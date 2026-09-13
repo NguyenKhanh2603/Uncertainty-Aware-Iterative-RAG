@@ -237,10 +237,10 @@ def evaluate(
         "test_ranking": {
             name: fixed_k_metrics(test_labels, scores[1]) for name, scores in methods.items()
         },
-        "conformal": {},
+        "uncapped_query_worst_support_ablation": {},
     }
     for alpha in (0.2, 0.1, 0.05):
-        result["conformal"][str(alpha)] = {}
+        result["uncapped_query_worst_support_ablation"][str(alpha)] = {}
         for name, (cal_score, test_score) in methods.items():
             threshold, order = conformal_threshold(
                 cal_score[cal_retrievable],
@@ -249,7 +249,7 @@ def evaluate(
                 coverage_target="all_support",
             )
             mask = keep_mask(test_score, threshold)
-            result["conformal"][str(alpha)][name] = {
+            result["uncapped_query_worst_support_ablation"][str(alpha)][name] = {
                 "threshold": threshold,
                 "finite_sample_order": order,
                 "conditional_on_retrievable": conditional_metrics(
@@ -325,7 +325,7 @@ def main() -> None:
         "note": (
             "original_cosine_methods contains the proposal's false-bank conformal "
             "p-values + BY + K=10 and the later support-bank coverage + K=10 baseline. "
-            "The conformal field is an uncapped query-worst-support ablation and must "
+            "The explicitly named uncapped query-worst-support field is an ablation and must "
             "not be labelled as the original cosine-conformal proposal."
         ),
         "datasets": {"tatqa": tatqa, "hotpotqa": hotpot, "mmqa_text_table": mmqa},
