@@ -58,3 +58,18 @@ Vì thế attention-only không phải lời giải cuối. Tín hiệu internal
 - Fresh A100 smoke rerun: 3/3 queries, Top-30, 12 answer tokens tối đa, cả original và reversed order.
 - Attention numbers: raw traces đã checkpoint từ 120 train + 150 calibration + 150 locked test queries; phép fit/calibration/evaluation trong bảng được chạy lại với code mới.
 - Internal large validation: 96 probe-train + 904 calibration queries (714 retrievable) + 1.000 test queries (768 retrievable), không overlap query ID.
+
+## Thí nghiệm cải thiện frontier
+
+Ba hướng tiếp theo đã được kiểm tra mà không chạy lại feature extraction:
+
+| Thí nghiệm, α=0.10 | Test n | Chunks | Precision | Micro recall | All-support coverage | Kết luận |
+|---|---:|---:|---:|---:|---:|---|
+| Baseline internal fusion, probe 96 | 768 | 3.388 | 29.32% | 88.31% | 87.89% | Mốc so sánh |
+| Query-adaptive threshold | 768 | 4.549 | 21.89% | 88.54% | 87.24% | Không cải thiện frontier |
+| Thêm attention vào fusion | 150 | 2.700 | 36.05% | 84.88% | 83.33% | Weight được chọn trên train là 0.0; attention bị loại |
+| **Probe train 452 + retuned fusion** | **768** | **3.233** | **30.85%** | **88.66%** | **88.41%** | Pareto improvement nhỏ |
+
+So với baseline 96-query probe, probe 452-query ở α=0.10 giảm 0.155 chunk/query, paired-bootstrap 95% CI `[-0.241, -0.072]`, và tăng precision 1.53 điểm phần trăm, CI `[+0.65, +2.39]`. Recall tăng 0.35 điểm, CI `[-1.50, +2.18]`, và all-support coverage tăng 0.52 điểm, CI `[-1.43, +2.47]`; hai thay đổi coverage này chưa có ý nghĩa thống kê. Vì vậy kết luận chắc nhất là thêm probe-training data cải thiện efficiency/precision ở mức recall không phân biệt được với baseline.
+
+Không có bằng chứng rằng threshold prediction hay cộng attention đơn giản sẽ tạo bước nhảy lớn. Cơ hội còn lại nằm ở việc học score tốt hơn: train relevance probe trên nhiều query tách rời hơn, dùng hard-negative mining, hoặc train một causal-value probe với label là thay đổi answer log-likelihood khi mask từng chunk. Với 768 retrievable test queries chỉ có trung bình 1.125 support chunks/query, trong khi hệ thống đang giữ 3.23 chunks; do đó vẫn còn headroom nếu score phân biệt support tốt hơn.
