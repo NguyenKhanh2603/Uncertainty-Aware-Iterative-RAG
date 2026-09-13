@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 3,
+  "completed_queries": 3,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 34.092007499188185,
+  "rows": "research/internal_state_rag/results/attention_clean_smoke_n3/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/attention_clean_smoke_n3/manifest.json"
+}

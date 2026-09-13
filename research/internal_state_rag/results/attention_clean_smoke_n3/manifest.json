@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "method": "answer_token_to_chunk_attention_with_reversed_position_control",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2.5-3B-Instruct/snapshots/aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "source_feature_manifest": "research/internal_state_rag/results/pairwise_relevance_cal_fresh_n904_plan.json",
+  "input_role": "calibration",
+  "source_split": "train",
+  "top_l": 30,
+  "max_answer_tokens": 12,
+  "max_new_tokens": 24,
+  "planned_queries": 3,
+  "plan": [
+    "005c2faf-d9c4-44a9-89b6-a2e6b2b4dbc9",
+    "008b9936-2795-43fb-b82a-88760033f21d",
+    "0111a37f-2265-4f8e-8fca-f201f9ad3b4c"
+  ]
+}
