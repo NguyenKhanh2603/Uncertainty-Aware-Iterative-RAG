@@ -30,6 +30,7 @@ from research.internal_state_rag.analyze_causal_ranknet_probe import rank_loss
 from research.internal_state_rag.analyze_hard_negative_calibration_curve import (
     hard_negative_mask,
 )
+from research.internal_state_rag.make_pairwise_feature_plan import make_plan
 from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
     conformal_threshold,
     end_to_end_metrics,
@@ -120,6 +121,16 @@ def test_hard_negative_mask_keeps_support_and_highest_scoring_negatives():
     mask = hard_negative_mask(labels, scores, hard_negatives=2)
 
     assert mask.tolist() == [[True, True, True, False]]
+
+
+def test_pairwise_feature_plan_is_reproducible_and_excludes_prior_role():
+    available = ["q3", "q1", "q2", "q4"]
+
+    first = make_plan(available, n=2, seed=7, excluded={"q4"})
+    second = make_plan(list(reversed(available)), n=2, seed=7, excluded={"q4"})
+
+    assert first == second
+    assert "q4" not in first
 
 
 def test_attention_entropy_preserves_layer_and_head_axes():
