@@ -24,6 +24,12 @@ at 84.9% recall and 36.0% precision on those exact test queries. Candidate-wise
 cosine BY keeps only 0.12 chunks per query, leaves 93.3% empty, and reaches just
 6.9% recall despite 52.2% precision.
 
+A follow-up disjoint split trained the layer-30 probe on 452 queries and used
+another 452 for conformal calibration. At `alpha=0.10`, retuned fusion keeps
+3.23 chunks with 30.85% precision and 88.66% micro recall. Relative to the
+96-query probe, paired bootstrap confirms fewer chunks and higher precision;
+the small recall increase is not statistically resolved.
+
 Top-30 contains support for 768 of 1,000 test queries, setting an unconditional
 end-to-end query coverage ceiling of 76.8%. The observed conditional coverage
 is slightly below its nominal target, so the report does not claim an absolute
@@ -42,6 +48,8 @@ is slightly below its nominal target, so the report does not claim an absolute
   clean-split evaluation.
 - `research/internal_state_rag/analyze_attention_only_clean_conformal.py`:
   matched comparison and attention-only probe evaluation.
+- `research/internal_state_rag/analyze_scaled_hidden_probe.py`: larger-probe
+  split, retuned fusion, and paired-bootstrap analysis.
 - `research/internal_state_rag/results/pairwise_conformal_clean_n96_cal904_test1000.json`:
   complete machine-readable result at alpha 0.20, 0.10, and 0.05.
 - `research/internal_state_rag/results/pairwise_relevance_cal_fresh_n904/` and
