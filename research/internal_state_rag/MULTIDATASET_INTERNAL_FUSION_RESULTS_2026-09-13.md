@@ -171,7 +171,10 @@ statistical targets must be named when comparing the rows.
 On the full-corpus TAT-QA run, cosine Top-10 itself retains only 73.61% of support
 chunks. That cap explains why Cos-Cov cannot reproduce the earlier 90.18% TAT-QA
 smoke recall obtained from the much easier dataset-provided candidate pool. This
-is a retrieval/ranking ceiling, not a conformal quantile bug.
+is a retrieval/ranking ceiling, not a conformal quantile bug. At the 90% support
+coverage threshold, the pre-cap set contains 18.97 eligible chunks/query and
+reaches 92.71% recall; applying the proposal's cosine-rank K=10 cap yields 8.094
+selected chunks/query and 71.88% recall.
 
 ## Original proposal baseline: cosine + BY-FDR
 
