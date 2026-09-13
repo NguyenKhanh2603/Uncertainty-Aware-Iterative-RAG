@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "hotpotqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/conformal_global_run/official_bundle_role_split_hotpotqa",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 2000,
+  "corpus_chunks": 19265,
+  "rows": 60000,
+  "top_l": 30,
+  "role_counts": {
+    "development": 0,
+    "calibration": 1000,
+    "test": 1000
+  },
+  "source_split_role_counts": {
+    "distractor/train": {
+      "development": 0,
+      "calibration": 1000,
+      "test": 0
+    },
+    "distractor/validation": {
+      "development": 0,
+      "calibration": 0,
+      "test": 1000
+    }
+  },
+  "split_policy": "official_holdout",
+  "split_policy_detail": "official train -> development/calibration; official dev/validation -> test",
+  "retrieved_support_rows": 3479,
+  "retriever_id": "jinaai/jina-clip-v2@e10d47f5691d0454a0fb5d13f46f2199b74cb436#dim=512#dtype=bfloat16",
+  "corpus_revision": "sha256:d5b082a18751afae5a2e4627f3b9df773fc4a6658718a4fb3b1dd872c35ebd02",
+  "preprocess_hash": "sha256:fb509334af88e360dc0035b686471fcb6ef7bbe018f921cdd1e13e1257f32cfc",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "global_corpus",
+    "min_per_modality": null,
+    "available_modalities": [
+      "text"
+    ]
+  },
+  "candidate_scope": "global_corpus",
+  "candidate_pool": {
+    "minimum": 19265,
+    "maximum": 19265,
+    "mean": 19265.0
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.0,
+    "load_records": 0.485,
+    "encode_corpus": 262.193,
+    "encode_queries": 8.449,
+    "rank_candidates": 0.367,
+    "write_log": 3.278,
+    "total": 275.351
+  },
+  "search_stats": {
+    "candidate_pairs": null,
+    "corpus_on_gpu": null
+  },
+  "output": "hotpotqa_top30_bge_reranked.jsonl.gz",
+  "selection_score_id": "cross_encoder_sigmoid:BAAI/bge-reranker-v2-m3@953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e#max_length=512",
+  "selection_score_policy": "rerank frozen dense Top-L; higher is more relevant",
+  "score_diagnostics": {
+    "calibration": {
+      "cosine": {
+        "rows": 30000,
+        "supports": 1732,
+        "roc_auc": 0.9178529198914646,
+        "average_precision": 0.6360132818631453
+      },
+      "selection": {
+        "rows": 30000,
+        "supports": 1732,
+        "roc_auc": 0.9921091480553501,
+        "average_precision": 0.912604171474425
+      }
+    },
+    "test": {
+      "cosine": {
+        "rows": 30000,
+        "supports": 1747,
+        "roc_auc": 0.9135632465267882,
+        "average_precision": 0.5995430342263965
+      },
+      "selection": {
+        "rows": 30000,
+        "supports": 1747,
+        "roc_auc": 0.9900810286220928,
+        "average_precision": 0.900966169113538
+      }
+    }
+  },
+  "rescore_seconds": 324.768
+}
