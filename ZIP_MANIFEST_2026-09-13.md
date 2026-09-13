@@ -1,7 +1,7 @@
 # Conformal recall research package — 2026-09-13
 
 This archive is a reproducible checkpoint of the repository after the clean
-TAT-QA conformal pruning validation.
+TAT-QA conformal pruning validation and the matched attention-only comparison.
 
 ## Main result
 
@@ -16,6 +16,14 @@ recall. BGE keeps 5.73 candidates at 91.0% recall. At `alpha=0.05`, fusion keeps
 6.30 candidates at 95.6% recall, compared with BGE's 15.16 candidates at 95.7%
 recall.
 
+The matched 150-query comparison confirms that answer-to-chunk attention is a
+real relevance signal, but it is not an efficient high-recall pruner. At
+`alpha=0.10`, position-controlled attention keeps 7.06 chunks at 86.6% micro
+recall and 14.1% precision. The three-signal internal fusion keeps 2.70 chunks
+at 84.9% recall and 36.0% precision on those exact test queries. Candidate-wise
+cosine BY keeps only 0.12 chunks per query, leaves 93.3% empty, and reaches just
+6.9% recall despite 52.2% precision.
+
 Top-30 contains support for 768 of 1,000 test queries, setting an unconditional
 end-to-end query coverage ceiling of 76.8%. The observed conditional coverage
 is slightly below its nominal target, so the report does not claim an absolute
@@ -25,11 +33,15 @@ is slightly below its nominal target, so the report does not claim an absolute
 
 - `research/internal_state_rag/MENTOR_BRIEF_CONFORMAL_RECALL.md`: concise
   Vietnamese analysis for mentor discussion.
+- `research/internal_state_rag/FULL_PRUNING_COMPARISON_2026-09-13.md`: full
+  cosine-BY, attention-only, BGE, and query-level internal-fusion table.
 - `research/internal_state_rag/RESULTS_INTERNAL_CHUNK_SIGNALS.md`: full research
   report, including prior attention, LM-head, hidden-state, causal, and
   generation experiments.
 - `research/internal_state_rag/analyze_pairwise_conformal_clean_split.py`: final
   clean-split evaluation.
+- `research/internal_state_rag/analyze_attention_only_clean_conformal.py`:
+  matched comparison and attention-only probe evaluation.
 - `research/internal_state_rag/results/pairwise_conformal_clean_n96_cal904_test1000.json`:
   complete machine-readable result at alpha 0.20, 0.10, and 0.05.
 - `research/internal_state_rag/results/pairwise_relevance_cal_fresh_n904/` and
