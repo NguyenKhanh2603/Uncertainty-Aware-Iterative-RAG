@@ -3,11 +3,11 @@
 ## Kết luận một câu
 
 Nút thắt chính nằm ở bước **candidate-wise BY selection**, không nằm ở việc
-Top-L thiếu candidates. Retrieve full corpus và tăng L có thể cải thiện retrieval
-coverage một ít, nhưng không giải quyết việc BY loại gần hết support đã có trong
-Top-L. Nếu mục tiêu sản phẩm là giữ đủ evidence cho RAG, cần chuyển guarantee từ
-candidate-wise FDR sang query-level support coverage, hoặc tách certified set và
-fallback set.
+Top-L thiếu candidates. Clean split 96 train / 904 calibration / 1,000 test xác
+nhận rằng query-level conformal với BGE + internal model signal kéo conditional
+mean support recall lên 91.4% tại `alpha=0.10`, trong khi chỉ giữ trung bình 3.39
+trên 30 chunks. Retrieve full corpus vẫn cần để xây candidate đúng, nhưng tăng L
+không giải quyết việc BY loại gần hết support đã có trong Top-L.
 
 ## Số liệu chính
 
@@ -67,7 +67,7 @@ BY.
 
 ## Hướng giải quyết đề xuất
 
-### 1. Query-level conformal coverage
+### 1. Query-level conformal coverage: kết quả clean split
 
 Đổi câu hỏi thống kê từ “chunk này có chắc chắn không phải false match?” thành
 “prediction set có giữ ít nhất một, hoặc toàn bộ, support cần thiết không?”.
@@ -79,7 +79,39 @@ z(BGE) + 0.20 z(Yes-vs-No LM-head)
        + 0.75 z(layer-30 relevance probe)
 ```
 
-kết quả trên 256 fresh queries tại alpha 0.05 là:
+kết quả frozen method trên split lớn hoàn toàn rời nhau:
+
+- train linear probe: 96 official-train queries;
+- calibrate threshold: 904 official-train queries còn lại, trong đó 714 có
+  support trong Top-30;
+- test một lần: 1,000 official-dev queries, trong đó 768 có support trong
+  Top-30;
+- query-ID overlap giữa ba vai trò: 0.
+
+Với target giữ **toàn bộ support đã retrieve được**:
+
+| Alpha | Score | Chunks giữ / 30 | Precision | Micro recall | Mean query recall | All-support coverage |
+|---:|---|---:|---:|---:|---:|---:|
+| 0.20 | BGE | 3.19 | 28.5% | 80.7% | 83.8% | 80.1% |
+| 0.20 | Internal fusion | **1.86** | **47.7%** | 78.9% | 82.4% | 78.3% |
+| **0.10** | BGE | 5.73 | 17.4% | 88.4% | 91.0% | 87.4% |
+| **0.10** | Internal fusion | **3.39** | **29.3%** | **88.3%** | **91.4%** | **87.9%** |
+| 0.05 | BGE | 15.16 | 7.0% | 94.3% | 95.7% | 93.8% |
+| 0.05 | Internal fusion | **6.30** | **16.8%** | 94.1% | 95.6% | 93.4% |
+
+Vậy recall thấp **có thể sửa được** nếu đổi event conformal cho đúng mục tiêu
+RAG. Ở `alpha=0.10`, internal fusion giữ ít hơn BGE 2.35 chunks/query, bootstrap
+95% CI `[2.14, 2.56]`, trong khi chênh lệch mean recall là +0.37 điểm phần trăm,
+CI `[-1.13, +1.84]`. Fusion chủ yếu tăng efficiency và precision tại cùng recall;
+việc nhảy từ BY recall 6.9% lên khoảng 88--91% đến từ đổi candidate-wise BY-FDR
+sang query-level coverage.
+
+Ở operating point an toàn hơn `alpha=0.05`, fusion giữ 6.30 chunks thay vì 15.16
+cho BGE, với mean recall gần như bằng nhau (95.6% và 95.7%). Kết quả generation
+64 câu trước đó cũng không thấy khác biệt đáng kể về F1/EM/numerical accuracy ở
+alpha này.
+
+Kết quả 256 câu trước đây được giữ như replication ban đầu:
 
 | Target | Score | Chunks giữ / 30 | Support recall | Query coverage |
 |---|---|---:|---:|---:|
@@ -90,6 +122,21 @@ kết quả trên 256 fresh queries tại alpha 0.05 là:
 
 Đây là hướng khuyến nghị khi recall/evidence coverage là yêu cầu chính. Claim
 thống kê lúc này là query-level coverage, không còn là candidate-wise BY-FDR.
+
+### Giới hạn retrieval và guarantee
+
+Top-30 chỉ chứa support cho 768/1,000 test queries. Vì vậy coverage end-to-end
+không thể vượt 76.8% nếu không sửa upstream retriever. Với all-support fusion:
+
+- `alpha=0.10`: any-support coverage trên toàn bộ 1,000 query là 72.9%;
+- `alpha=0.05`: any-support coverage trên toàn bộ 1,000 query là 75.1%.
+
+Coverage conditional quan sát cũng thấp hơn nominal một ít: all-support là
+87.9% so với target 90% ở alpha 0.10, và 93.4% so với target 95% ở alpha 0.05.
+Do calibration lấy từ official train còn test lấy từ official dev, đây là dấu
+hiệu cần kiểm tra exchangeability / split shift; không nên claim guarantee tuyệt
+đối 90% hoặc 95% từ run này. Con số đáng tin để nói là recall tăng mạnh và fusion
+giảm context đáng kể tại recall tương đương BGE.
 
 ### 2. BY certified set cộng fallback tách biệt
 
@@ -125,8 +172,10 @@ train probe và calibrate p-values.
   với all-support query-level conformal, alpha 0.05.
 - Nếu mục tiêu bắt buộc là candidate-wise FDR: giữ BY, thêm fallback tách nhãn,
   và chấp nhận precision--recall trade-off.
-- Chạy frozen method trên bank 1,000 dev queries của từng dataset trước khi đưa
-  ra claim paper-level.
+- Dùng `alpha=0.05` làm cấu hình ưu tiên hiện tại; báo cả conditional recall và
+  end-to-end coverage ceiling.
+- Với claim paper-level, lặp lại protocol 3-way split trên từng dataset và thêm
+  calibration có cùng distribution với test.
 
 ## Những câu không nên claim
 
@@ -136,6 +185,6 @@ train probe và calibrate p-values.
   nhưng guarantee đó không khớp trực tiếp với nhu cầu luôn có evidence cho RAG.
 - Không so precision của candidate-wise BY với coverage method mà bỏ qua việc
   hai phương pháp kiểm soát hai event khác nhau.
-- Chưa claim internal fusion đã giải quyết BY. Kết quả mạnh hiện tại thuộc
-  query-level coverage; candidate-wise internal-BY vẫn cần bank 1,000 queries
-  độc lập.
+- Không claim internal fusion đã giải quyết BY. Kết quả mạnh thuộc query-level
+  coverage; fusion làm set nhỏ hơn tại cùng recall, còn thay đổi event conformal
+  mới là nguyên nhân chính kéo recall lên.

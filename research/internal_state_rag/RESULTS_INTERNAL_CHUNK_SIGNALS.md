@@ -14,14 +14,18 @@ The `z` transformations are computed within each query's Top-30. Qwen remains
 frozen. The only trained component is an L2 logistic probe over the final token
 state of an explicit question--chunk relevance prompt.
 
-On 256 fresh test-role TAT-QA queries, disjoint from all previously used test
-queries, this score improved mean query AP from 0.759 to 0.813 and Top-1 support
-from 67.2% to 73.8%. Both gains were significant under paired query bootstrap.
-At the conformal all-support threshold with `alpha=0.05`, it retained 9.92 of
-30 chunks on average versus 26.76 for BGE while achieving 97.3% all-support
-coverage versus 99.2% for BGE. A 64-query answer-generation check found no
-detectable F1, EM, or numerical-accuracy difference between those two
-`alpha=0.05` keep-sets.
+On the final clean split, the probe uses 96 official-train queries, conformal
+calibration uses the other 904 official-train queries, and evaluation uses all
+1,000 official-dev test-role queries. Query-ID overlap is zero. Among the 768
+test queries whose Top-30 contains support, the score improved mean query AP
+from 0.745 to 0.800 and Top-1 support from 66.4% to 72.7%.
+
+At the all-support `alpha=0.10` operating point, fusion retained 3.39 chunks and
+achieved 91.4% mean support recall, compared with 5.73 chunks and 91.0% recall
+for BGE. At `alpha=0.05`, fusion retained 6.30 chunks versus 15.16 for BGE while
+achieving nearly identical mean recall, 95.6% versus 95.7%. A prior 64-query
+answer-generation check found no detectable F1, EM, or numerical-accuracy
+difference at `alpha=0.05`.
 
 The useful target still must be specified carefully:
 
@@ -142,9 +146,11 @@ queries:
 
 This is the cleanest answer to the recall problem. It does not preserve the old
 candidate-wise BY-FDR claim; it makes a coverage claim aligned with the RAG
-failure event. For a formal result, train the probe before calibration, freeze
-the prompt/layer/weights, and fit only the coverage threshold on the separate
-1,000-query development bank for each dataset.
+failure event. The final 96/904/1,000 run below follows the required ordering:
+train the probe, freeze the prompt/layer/weights, fit only the threshold on a
+separate bank, and evaluate once. Its empirical coverage shortfall also shows
+why exchangeability between calibration and test source splits must be checked
+before making a formal coverage claim.
 
 ### B. Keep candidate-wise BY and expose a fallback channel
 
@@ -335,6 +341,53 @@ minus BGE was -0.008 F1, 95% CI `[-0.076, +0.055]`, with zero mean change in EM
 and numerical accuracy. At `alpha=0.10`, fusion numerical accuracy was 6.25
 points lower, CI `[-12.5, -1.6]`; that threshold is too aggressive for the
 current TAT-QA generator.
+
+#### Final disjoint 96/904/1,000 validation
+
+The final run removes the main limitation above. The trained probe is fit only
+on 96 queries. Thresholds are then fit on 904 different calibration queries and
+evaluated once on 1,000 different test queries. Of the calibration queries, 714
+have support in Top-30; of the test queries, 768 do. Query-level calibration and
+conditional metrics use only these retrievable queries.
+
+On the retrievable 768-query test subset, frozen ranking quality was:
+
+| Score | Mean query AP | MRR | Top-1 | Top-5 coverage | Top-10 coverage |
+|---|---:|---:|---:|---:|---:|
+| BGE | 0.745 | 0.768 | 66.4% | 90.6% | 96.1% |
+| Three-signal fusion | **0.800** | **0.822** | **72.7%** | **95.3%** | **98.4%** |
+
+For the all-support conformal event:
+
+| Alpha | Score | Mean kept | Precision | Micro recall | Mean query recall | All-support coverage |
+|---:|---|---:|---:|---:|---:|---:|
+| 0.20 | BGE | 3.19 | 28.5% | 80.7% | 83.8% | 80.1% |
+| 0.20 | Fusion | **1.86** | **47.7%** | 78.9% | 82.4% | 78.3% |
+| **0.10** | BGE | 5.73 | 17.4% | 88.4% | 91.0% | 87.4% |
+| **0.10** | Fusion | **3.39** | **29.3%** | **88.3%** | **91.4%** | **87.9%** |
+| 0.05 | BGE | 15.16 | 7.0% | 94.3% | 95.7% | 93.8% |
+| 0.05 | Fusion | **6.30** | **16.8%** | 94.1% | 95.6% | 93.4% |
+
+At `alpha=0.10`, fusion keeps 2.35 fewer chunks per retrievable query than BGE,
+paired-bootstrap 95% CI `[2.14, 2.56]`. Its mean recall difference is +0.37
+percentage points, CI `[-1.13, +1.84]`. At `alpha=0.05`, it keeps 8.86 fewer
+chunks, CI `[8.27, 9.46]`, while the recall difference is -0.11 points, CI
+`[-1.17, +0.93]`. Internal signals therefore improve ranking, precision, and
+context efficiency at approximately matched recall. The large recall gain over
+candidate-wise cosine+BY, from 6.9% conditional micro recall to 88.3% at alpha
+0.10 or 94.1% at alpha 0.05, primarily comes from calibrating the query-level
+support event rather than BY-FDR per chunk.
+
+The guarantee has an essential scope restriction. Top-30 retrieval finds at
+least one support for only 768/1,000 test queries, so end-to-end query coverage
+cannot exceed 76.8%. Fusion reaches 72.9% any-support coverage over all test
+queries at all-support `alpha=0.10`, and 75.1% at `alpha=0.05`. Conditional
+all-support coverage is 87.9% and 93.4%, respectively, slightly below the 90%
+and 95% nominal targets. Because calibration comes from official train and test
+comes from official dev, this persistent shortfall may reflect source-split
+shift in addition to finite-sample variation. The result supports a strong
+recall and efficiency claim, but not an unconditional 90% or 95% coverage
+guarantee.
 
 ### 6. Attention heads, LM heads, and MLPs
 
