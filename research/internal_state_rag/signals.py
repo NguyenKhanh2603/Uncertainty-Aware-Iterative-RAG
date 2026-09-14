@@ -215,7 +215,9 @@ class QwenInternalStateExtractor:
                 # Hugging Face stores the already-normalized final decoder state
                 # at hidden_states[-1]; intermediate layer outputs still need
                 # the model's final norm before applying the unembedding.
-                projected = hidden if layer == self.n_layers - 1 else self.core.norm(hidden)
+                projected = (
+                    hidden if layer == self.n_layers - 1 else self._final_norm(hidden)
+                )
                 logits = self.lm_head(projected).float()[0]
                 log_probs = torch.log_softmax(logits, dim=-1)
                 probs = log_probs.exp()
@@ -243,7 +245,7 @@ class QwenInternalStateExtractor:
                         )
 
             next_id = torch.tensor([[target_id]], device=input_ids.device, dtype=input_ids.dtype)
-            current_embedding = self.core.embed_tokens(next_id)
+            current_embedding = self.model.get_input_embeddings()(next_id)
             current_position = current_position + 1
             running_mask = torch.cat(
                 [
@@ -271,7 +273,7 @@ class QwenInternalStateExtractor:
 
     def _prompt_embeddings(self, inputs: Any) -> torch.Tensor:
         input_ids = inputs["input_ids"]
-        embeddings = self.core.embed_tokens(input_ids)
+        embeddings = self.model.get_input_embeddings()(input_ids)
         if not getattr(self.client, "is_qwen_vl", False):
             return embeddings
         pixel_values = inputs.get("pixel_values")
@@ -285,6 +287,15 @@ class QwenInternalStateExtractor:
             image_mask.to(embeddings.device),
             image_embeddings.to(embeddings.device, embeddings.dtype),
         )
+
+    def _final_norm(self, hidden: torch.Tensor) -> torch.Tensor:
+        norm = getattr(self.core, "norm", None)
+        if norm is None:
+            language_model = getattr(self.core, "language_model", None)
+            norm = getattr(language_model, "norm", None)
+        if norm is None:
+            raise AttributeError("Could not locate the decoder final norm")
+        return norm(hidden)
 
     def _prompt_position_ids(self, inputs: Any) -> torch.Tensor:
         input_ids = inputs["input_ids"]
