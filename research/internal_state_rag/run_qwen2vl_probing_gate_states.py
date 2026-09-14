@@ -167,8 +167,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
-    args = parse_args()
+def main(
+    args: argparse.Namespace | None = None,
+    *,
+    client: ResearchTextClient | None = None,
+) -> dict[str, Any]:
+    """Extract one split, optionally reusing a model client across suite jobs."""
+
+    if args is None:
+        args = parse_args()
     manifest = json.loads(args.feature_manifest.read_text(encoding="utf-8"))
     full_plan = [str(value) for value in manifest["plan"]]
     if args.start < 0 or args.n < 1 or args.start + args.n > len(full_plan):
@@ -189,7 +196,12 @@ def main() -> None:
     if unexpected:
         raise ValueError(f"Output contains qids outside requested plan: {sorted(unexpected)}")
 
-    client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
+    if client is None:
+        client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
+    elif str(client.model_name) != str(args.model):
+        raise ValueError(
+            f"Reused client model {client.model_name!r} does not match {args.model!r}"
+        )
     compute_dtype = {"bfloat16": torch.bfloat16, "float16": torch.float16}[args.compute_dtype]
     if next(client.model.parameters()).dtype != compute_dtype:
         client.model.to(dtype=compute_dtype)
@@ -294,6 +306,7 @@ def main() -> None:
     output["elapsed_seconds_this_invocation"] = round(time.monotonic() - started, 3)
     atomic_write(args.output, output)
     print(json.dumps({key: value for key, value in output.items() if key != "queries"}, indent=2))
+    return output
 
 
 if __name__ == "__main__":

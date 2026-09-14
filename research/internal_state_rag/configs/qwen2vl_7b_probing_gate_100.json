@@ -1,0 +1,100 @@
+{
+  "jobs": [
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/probe_train/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/probe_train/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/tatqa_probe_train100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/calibration/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/calibration/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/tatqa_calibration100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/test/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/tatqa/test/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_tatqa/tatqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/tatqa_test100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/probe_train/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/probe_train/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/hotpotqa_probe_train100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/calibration/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/calibration/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/hotpotqa_calibration100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/test/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/hotpotqa/test/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/hotpotqa_test100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/probe_train/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/probe_train/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/mmqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/mmqa_probe_train100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/calibration/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/calibration/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/mmqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/mmqa_calibration100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/test/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/mmqa/test/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_role_split_mmqa/mmqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/mmqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/mmqa_test100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/probe_train/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/probe_train/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_probe_train100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/calibration/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/calibration/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_calibration100.json"
+    },
+    {
+      "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/test/manifest.json",
+      "feature_npz": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/test/features.npz",
+      "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
+      "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
+      "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_test100.json"
+    }
+  ]
+}
