@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "webqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/conformal_global_run/official_bundle_webqa_train1000_test250",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 1250,
+  "corpus_chunks": 38010,
+  "rows": 37500,
+  "top_l": 30,
+  "role_counts": {
+    "development": 465,
+    "calibration": 535,
+    "test": 250
+  },
+  "source_split_role_counts": {
+    "train": {
+      "development": 465,
+      "calibration": 535,
+      "test": 0
+    },
+    "validation": {
+      "development": 0,
+      "calibration": 0,
+      "test": 250
+    }
+  },
+  "split_policy": "official_holdout",
+  "split_policy_detail": "official train -> development/calibration; official dev/validation -> test",
+  "retrieved_support_rows": 1664,
+  "retriever_id": "jinaai/jina-embeddings-v4@853c867b65b749f3c3c72a06868140d842e04f06#dim=512#dtype=bfloat16",
+  "corpus_revision": "sha256:51a102b94eb09e1f3964d11ee53e3e1eb05f1ca2ad79b78e12460487db658b9c",
+  "preprocess_hash": "sha256:5ed8c19d45b83449fc0e46ca5707e5ee8174a7ad38cbef237acebfb10ddd772e",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "global_corpus",
+    "image_caption_fusion": false,
+    "max_image_pixels": 200704,
+    "min_per_modality": null,
+    "available_modalities": [
+      "image",
+      "text"
+    ]
+  },
+  "candidate_scope": "global_corpus",
+  "candidate_pool": {
+    "minimum": 38010,
+    "maximum": 38010,
+    "mean": 38010.0
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.001,
+    "load_records": 112.113,
+    "encode_corpus": 9368.891,
+    "encode_queries": 35.032,
+    "rank_candidates": 0.546,
+    "write_log": 2.502,
+    "total": 9889.509
+  },
+  "search_stats": {
+    "candidate_pairs": null,
+    "corpus_on_gpu": null
+  },
+  "output": "webqa_jina_v4_top30.jsonl.gz"
+}
