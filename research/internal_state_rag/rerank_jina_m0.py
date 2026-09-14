@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from transformers import AutoModel
+from transformers import AutoModel, AutoProcessor
 
 
 def iter_jsonl(path: Path):
@@ -54,6 +54,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--image-batch-size", type=int, default=8)
     parser.add_argument("--text-max-length", type=int, default=1024)
     parser.add_argument("--image-max-length", type=int, default=2048)
+    parser.add_argument("--max-image-pixels", type=int, default=200704)
     parser.add_argument("--checkpoint-every", type=int, default=512)
     return parser.parse_args()
 
@@ -85,6 +86,13 @@ def main() -> None:
             torch_dtype=torch.bfloat16,
             attn_implementation="sdpa",
         ).eval().to("cuda")
+        model._processor = AutoProcessor.from_pretrained(
+            args.model,
+            revision=args.model_revision,
+            max_pixels=args.max_image_pixels,
+            min_pixels=3136,
+            trust_remote_code=True,
+        )
         for modality, batch_size, max_length in (
             ("text", args.text_batch_size, args.text_max_length),
             ("image", args.image_batch_size, args.image_max_length),
@@ -162,6 +170,7 @@ def main() -> None:
         "image_batch_size": args.image_batch_size,
         "text_max_length": args.text_max_length,
         "image_max_length": args.image_max_length,
+        "max_image_pixels": args.max_image_pixels,
         "elapsed_seconds": round(time.perf_counter() - started, 3),
     }
     Path(str(args.output) + ".manifest.json").write_text(
