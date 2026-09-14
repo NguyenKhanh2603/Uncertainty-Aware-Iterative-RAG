@@ -37,6 +37,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--feature-manifest", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
+        "--bundle-root",
+        type=Path,
+        help="Root used to resolve relative image paths; defaults to questions/../...",
+    )
+    parser.add_argument(
         "--questions",
         type=Path,
         default=root / "official_bundle_role_split_tatqa/tatqa/questions.jsonl",
@@ -124,6 +129,9 @@ def main() -> None:
         "source_feature_manifest": str(args.feature_manifest),
         "input_role": input_role,
         "source_split": str(source_manifest["source_split"]),
+        "bundle_root": str(
+            (args.bundle_root or args.questions.parent.parent).resolve()
+        ),
         "top_l": top_l,
         "max_answer_tokens": args.max_answer_tokens,
         "max_new_tokens": args.max_new_tokens,
@@ -145,6 +153,13 @@ def main() -> None:
 
     questions = load_rows(args.questions, "qid")
     corpus = load_rows(args.corpus, "id")
+    bundle_root = (args.bundle_root or args.questions.parent.parent).resolve()
+    for row in corpus.values():
+        if row.get("modality") != "image":
+            continue
+        image_path = str(row["content"])
+        if not image_path.startswith(("http://", "https://", "data:", "/")):
+            row["content"] = str((bundle_root / image_path).resolve())
     retrieval = load_retrieval(args.retrieval, split_role=input_role)
     completed = load_completed(rows_path)
     client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
