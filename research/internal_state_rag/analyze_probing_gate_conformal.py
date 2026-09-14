@@ -78,17 +78,30 @@ def align_features(
     return x, labels, scores, qids, np.asarray([row["risk_labels"] for row in ordered], dtype=object)
 
 
-def risk_vector(
-    gate_rows: dict[str, dict[str, Any]], qids: np.ndarray, *, top_k: int
+def reranker_risk_vector(
+    labels: np.ndarray,
+    reranker_scores: np.ndarray,
+    *,
+    top_k: int,
 ) -> np.ndarray:
-    key = f"no_support_top{top_k}"
-    values = []
-    for qid in qids.astype(str):
-        row = gate_rows[str(qid)]
-        if key not in row["risk_labels"]:
-            raise ValueError(f"Risk label {key} absent for {qid}")
-        values.append(bool(row["risk_labels"][key]))
-    return np.asarray(values, dtype=bool)
+    """Return whether Jina's Top-K contains no labelled support.
+
+    Gate states are extracted from the frozen retrieval pool, whose stored rank
+    is the embedding order.  Conformal pruning uses Jina reranker scores, so the
+    operational risk target must be formed after sorting by those same scores.
+    """
+
+    if labels.shape != reranker_scores.shape:
+        raise ValueError("labels and reranker scores must have identical shapes")
+    finite_scores = np.nan_to_num(
+        reranker_scores,
+        nan=-np.inf,
+        posinf=np.finfo(np.float64).max,
+        neginf=-np.inf,
+    )
+    order = np.argsort(-finite_scores, axis=1, kind="stable")[:, :top_k]
+    top_labels = np.take_along_axis(labels, order, axis=1)
+    return ~top_labels.any(axis=1)
 
 
 def safe_classifier(
@@ -285,11 +298,15 @@ def main() -> None:
     if any(overlaps.values()):
         raise ValueError(f"Gate query splits overlap: {overlaps}")
 
-    probe_risk = risk_vector(probe_rows, probe_qids, top_k=args.risk_top_k)
-    calibration_risk = risk_vector(
-        calibration_rows, calibration_qids, top_k=args.risk_top_k
+    probe_risk = reranker_risk_vector(
+        probe_labels, probe_scores, top_k=args.risk_top_k
     )
-    test_risk = risk_vector(test_rows, test_qids, top_k=args.risk_top_k)
+    calibration_risk = reranker_risk_vector(
+        calibration_labels, calibration_scores, top_k=args.risk_top_k
+    )
+    test_risk = reranker_risk_vector(
+        test_labels, test_scores, top_k=args.risk_top_k
+    )
     model, model_type = safe_classifier(probe_x, probe_risk, c=args.probe_c)
     fallback = float(np.mean(probe_risk))
     probe_probability = gate_probability(model, probe_x, fallback)
@@ -328,7 +345,7 @@ def main() -> None:
         "method": "probing_rag_query_gate_mondrian_conformal_pruning",
         "gate": {
             "model_type": model_type,
-            "risk_target": f"no_support_top{args.risk_top_k}",
+            "risk_target": f"no_support_in_jina_reranker_top{args.risk_top_k}",
             "probe_c": args.probe_c,
             "gate_threshold": args.gate_threshold,
             "probe": classification_metrics(probe_risk, probe_probability),

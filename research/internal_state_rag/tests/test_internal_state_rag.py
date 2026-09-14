@@ -36,6 +36,9 @@ from research.internal_state_rag.analyze_pairwise_conformal_clean_split import (
     end_to_end_metrics,
     keep_mask,
 )
+from research.internal_state_rag.analyze_probing_gate_conformal import (
+    reranker_risk_vector,
+)
 from research.internal_state_rag.signals import (
     InternalTrace,
     contrast_trace,
@@ -282,3 +285,24 @@ def test_end_to_end_coverage_counts_unretrievable_queries_as_failures():
     assert metrics["retrieval_query_coverage_ceiling"] == 0.5
     assert metrics["query_any_support_coverage"] == 0.5
     assert metrics["query_all_support_coverage"] == 0.5
+
+
+def test_probing_gate_risk_uses_reranker_order():
+    labels = np.asarray(
+        [
+            [False, True, False],
+            [True, False, False],
+        ]
+    )
+    reranker_scores = np.asarray(
+        [
+            [0.1, 0.9, 0.2],
+            [0.1, 0.9, 0.8],
+        ]
+    )
+
+    top1_risk = reranker_risk_vector(labels, reranker_scores, top_k=1)
+    top3_risk = reranker_risk_vector(labels, reranker_scores, top_k=3)
+
+    assert top1_risk.tolist() == [False, True]
+    assert top3_risk.tolist() == [False, False]
