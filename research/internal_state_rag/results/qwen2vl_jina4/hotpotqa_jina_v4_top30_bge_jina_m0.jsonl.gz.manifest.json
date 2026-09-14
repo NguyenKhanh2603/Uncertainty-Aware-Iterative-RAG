@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "model": "jinaai/jina-reranker-m0",
+  "model_revision": "94bfe0aeb2d4dd7978362699cddd5893d4e0adc8",
+  "input": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30_bge.jsonl.gz",
+  "output": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30_bge_jina_m0.jsonl.gz",
+  "rows": 60000,
+  "queries": 2000,
+  "text_pairs": 60000,
+  "image_pairs": 0,
+  "text_batch_size": 16,
+  "image_batch_size": 4,
+  "text_max_length": 1024,
+  "image_max_length": 2048,
+  "max_image_pixels": 200704,
+  "elapsed_seconds": 568.668
+}
