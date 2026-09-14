@@ -230,6 +230,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--n-heads", type=int, default=4)
     parser.add_argument("--max-answer-tokens", type=int, default=8)
     parser.add_argument("--layers", default="3,7,11,15,19,23,27")
+    parser.add_argument(
+        "--compute-dtype",
+        choices=("bfloat16", "float16"),
+        default="bfloat16",
+        help="Inference dtype; BF16 avoids FP16 QK overflow on long multimodal prompts.",
+    )
     parser.add_argument("--seed", type=int, default=20260914)
     return parser.parse_args()
 
@@ -268,6 +274,15 @@ def main() -> None:
         raise ValueError(f"Output contains qids outside requested plan: {sorted(unexpected)}")
 
     client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
+    compute_dtype = {
+        "bfloat16": torch.bfloat16,
+        "float16": torch.float16,
+    }[args.compute_dtype]
+    # The base client intentionally loads the production benchmark in FP16.
+    # This causal pilot uses BF16 by default because eager attention materializes
+    # QK scores and FP16 can overflow for long text/table/image contexts.
+    if next(client.model.parameters()).dtype != compute_dtype:
+        client.model.to(dtype=compute_dtype)
     extractor = QwenInternalStateExtractor(client, layers=layers)
     started = time.monotonic()
     loo_limit = top_l if args.loo_candidates <= 0 else min(top_l, int(args.loo_candidates))
@@ -288,6 +303,7 @@ def main() -> None:
             "loo_candidates_per_query": loo_limit,
             "hidden_candidates_per_query": hidden_limit,
             "max_answer_tokens": args.max_answer_tokens,
+            "compute_dtype": args.compute_dtype,
             "layers": extractor.layers,
             "completed_queries": len(completed_by_qid),
             "head_screening": head_screening,
