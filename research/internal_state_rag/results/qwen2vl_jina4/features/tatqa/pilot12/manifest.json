@@ -1,0 +1,41 @@
+{
+  "status": "complete",
+  "method": "qwen2vl_pairwise_relevance_hidden_and_lm_head",
+  "model": "/workspace/hf_cache/hub/models--Qwen--Qwen2-VL-2B-Instruct/snapshots/895c3a49bc3fa70a340399125c650a463535e71c",
+  "model_revision": "895c3a49bc3fa70a340399125c650a463535e71c",
+  "input_role": "development",
+  "source_split": "train",
+  "n_queries": 12,
+  "top_l": 30,
+  "layers": [
+    3,
+    7,
+    11,
+    15,
+    19,
+    23,
+    27
+  ],
+  "projection_dim": 256,
+  "projection_seed": 1949,
+  "text_batch_size": 24,
+  "image_batch_size": 6,
+  "max_length": 1024,
+  "min_pixels": 3136,
+  "max_pixels": 200704,
+  "elapsed_seconds": 7.296,
+  "plan": [
+    "d39b1caa-4eef-4131-8b70-719d478f1496",
+    "e26d0c78-86ae-4180-b8ed-0c8c77d5d13e",
+    "4aefde0b-e80c-43a3-8878-ac7af5201c22",
+    "53cf95f3-bc38-4c03-96e7-e73c76a35a84",
+    "db85275f-c76a-43ca-a61f-68861eacd885",
+    "400c5b71-626c-44a7-965f-4d13586e00b8",
+    "7102c8f6-65bd-4bfa-aed4-11676f81d48a",
+    "9729e264-6b1f-4595-8239-5b73109247eb",
+    "6df3247d-7046-4825-af98-d885756717f1",
+    "6ae2c15d-9722-4ce8-8c70-0e27577d55f1",
+    "c22aae5b-2b1a-4739-883c-a004fb3aef30",
+    "e224a10b-a9e2-4727-aa6e-cea97fef9b3d"
+  ]
+}
