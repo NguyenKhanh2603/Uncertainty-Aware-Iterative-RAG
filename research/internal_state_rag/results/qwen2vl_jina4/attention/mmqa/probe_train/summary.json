@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 504,
+  "completed_queries": 504,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 3034.02118428424,
+  "rows": "research/internal_state_rag/results/qwen2vl_jina4/attention/mmqa/probe_train/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/qwen2vl_jina4/attention/mmqa/probe_train/manifest.json"
+}
