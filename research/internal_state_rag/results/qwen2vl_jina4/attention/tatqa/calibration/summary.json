@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 484,
+  "completed_queries": 484,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 1256.2982524447143,
+  "rows": "research/internal_state_rag/results/qwen2vl_jina4/attention/tatqa/calibration/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/qwen2vl_jina4/attention/tatqa/calibration/manifest.json"
+}
