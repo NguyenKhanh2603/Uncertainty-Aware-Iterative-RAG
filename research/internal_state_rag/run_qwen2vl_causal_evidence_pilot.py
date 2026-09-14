@@ -461,53 +461,68 @@ def main() -> None:
         "random_mask": random_heads,
         "bottom_mask": bottom_heads,
     }
-    for record in evaluation_records:
-        qid = str(record["qid"])
-        question = questions[qid]
-        candidates = retrieval[qid][:top_l]
-        chunks = [to_chunk(row, corpus) for row in candidates]
-        prompt = (
-            "Answer using only the supplied context. Return only the short answer.\n"
-            f"Question: {question['question']}"
-        )
-        answer = str(question["gold_answers"][0])
-        condition_results: dict[str, Any] = {}
-        for name, heads in conditions.items():
-            if not heads:
-                condition_results[name] = {"heads": [], "masked_mean_gold_logprob": None, "gold_logprob_delta": None}
-                continue
-            with mask_attention_heads(client.model, heads):
-                masked_logits = teacher_forced_final_logits(
-                    extractor,
-                    prompt,
-                    chunks,
-                    answer,
-                    max_answer_tokens=args.max_answer_tokens,
-                )
-            masked_lp = answer_logprobs(masked_logits, record["answer_token_ids"])
-            condition_results[name] = {
-                "heads": [[int(layer), int(head)] for layer, head in heads],
-                "masked_mean_gold_logprob": float(masked_lp.mean()),
-                "gold_logprob_delta": float(masked_lp.mean() - record["full_mean_gold_logprob"]),
-                "token_logprob_delta": (masked_lp - np.asarray(record["full_token_logprobs"])).astype(float).tolist(),
-            }
-        record["causal_head_masking"] = condition_results
-        atomic_write(
-            args.output,
-            payload(
-                "running",
-                head_screening={
-                    "layers": extractor.layers,
-                    "num_heads": int(client.model.config.num_attention_heads),
-                    "discovery_queries_used": len(discovery_records),
-                    "ranking": ranking,
-                    "top_heads": [[int(layer), int(head)] for layer, head in top_heads],
-                    "random_heads": [[int(layer), int(head)] for layer, head in random_heads],
-                    "bottom_heads": [[int(layer), int(head)] for layer, head in bottom_heads],
-                },
-            ),
-        )
-        print(f"[mask] {qid} top={condition_results['top_mask']['gold_logprob_delta']}", flush=True)
+    # The causal intervention also needs SDPA on long FP16 prompts.  Keeping
+    # this context active avoids the NaNs produced by eager attention in the
+    # Qwen2-VL decoder while the selected heads are masked.
+    with _memory_efficient_attention(client.model):
+        for record in evaluation_records:
+            qid = str(record["qid"])
+            question = questions[qid]
+            candidates = retrieval[qid][:top_l]
+            chunks = [to_chunk(row, corpus) for row in candidates]
+            prompt = (
+                "Answer using only the supplied context. Return only the short answer.\n"
+                f"Question: {question['question']}"
+            )
+            answer = str(question["gold_answers"][0])
+            condition_results: dict[str, Any] = {}
+            for name, heads in conditions.items():
+                if not heads:
+                    condition_results[name] = {
+                        "heads": [],
+                        "masked_mean_gold_logprob": None,
+                        "gold_logprob_delta": None,
+                    }
+                    continue
+                with mask_attention_heads(client.model, heads):
+                    masked_logits = teacher_forced_final_logits(
+                        extractor,
+                        prompt,
+                        chunks,
+                        answer,
+                        max_answer_tokens=args.max_answer_tokens,
+                    )
+                masked_lp = answer_logprobs(masked_logits, record["answer_token_ids"])
+                condition_results[name] = {
+                    "heads": [[int(layer), int(head)] for layer, head in heads],
+                    "masked_mean_gold_logprob": float(masked_lp.mean()),
+                    "gold_logprob_delta": float(
+                        masked_lp.mean() - record["full_mean_gold_logprob"]
+                    ),
+                    "token_logprob_delta": (
+                        masked_lp - np.asarray(record["full_token_logprobs"])
+                    ).astype(float).tolist(),
+                }
+            record["causal_head_masking"] = condition_results
+            atomic_write(
+                args.output,
+                payload(
+                    "running",
+                    head_screening={
+                        "layers": extractor.layers,
+                        "num_heads": int(client.model.config.num_attention_heads),
+                        "discovery_queries_used": len(discovery_records),
+                        "ranking": ranking,
+                        "top_heads": [[int(layer), int(head)] for layer, head in top_heads],
+                        "random_heads": [[int(layer), int(head)] for layer, head in random_heads],
+                        "bottom_heads": [[int(layer), int(head)] for layer, head in bottom_heads],
+                    },
+                ),
+            )
+            print(
+                f"[mask] {qid} top={condition_results['top_mask']['gold_logprob_delta']}",
+                flush=True,
+            )
 
     ranking_metrics = {}
     for key in (
