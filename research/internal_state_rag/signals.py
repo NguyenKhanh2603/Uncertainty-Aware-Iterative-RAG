@@ -310,11 +310,16 @@ class QwenInternalStateExtractor:
         }
         if "mm_token_type_ids" in inputs:
             kwargs["mm_token_type_ids"] = inputs["mm_token_type_ids"]
+        rope_owner = (
+            self.model
+            if hasattr(self.model, "get_rope_index")
+            else self.core
+        )
         try:
-            position_ids, _ = self.model.get_rope_index(**kwargs)
+            position_ids, _ = rope_owner.get_rope_index(**kwargs)
         except TypeError:
             kwargs.pop("mm_token_type_ids", None)
-            position_ids, _ = self.model.get_rope_index(**kwargs)
+            position_ids, _ = rope_owner.get_rope_index(**kwargs)
         return position_ids
 
     @staticmethod
