@@ -96,7 +96,14 @@ def candidate_record(
         "modality": str(retrieval_row["modality"]),
         "is_support": retrieval_row["support_label"] == "support",
         "cosine_score": float(retrieval_row["cosine_score"]),
-        "bge_score": float(retrieval_row["selection_score"]),
+        # Attention-only can be evaluated directly on the dense Top-L pool,
+        # where no cross-encoder selection score exists.  Preserve an
+        # optional score for provenance without making it an input signal.
+        "selection_score": (
+            None
+            if retrieval_row.get("selection_score") is None
+            else float(retrieval_row["selection_score"])
+        ),
         "chunk_token_count": token_count,
         "original_attention_mass": original["mass"],
         "original_attention_fraction": original["fraction"],
@@ -130,6 +137,7 @@ def main() -> None:
         "source_feature_manifest": str(args.feature_manifest),
         "input_role": input_role,
         "source_split": str(source_manifest["source_split"]),
+        "retrieval": str(args.retrieval),
         "bundle_root": str(
             (args.bundle_root or args.questions.parent.parent).resolve()
         ),
