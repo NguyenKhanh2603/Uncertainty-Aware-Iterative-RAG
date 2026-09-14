@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 465,
+  "completed_queries": 465,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 3899.85340391472,
+  "rows": "research/internal_state_rag/results/qwen2vl_jina4/attention/webqa/probe_train/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/qwen2vl_jina4/attention/webqa/probe_train/manifest.json"
+}
