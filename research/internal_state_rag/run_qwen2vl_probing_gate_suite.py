@@ -23,6 +23,7 @@ DEFAULTS: dict[str, Any] = {
     "projection_dim": 32,
     "max_new_tokens": 12,
     "max_answer_tokens": 12,
+    "max_image_pixels": None,
     "compute_dtype": "bfloat16",
     "seed": 20260914,
     "feature_npz": None,

@@ -133,7 +133,7 @@ def generate_answer_last_token(
     chunks: list[Any],
     *,
     max_new_tokens: int,
-) -> str:
+) -> tuple[str, int]:
     """Greedy decode without materializing prompt-length vocabulary logits.
 
     ``model.generate`` calls the outer conditional-generation model on the
@@ -148,6 +148,11 @@ def generate_answer_last_token(
     input_ids = inputs["input_ids"]
     if input_ids.shape[0] != 1 or input_ids.shape[1] < 2:
         raise ValueError("Greedy decode expects one non-empty prompt")
+    max_positions = int(client.model.config.max_position_embeddings)
+    if input_ids.shape[1] > max_positions:
+        raise ValueError(
+            f"Prompt has {input_ids.shape[1]} tokens, exceeding model limit {max_positions}"
+        )
     attention_mask = inputs.get("attention_mask", torch.ones_like(input_ids))
     prompt_embeddings = extractor._prompt_embeddings(inputs)
     prompt_positions = extractor._prompt_position_ids(inputs)
@@ -201,7 +206,10 @@ def generate_answer_last_token(
             ],
             dim=-1,
         )
-    return client.tokenizer.decode(generated, skip_special_tokens=True).strip()
+    return (
+        client.tokenizer.decode(generated, skip_special_tokens=True).strip(),
+        int(input_ids.shape[1]),
+    )
 
 
 def atomic_write(path: Path, payload: dict[str, Any]) -> None:
@@ -236,6 +244,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--projection-dim", type=int, default=32)
     parser.add_argument("--max-new-tokens", type=int, default=12)
     parser.add_argument("--max-answer-tokens", type=int, default=12)
+    parser.add_argument(
+        "--max-image-pixels",
+        type=int,
+        default=None,
+        help="Optional per-image pixel cap applied by the Qwen-VL processor.",
+    )
     parser.add_argument(
         "--compute-dtype",
         choices=("bfloat16", "float16"),
@@ -280,6 +294,12 @@ def main(
         raise ValueError(
             f"Reused client model {client.model_name!r} does not match {args.model!r}"
         )
+    if args.max_image_pixels is not None:
+        if args.max_image_pixels < 28 * 28:
+            raise ValueError("max-image-pixels must be at least one 28x28 patch")
+        if not client.is_qwen_vl:
+            raise ValueError("max-image-pixels requires a Qwen-VL model")
+        client.processor.image_processor.max_pixels = int(args.max_image_pixels)
     compute_dtype = {"bfloat16": torch.bfloat16, "float16": torch.float16}[args.compute_dtype]
     if next(client.model.parameters()).dtype != compute_dtype:
         client.model.to(dtype=compute_dtype)
@@ -308,6 +328,7 @@ def main(
             "compute_dtype": args.compute_dtype,
             "max_new_tokens": args.max_new_tokens,
             "max_answer_tokens": args.max_answer_tokens,
+            "max_image_pixels": args.max_image_pixels,
             "risk_definition": {
                 "no_support_top1": "no labelled support among rank 1 candidate",
                 "no_support_top3": "no labelled support among rank 1-3 candidates",
@@ -337,7 +358,7 @@ def main(
                 f"Question: {question['question']}"
             )
             started_query = time.monotonic()
-            draft = generate_answer_last_token(
+            draft, prompt_tokens = generate_answer_last_token(
                 client,
                 extractor,
                 prompt,
@@ -363,6 +384,7 @@ def main(
                 "state_features": vector.astype(float).tolist(),
                 "state_diagnostics": diagnostics,
                 "draft_answer_token_count": len(trace.answer_token_ids),
+                "prompt_tokens": prompt_tokens,
                 "support_count_top30": int(support.sum()),
                 "risk_labels": {
                     f"no_support_top{k}": bool(not support[:k].any())
