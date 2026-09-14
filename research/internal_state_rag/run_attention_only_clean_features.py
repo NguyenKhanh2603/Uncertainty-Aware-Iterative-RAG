@@ -53,6 +53,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--max-answer-tokens", type=int, default=12)
     parser.add_argument("--max-new-tokens", type=int, default=24)
+    parser.add_argument("--min-pixels", type=int, default=3136)
+    parser.add_argument("--max-pixels", type=int, default=200704)
     parser.add_argument(
         "--limit",
         type=int,
@@ -125,6 +127,8 @@ def main() -> None:
         "top_l": top_l,
         "max_answer_tokens": args.max_answer_tokens,
         "max_new_tokens": args.max_new_tokens,
+        "min_pixels": args.min_pixels,
+        "max_pixels": args.max_pixels,
         "planned_queries": len(plan),
         "plan": plan,
     }
@@ -144,6 +148,14 @@ def main() -> None:
     retrieval = load_retrieval(args.retrieval, split_role=input_role)
     completed = load_completed(rows_path)
     client = ResearchTextClient(args.model, device="cuda", load_in_4bit=False)
+    if client.is_qwen_vl:
+        client.processor.image_processor.min_pixels = args.min_pixels
+        client.processor.image_processor.max_pixels = args.max_pixels
+        # Prefix passes do not request attention matrices.  SDPA keeps those
+        # long multimodal prefills tractable; Transformers falls back to eager
+        # only for the one-token decode calls that request attention weights.
+        client.model.config._attn_implementation = "sdpa"
+        client.model.model.config._attn_implementation = "sdpa"
     extractor = QwenInternalStateExtractor(client)
     started = time.perf_counter()
 
