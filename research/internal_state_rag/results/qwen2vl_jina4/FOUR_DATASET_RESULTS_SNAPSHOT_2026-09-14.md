@@ -43,7 +43,7 @@ The main table reports alpha = 0.1. Chunks, precision, support recall, and query
 | MMQA | Jina-m0 + Qwen internal | 2.94 | 40.07% | 94.02% | 92.83% | 88.00% |
 | WebQA | Original cosine-BY | 0.00 | 0.00% | 0.00% | 0.00% | 0.00% |
 | WebQA | Jina-v4 cosine + query conformal | 19.07 | 5.85% | 88.65% | 85.71% | 62.40% |
-| WebQA | Attention-only | pending | pending | pending | pending | pending |
+| WebQA | Attention-only | 22.21 | 5.57% | 98.25% | 97.80% | 71.20% |
 | WebQA | Qwen internal-only | 7.41 | 14.69% | 86.46% | 84.07% | 61.20% |
 | WebQA | Jina-m0 reranker-only | 7.29 | 15.38% | 89.08% | 87.36% | 63.60% |
 | WebQA | Jina-m0 + Qwen internal | 5.35 | 20.66% | 87.77% | 84.62% | 61.60% |
@@ -65,7 +65,7 @@ Full-corpus retrieval and Top-L = 30 give high retrieval ceilings on the first t
 ## Findings
 
 1. Query-level conformal calibration restores recall, but raw cosine needs 8-19 chunks per retrievable query at alpha = 0.1.
-2. Attention-only also restores recall by retaining 14-21 chunks. Its precision is only 4.8-12.4%, so attention magnitude is not an effective standalone chunk-pruning score.
+2. Attention-only also restores recall by retaining 14-22 chunks. Its precision is only 4.8-12.4%, so attention magnitude is not an effective standalone chunk-pruning score. WebQA makes this especially clear: position-controlled attention reaches 98.25% support recall but retains 22.21 of 30 candidates at 5.57% precision.
 3. Jina-m0 reranker-only is the strongest practical selector. It retains about three chunks on TAT-QA, HotpotQA, and MMQA with 92-94% support recall. WebQA is harder and needs 7.29 chunks for 89.08% recall.
 4. Qwen hidden states contain a reproducible relevance signal. TAT-QA, HotpotQA, and MMQA select decoder layer 19; WebQA selects layer 15. Internal-only improves over cosine on TAT-QA and HotpotQA, but does not generalize as a replacement on MMQA or WebQA.
 5. Adding internal state to Jina-m0 changes recall by +0.39 percentage points on TAT-QA, +0.05 on HotpotQA, +0.17 on MMQA, and -1.31 on WebQA. These results do not establish a broad recall improvement over the reranker.
@@ -77,15 +77,13 @@ The current evidence supports replacing candidate-wise cosine-BY with a stronger
 
 The original cosine-BY row and the query-level conformal rows implement different selection guarantees. The BY method can emit an empty set; query-level conformal uses a Top-1 fallback. They are shown together to expose the failure mode, not as identical conformal procedures.
 
-Some Qwen attention traces contain non-finite values. The evaluator counts those queries as tied zero scores rather than dropping them. The completed invalid-trace counts are 547/1,000 test queries for TAT-QA, 205/1,000 for HotpotQA, and 190/1,000 for MMQA.
-
-WebQA attention test extraction is complete. Its calibration and probe-training extraction were still running when this snapshot was written, so no WebQA attention metric is reported here.
+Some Qwen attention traces contain non-finite values. The evaluator counts those queries as tied zero scores rather than dropping them. The invalid-trace counts are 547/1,000 test queries for TAT-QA, 205/1,000 for HotpotQA, 190/1,000 for MMQA, and 32/250 for WebQA.
 
 ## Result files
 
 - `{tatqa,hotpotqa,mmqa,webqa}_cosine_by_report.json`: original candidate-wise cosine-BY.
 - `{tatqa,hotpotqa,mmqa,webqa}_ablation_report.json`: cosine, LM-head, hidden probe, internal-only, Jina-m0, and fusion results.
-- `{tatqa,hotpotqa,mmqa}_attention_only_report.json`: completed attention-only results.
+- `{tatqa,hotpotqa,mmqa,webqa}_attention_only_report.json`: completed attention-only results.
 - `{dataset}_ablation_predictions.npz`: per-query scores and retained masks.
 - `features/{dataset}/{probe_train,calibration,test}/features.npz`: Qwen internal feature arrays.
 - `attention/{dataset}/{role}/queries.jsonl`: raw attention extraction for completed roles.
