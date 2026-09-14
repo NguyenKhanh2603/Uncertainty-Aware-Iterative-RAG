@@ -42,6 +42,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--predictions-output", type=Path, required=True)
     parser.add_argument("--alpha", type=float, default=0.1)
     parser.add_argument("--allocation-step", type=float, default=0.005)
+    parser.add_argument(
+        "--global-alpha-grid",
+        default="0.01,0.015,0.02,0.025,0.03,0.035,0.04,0.045,0.05,0.06,0.07,0.08,0.09,0.1,0.12,0.15,0.2",
+        help="Global thresholds used for a descriptive budget-matched frontier.",
+    )
     parser.add_argument("--seed", type=int, default=941)
     parser.add_argument("--bootstrap-samples", type=int, default=10_000)
     return parser.parse_args()
@@ -169,13 +174,18 @@ def evaluate_rule(
     thresholds, orders, counts = modality_thresholds(
         cal_scores, cal_labels, cal_modalities, alpha_by_modality
     )
+    cal_mask = modality_keep_mask(cal_scores, cal_modalities, thresholds)
     mask = modality_keep_mask(test_scores, test_modalities, thresholds)
+    cal_retrievable = cal_labels.any(axis=1)
     retrievable = test_labels.any(axis=1)
     return {
         "alpha_by_modality": alpha_by_modality,
         "thresholds": thresholds,
         "finite_sample_orders": orders,
         "calibration_queries_by_support_modality": counts,
+        "calibration_mean_chunks_kept": float(
+            cal_mask[cal_retrievable].sum(axis=1).mean()
+        ),
         "conditional_on_retrievable": conditional_metrics(
             test_labels[retrievable], mask[retrievable]
         ),
@@ -224,6 +234,11 @@ def main() -> None:
     support_modalities = sorted(
         set(cal_modalities[cal_labels].tolist()) | set(test_modalities[test_labels].tolist())
     )
+    global_alpha_grid = sorted(
+        {float(value) for value in args.global_alpha_grid.split(",") if value.strip()}
+    )
+    if not global_alpha_grid or any(not 0 < value < 1 for value in global_alpha_grid):
+        raise ValueError("global-alpha-grid values must be between zero and one")
 
     methods = [
         "jina_v4_cosine",
@@ -247,10 +262,15 @@ def main() -> None:
             coverage_target="all_support",
         )
         global_mask = keep_mask(test_scores[method], threshold)
+        global_cal_mask = keep_mask(cal_scores[method], threshold)
+        cal_retrievable = cal_labels.any(axis=1)
         global_result = {
             "alpha": args.alpha,
             "threshold": threshold,
             "finite_sample_order": order,
+            "calibration_mean_chunks_kept": float(
+                global_cal_mask[cal_retrievable].sum(axis=1).mean()
+            ),
             "conditional_on_retrievable": conditional_metrics(
                 test_labels[retrievable], global_mask[retrievable]
             ),
@@ -294,6 +314,46 @@ def main() -> None:
                 seed=args.seed + 100 * method_index + len(rules),
                 samples=args.bootstrap_samples,
             )
+
+        global_frontier = []
+        for frontier_alpha in global_alpha_grid:
+            frontier_threshold, frontier_order = conformal_threshold(
+                cal_scores[method][cal_retrievable],
+                cal_labels[cal_retrievable],
+                alpha=frontier_alpha,
+                coverage_target="all_support",
+            )
+            frontier_cal_mask = keep_mask(cal_scores[method], frontier_threshold)
+            frontier_test_mask = keep_mask(test_scores[method], frontier_threshold)
+            global_frontier.append(
+                {
+                    "alpha": frontier_alpha,
+                    "threshold": frontier_threshold,
+                    "finite_sample_order": frontier_order,
+                    "calibration_mean_chunks_kept": float(
+                        frontier_cal_mask[cal_retrievable].sum(axis=1).mean()
+                    ),
+                    "conditional_on_retrievable": conditional_metrics(
+                        test_labels[retrievable], frontier_test_mask[retrievable]
+                    ),
+                    "test_support_by_modality": modality_recall(
+                        test_labels[retrievable],
+                        frontier_test_mask[retrievable],
+                        test_modalities[retrievable],
+                    ),
+                }
+            )
+        for rule_name in (
+            "mondrian_bonferroni_equal",
+            "mondrian_bonferroni_probe_allocated",
+        ):
+            target = rules[rule_name]["calibration_mean_chunks_kept"]
+            matched = min(
+                global_frontier,
+                key=lambda row: abs(row["calibration_mean_chunks_kept"] - target),
+            )
+            rules[rule_name]["descriptive_global_budget_match"] = matched
+        rules["global_alpha_frontier"] = global_frontier
         results[method] = rules
         for rule_name, mask in masks.items():
             masks_to_save[f"mask_{method}_{rule_name}"] = mask
@@ -318,6 +378,11 @@ def main() -> None:
             "selected_layer": selected_layer,
             "selected_c": selected_c,
             "allocation_step": args.allocation_step,
+            "global_alpha_grid": global_alpha_grid,
+            "budget_match_note": (
+                "nearest global point is selected by calibration mean chunks and is a "
+                "descriptive efficiency comparison, not a separately guaranteed target"
+            ),
         },
         "results": results,
         "probe_allocation_audit": allocation_audit,
