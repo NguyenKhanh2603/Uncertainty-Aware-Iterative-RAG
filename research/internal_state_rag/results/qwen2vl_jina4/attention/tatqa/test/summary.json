@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 1000,
+  "completed_queries": 1000,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 2579.9250683151186,
+  "rows": "research/internal_state_rag/results/qwen2vl_jina4/attention/tatqa/test/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/qwen2vl_jina4/attention/tatqa/test/manifest.json"
+}
