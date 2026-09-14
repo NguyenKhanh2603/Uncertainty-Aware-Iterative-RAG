@@ -40,6 +40,9 @@ def load_retrieval(path: Path, role: str) -> dict[str, list[dict]]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", default="Qwen/Qwen2-VL-2B-Instruct")
+    parser.add_argument(
+        "--model-revision", default="895c3a49bc3fa70a340399125c650a463535e71c"
+    )
     parser.add_argument("--feature-manifest", type=Path, required=True)
     parser.add_argument("--questions", type=Path, required=True)
     parser.add_argument("--corpus", type=Path, required=True)
@@ -116,13 +119,17 @@ def main() -> None:
     retrieval = load_retrieval(args.retrieval, str(plan_payload["input_role"]))
 
     processor = AutoProcessor.from_pretrained(
-        args.model, min_pixels=args.min_pixels, max_pixels=args.max_pixels
+        args.model,
+        revision=args.model_revision,
+        min_pixels=args.min_pixels,
+        max_pixels=args.max_pixels,
     )
     processor.tokenizer.padding_side = "left"
     if processor.tokenizer.pad_token_id is None:
         processor.tokenizer.pad_token_id = processor.tokenizer.eos_token_id
     model = Qwen2VLForConditionalGeneration.from_pretrained(
         args.model,
+        revision=args.model_revision,
         torch_dtype=torch.bfloat16,
         attn_implementation="sdpa",
     ).eval().to("cuda")
@@ -251,6 +258,7 @@ def main() -> None:
         "status": "complete",
         "method": "qwen2vl_pairwise_relevance_hidden_and_lm_head",
         "model": args.model,
+        "model_revision": args.model_revision,
         "input_role": plan_payload["input_role"],
         "source_split": plan_payload["source_split"],
         "n_queries": n_queries,

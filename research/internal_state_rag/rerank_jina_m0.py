@@ -47,6 +47,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bundle-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", default="jinaai/jina-reranker-m0")
+    parser.add_argument(
+        "--model-revision", default="94bfe0aeb2d4dd7978362699cddd5893d4e0adc8"
+    )
     parser.add_argument("--text-batch-size", type=int, default=16)
     parser.add_argument("--image-batch-size", type=int, default=8)
     parser.add_argument("--text-max-length", type=int, default=1024)
@@ -77,6 +80,7 @@ def main() -> None:
     if len(missing):
         model = AutoModel.from_pretrained(
             args.model,
+            revision=args.model_revision,
             trust_remote_code=True,
             torch_dtype=torch.bfloat16,
             attn_implementation="sdpa",
@@ -133,6 +137,7 @@ def main() -> None:
             row["selection_score"] = float(scores[index])
             row["selection_score_id"] = (
                 f"multimodal_cross_encoder:{args.model}"
+                f"@{args.model_revision}"
                 f"#text_max={args.text_max_length}#image_max={args.image_max_length}"
             )
             output_rows.append(row)
@@ -146,6 +151,7 @@ def main() -> None:
     manifest = {
         "status": "complete",
         "model": args.model,
+        "model_revision": args.model_revision,
         "input": str(args.retrieval),
         "output": str(args.output),
         "rows": len(rows),
