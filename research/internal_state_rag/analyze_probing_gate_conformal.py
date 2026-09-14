@@ -50,14 +50,29 @@ def align_features(
     npz_path: Path,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
     values = np.load(npz_path, allow_pickle=False)
-    qids = values["qids"].astype(str)
-    missing = set(qids).difference(gate_rows)
-    if missing:
-        raise ValueError(f"{len(missing)} feature qids are missing gate states ({npz_path})")
+    all_qids = values["qids"].astype(str)
+    # Gate extraction may intentionally cover a bounded pilot subset while the
+    # frozen feature artifact contains the complete split.  Restrict the
+    # feature rows to the gate qids, retaining artifact order so labels and
+    # reranker scores stay aligned.  A gate qid absent from the artifact is a
+    # real alignment error and should still fail loudly.
+    feature_qid_set = set(all_qids)
+    missing_from_features = set(gate_rows).difference(feature_qid_set)
+    if missing_from_features:
+        raise ValueError(
+            f"{len(missing_from_features)} gate qids are missing from feature artifact "
+            f"({npz_path})"
+        )
+    indices = np.asarray(
+        [index for index, qid in enumerate(all_qids) if qid in gate_rows], dtype=np.int64
+    )
+    if len(indices) == 0:
+        raise ValueError(f"No gate qids found in feature artifact ({npz_path})")
+    qids = all_qids[indices]
     ordered = [gate_rows[str(qid)] for qid in qids]
     x = np.asarray([row["state_features"] for row in ordered], dtype=np.float64)
-    labels = values["labels"].astype(bool)
-    scores = values["reranker_scores"].astype(np.float64)
+    labels = values["labels"][indices].astype(bool)
+    scores = values["reranker_scores"][indices].astype(np.float64)
     if not np.isfinite(x).all():
         raise ValueError("Gate features contain non-finite values")
     return x, labels, scores, qids, np.asarray([row["risk_labels"] for row in ordered], dtype=object)
