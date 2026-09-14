@@ -171,6 +171,7 @@ def main() -> None:
         # only for the one-token decode calls that request attention weights.
         client.model.config._attn_implementation = "sdpa"
         client.model.model.config._attn_implementation = "sdpa"
+        client.model.model.language_model.config._attn_implementation = "sdpa"
     extractor = QwenInternalStateExtractor(client)
     started = time.perf_counter()
 

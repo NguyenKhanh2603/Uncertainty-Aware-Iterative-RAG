@@ -178,6 +178,14 @@ class QwenInternalStateExtractor:
             return_dict=True,
         )
 
+        # SDPA is used for the long prefix.  Only the one-token decode passes
+        # need explicit attention weights, so switch the decoder modules to
+        # eager attention after the prefix cache has been built.
+        decoder = getattr(self.core, "language_model", self.core)
+        attention_config = decoder.config
+        previous_attention_implementation = attention_config._attn_implementation
+        attention_config._attn_implementation = "eager"
+
         n_selected = len(self.layers)
         n_tokens = len(answer_ids)
         n_heads = int(self.model.config.num_attention_heads)
@@ -259,6 +267,7 @@ class QwenInternalStateExtractor:
                 dim=-1,
             )
 
+        attention_config._attn_implementation = previous_attention_implementation
         return InternalTrace(
             answer_token_ids=[int(token_id) for token_id in answer_ids],
             layer_ids=self.layers,
