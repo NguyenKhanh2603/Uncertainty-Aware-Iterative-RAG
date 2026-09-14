@@ -28,7 +28,6 @@ import torch
 from research.internal_state_rag.contrastive_saliency import _memory_efficient_attention
 from research.internal_state_rag.run_tatqa_smoke import (
     ResearchTextClient,
-    generate_answer,
     load_retrieval,
     load_rows,
     to_chunk,
@@ -124,6 +123,85 @@ def query_state_features(trace: Any, projection: np.ndarray) -> tuple[np.ndarray
         "residual_norm_by_layer": np.linalg.norm(residual, axis=1).astype(float).tolist(),
         "attention_entropy_by_layer": attention_entropy.astype(float).tolist(),
     }
+
+
+@torch.inference_mode()
+def generate_answer_last_token(
+    client: ResearchTextClient,
+    extractor: QwenInternalStateExtractor,
+    query: str,
+    chunks: list[Any],
+    *,
+    max_new_tokens: int,
+) -> str:
+    """Greedy decode without materializing prompt-length vocabulary logits.
+
+    ``model.generate`` calls the outer conditional-generation model on the
+    complete multimodal prompt. Qwen2-VL 7B then applies its large LM head to
+    every prompt position, which can fail for Top-30 contexts containing many
+    images. This implementation builds the same KV cache through the decoder
+    core and applies the LM head only to the final position at each step.
+    """
+
+    alignment = client.align_and_prepare_inputs(query, chunks)
+    inputs = alignment.inputs
+    input_ids = inputs["input_ids"]
+    if input_ids.shape[0] != 1 or input_ids.shape[1] < 2:
+        raise ValueError("Greedy decode expects one non-empty prompt")
+    attention_mask = inputs.get("attention_mask", torch.ones_like(input_ids))
+    prompt_embeddings = extractor._prompt_embeddings(inputs)
+    prompt_positions = extractor._prompt_position_ids(inputs)
+    prefix = extractor.core(
+        input_ids=None,
+        inputs_embeds=prompt_embeddings[:, :-1, :],
+        attention_mask=attention_mask[:, :-1],
+        position_ids=extractor._slice_positions(prompt_positions, 0, -1),
+        use_cache=True,
+        output_attentions=False,
+        output_hidden_states=False,
+        return_dict=True,
+    )
+    cache = prefix.past_key_values
+    current_embedding = prompt_embeddings[:, -1:, :]
+    current_position = extractor._slice_positions(prompt_positions, -1, None)
+    running_mask = attention_mask
+    generated: list[int] = []
+    eos = client.model.generation_config.eos_token_id
+    eos_ids = {int(value) for value in eos} if isinstance(eos, (list, tuple)) else {int(eos)}
+
+    for _ in range(max_new_tokens):
+        output = extractor.core(
+            input_ids=None,
+            inputs_embeds=current_embedding,
+            attention_mask=running_mask,
+            position_ids=current_position,
+            past_key_values=cache,
+            use_cache=True,
+            output_attentions=False,
+            output_hidden_states=False,
+            return_dict=True,
+        )
+        cache = output.past_key_values
+        final_hidden = output.last_hidden_state[:, -1:, :]
+        next_id = int(torch.argmax(extractor.lm_head(final_hidden).float()[0, -1]).item())
+        if next_id in eos_ids:
+            break
+        generated.append(next_id)
+        token = torch.tensor([[next_id]], dtype=input_ids.dtype, device=input_ids.device)
+        current_embedding = client.model.get_input_embeddings()(token)
+        current_position = current_position + 1
+        running_mask = torch.cat(
+            [
+                running_mask,
+                torch.ones(
+                    (running_mask.shape[0], 1),
+                    dtype=running_mask.dtype,
+                    device=running_mask.device,
+                ),
+            ],
+            dim=-1,
+        )
+    return client.tokenizer.decode(generated, skip_special_tokens=True).strip()
 
 
 def atomic_write(path: Path, payload: dict[str, Any]) -> None:
@@ -259,8 +337,9 @@ def main(
                 f"Question: {question['question']}"
             )
             started_query = time.monotonic()
-            draft = generate_answer(
+            draft = generate_answer_last_token(
                 client,
+                extractor,
                 prompt,
                 chunks,
                 max_new_tokens=args.max_new_tokens,
