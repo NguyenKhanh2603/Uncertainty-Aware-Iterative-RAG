@@ -95,7 +95,7 @@ def make_scores(part, hidden, weights):
         score = row["lm_head"] * lm_head + row["hidden_probe"] * hidden
         return score if base is None else base + score
 
-    return {
+    methods = {
         "jina_v4_cosine": cosine,
         "lm_head_only": lm_head,
         "hidden_probe_only": hidden,
@@ -104,6 +104,11 @@ def make_scores(part, hidden, weights):
         "cosine_internal": internal("cosine_internal", cosine),
         "reranker_internal": internal("reranker_internal", reranker),
     }
+    if "bge_reranker_scores" in part.files and np.isfinite(part["bge_reranker_scores"]).all():
+        methods["bge_v2_m3_reranker"] = query_z(
+            part["bge_reranker_scores"].astype(np.float64)
+        )
+    return methods
 
 
 def main() -> None:
@@ -191,7 +196,10 @@ def main() -> None:
     output = {
         "status": "complete",
         "dataset": args.dataset,
-        "protocol": "500_probe_train_500_conformal_calibration_official_test_fixed_jina_v4_top30",
+        "protocol": (
+            "disjoint_training_subset_conformal_calibration_"
+            "official_test_fixed_jina_v4_top30"
+        ),
         "split": {
             "probe_train_total": len(train_labels),
             "probe_train_retrievable": int(train_retrievable.sum()),

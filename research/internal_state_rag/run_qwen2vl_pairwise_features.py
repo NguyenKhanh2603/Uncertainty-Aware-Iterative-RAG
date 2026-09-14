@@ -145,6 +145,7 @@ def main() -> None:
     labels = np.empty((n_queries, top_l), dtype=np.bool_)
     cosine_scores = np.empty((n_queries, top_l), dtype=np.float32)
     reranker_scores = np.empty((n_queries, top_l), dtype=np.float32)
+    bge_reranker_scores = np.full((n_queries, top_l), np.nan, dtype=np.float32)
     modalities = np.empty((n_queries, top_l), dtype="U8")
     chunk_ids = np.empty((n_queries, top_l), dtype="U128")
     prompt_lengths = np.empty((n_queries, top_l), dtype=np.int32)
@@ -201,6 +202,9 @@ def main() -> None:
             reranker_scores[query_index, candidate_index] = float(
                 candidate.get("jina_reranker_score", candidate.get("selection_score", np.nan))
             )
+            bge_reranker_scores[query_index, candidate_index] = float(
+                candidate.get("bge_reranker_score", np.nan)
+            )
             modalities[query_index, candidate_index] = modality
             chunk_ids[query_index, candidate_index] = str(candidate["chunk_id"])
             if modality == "image":
@@ -236,6 +240,7 @@ def main() -> None:
         labels=labels,
         cosine_scores=cosine_scores,
         reranker_scores=reranker_scores,
+        bge_reranker_scores=bge_reranker_scores,
         modalities=modalities,
         chunk_ids=chunk_ids,
         qids=np.asarray(plan),

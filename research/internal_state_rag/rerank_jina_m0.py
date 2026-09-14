@@ -127,6 +127,8 @@ def main() -> None:
             row = dict(rows[index])
             row["cosine_rank"] = int(row["rank"])
             row["rank"] = rank
+            if "bge" in str(row.get("selection_score_id", "")).lower():
+                row["bge_reranker_score"] = float(row["selection_score"])
             row["jina_reranker_score"] = float(scores[index])
             row["selection_score"] = float(scores[index])
             row["selection_score_id"] = (
