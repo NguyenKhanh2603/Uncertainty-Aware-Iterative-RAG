@@ -145,8 +145,9 @@ def resolve_dtype(device: str, dtype_name: str) -> torch.dtype:
 class JinaV4RetrievalAdapter:
     """Expose Jina Embeddings v4 through the legacy retrieval runner API."""
 
-    def __init__(self, model):
+    def __init__(self, model, max_image_pixels: int):
         self.model = model
+        self.max_image_pixels = max_image_pixels
 
     def encode_text(self, texts, *, task=None, truncate_dim=None):
         prompt_name = "query" if task and "query" in task else "passage"
@@ -164,10 +165,17 @@ class JinaV4RetrievalAdapter:
             task="retrieval",
             truncate_dim=truncate_dim,
             return_numpy=True,
+            max_pixels=self.max_image_pixels,
         )
 
 
-def load_model(model_name: str, revision: str, device: str, dtype_name: str):
+def load_model(
+    model_name: str,
+    revision: str,
+    device: str,
+    dtype_name: str,
+    max_image_pixels: int = 200704,
+):
     from transformers import AutoModel
 
     dtype = resolve_dtype(device, dtype_name)
@@ -179,7 +187,7 @@ def load_model(model_name: str, revision: str, device: str, dtype_name: str):
     )
     model = model.eval().to(device)
     if "jina-embeddings-v4" in model_name.lower():
-        model = JinaV4RetrievalAdapter(model)
+        model = JinaV4RetrievalAdapter(model, max_image_pixels)
     return model, dtype
 
 
@@ -618,6 +626,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-per-modality", type=int, default=10)
     parser.add_argument("--text-batch-size", type=int, default=32)
     parser.add_argument("--image-batch-size", type=int, default=8)
+    parser.add_argument("--max-image-pixels", type=int, default=200704)
     parser.add_argument(
         "--no-image-caption-fusion",
         action="store_true",
@@ -683,6 +692,7 @@ def main() -> None:
         "top_l": args.top_l,
         "candidate_scope": candidate_scope,
         "image_caption_fusion": not args.no_image_caption_fusion,
+        "max_image_pixels": args.max_image_pixels,
         "min_per_modality": (
             args.min_per_modality if args.retrieval_mode == "modality_aware" else None
         ),
@@ -715,7 +725,13 @@ def main() -> None:
     model = None
     if corpus_vectors is None:
         stage_started = time.perf_counter()
-        model, _ = load_model(args.model, args.model_revision, args.device, args.dtype)
+        model, _ = load_model(
+            args.model,
+            args.model_revision,
+            args.device,
+            args.dtype,
+            args.max_image_pixels,
+        )
         corpus_vectors = encode_corpus(
             model,
             corpus,
@@ -744,7 +760,13 @@ def main() -> None:
     if query_vectors is None:
         stage_started = time.perf_counter()
         if model is None:
-            model, _ = load_model(args.model, args.model_revision, args.device, args.dtype)
+            model, _ = load_model(
+                args.model,
+                args.model_revision,
+                args.device,
+                args.dtype,
+                args.max_image_pixels,
+            )
         query_vectors = encode_with_backoff(
             [query.question for query in queries],
             encode_batch=lambda batch: model.encode_text(
