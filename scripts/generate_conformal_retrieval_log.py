@@ -142,6 +142,31 @@ def resolve_dtype(device: str, dtype_name: str) -> torch.dtype:
     }[dtype_name]
 
 
+class JinaV4RetrievalAdapter:
+    """Expose Jina Embeddings v4 through the legacy retrieval runner API."""
+
+    def __init__(self, model):
+        self.model = model
+
+    def encode_text(self, texts, *, task=None, truncate_dim=None):
+        prompt_name = "query" if task and "query" in task else "passage"
+        return self.model.encode_text(
+            list(texts),
+            task="retrieval",
+            prompt_name=prompt_name,
+            truncate_dim=truncate_dim,
+            return_numpy=True,
+        )
+
+    def encode_image(self, images, *, truncate_dim=None):
+        return self.model.encode_image(
+            list(images),
+            task="retrieval",
+            truncate_dim=truncate_dim,
+            return_numpy=True,
+        )
+
+
 def load_model(model_name: str, revision: str, device: str, dtype_name: str):
     from transformers import AutoModel
 
@@ -153,6 +178,8 @@ def load_model(model_name: str, revision: str, device: str, dtype_name: str):
         torch_dtype=dtype,
     )
     model = model.eval().to(device)
+    if "jina-embeddings-v4" in model_name.lower():
+        model = JinaV4RetrievalAdapter(model)
     return model, dtype
 
 
@@ -205,6 +232,7 @@ def encode_corpus(
     truncate_dim: int,
     text_batch_size: int,
     image_batch_size: int,
+    image_caption_fusion: bool = True,
 ) -> np.ndarray:
     vectors: np.ndarray | None = None
     text_indices = [index for index, chunk in enumerate(corpus) if chunk.modality != "image"]
@@ -233,7 +261,11 @@ def encode_corpus(
             raise RuntimeError("Text and image encoders returned different dimensions")
         vectors[image_indices] = image_vectors
 
-    caption_indices = [index for index in image_indices if corpus[index].caption.strip()]
+    caption_indices = (
+        [index for index in image_indices if corpus[index].caption.strip()]
+        if image_caption_fusion
+        else []
+    )
     caption_vectors = encode_with_backoff(
         [corpus[index].caption for index in caption_indices],
         encode_batch=lambda batch: model.encode_text(list(batch), truncate_dim=truncate_dim),
@@ -586,6 +618,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-per-modality", type=int, default=10)
     parser.add_argument("--text-batch-size", type=int, default=32)
     parser.add_argument("--image-batch-size", type=int, default=8)
+    parser.add_argument(
+        "--no-image-caption-fusion",
+        action="store_true",
+        help="Use visual embeddings alone for image chunks.",
+    )
     parser.add_argument("--query-batch-size", type=int, default=64)
     parser.add_argument("--corpus-block-size", type=int, default=16384)
     parser.add_argument(
@@ -645,6 +682,7 @@ def main() -> None:
         "mode": args.retrieval_mode,
         "top_l": args.top_l,
         "candidate_scope": candidate_scope,
+        "image_caption_fusion": not args.no_image_caption_fusion,
         "min_per_modality": (
             args.min_per_modality if args.retrieval_mode == "modality_aware" else None
         ),
@@ -684,6 +722,7 @@ def main() -> None:
             truncate_dim=args.truncate_dim,
             text_batch_size=args.text_batch_size,
             image_batch_size=args.image_batch_size,
+            image_caption_fusion=not args.no_image_caption_fusion,
         )
         save_embedding_cache(args.cache_dir, f"corpus-{cache_identity}", corpus_ids, corpus_vectors)
         timings["encode_corpus"] = time.perf_counter() - stage_started
