@@ -113,6 +113,11 @@ def main() -> None:
             "test_retrievable": int(test["labels"].any(axis=1).sum()),
             "top_l": int(test["labels"].shape[1]),
             "overlaps": overlaps,
+            "invalid_attention_queries": {
+                "probe_train": train["invalid_queries"],
+                "calibration": calibration["invalid_queries"],
+                "test": test["invalid_queries"],
+            },
         },
         "learned_probe": learned_metadata,
         "methods": methods,

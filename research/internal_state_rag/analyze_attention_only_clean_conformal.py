@@ -44,33 +44,48 @@ def load_attention(path: Path, *, role: str = "") -> dict[str, Any]:
     top_l = len(rows[0]["candidates"])
     if any(len(row["candidates"]) != top_l for row in rows):
         raise ValueError(f"Inconsistent candidate counts in {path}")
+    raw_scores = {
+        name: np.asarray(
+            [[float(c[field]) for c in row["candidates"]] for row in rows],
+            dtype=np.float64,
+        )
+        for name, field in ATTENTION_SIGNALS.items()
+    }
+    raw_probe_features = {
+        field: np.asarray(
+            [[float(c[field]) for c in row["candidates"]] for row in rows],
+            dtype=np.float64,
+        )
+        for field in ("mean_attention_mass", "mean_attention_fraction")
+    }
+    invalid_queries = {
+        name: int((~np.isfinite(values).all(axis=1)).sum())
+        for name, values in {**raw_scores, **raw_probe_features}.items()
+    }
+    # Keep every query in the evaluation. A failed attention trace contributes
+    # a tied zero score for every chunk instead of being silently dropped.
+    raw_scores = {
+        name: np.nan_to_num(values, nan=0.0, posinf=0.0, neginf=0.0)
+        for name, values in raw_scores.items()
+    }
+    raw_probe_features = {
+        name: np.nan_to_num(values, nan=0.0, posinf=0.0, neginf=0.0)
+        for name, values in raw_probe_features.items()
+    }
     return {
         "qids": np.asarray([str(row["qid"]) for row in rows]),
         "labels": np.asarray(
             [[bool(c["is_support"]) for c in row["candidates"]] for row in rows]
         ),
-        "scores": {
-            name: query_z(
-                np.asarray(
-                    [[float(c[field]) for c in row["candidates"]] for row in rows]
-                )
-            )
-            for name, field in ATTENTION_SIGNALS.items()
-        },
+        "scores": {name: query_z(values) for name, values in raw_scores.items()},
         "probe_features": np.stack(
             [
-                query_z(
-                    np.asarray(
-                        [
-                            [float(c[field]) for c in row["candidates"]]
-                            for row in rows
-                        ]
-                    )
-                )
+                query_z(raw_probe_features[field])
                 for field in ("mean_attention_mass", "mean_attention_fraction")
             ],
             axis=-1,
         ),
+        "invalid_queries": invalid_queries,
     }
 
 
