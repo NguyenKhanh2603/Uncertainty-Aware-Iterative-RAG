@@ -78,7 +78,7 @@
       "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
       "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
       "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
-      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_probe_train100.json"
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_probe_train_lastlogit100.json"
     },
     {
       "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/calibration/manifest.json",
@@ -86,7 +86,7 @@
       "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
       "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
       "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
-      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_calibration100.json"
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_calibration_lastlogit100.json"
     },
     {
       "feature_manifest": "research/internal_state_rag/results/qwen2vl_jina4/features/webqa/test/manifest.json",
@@ -94,7 +94,7 @@
       "questions": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/questions.jsonl",
       "corpus": "data/conformal_global_run/official_bundle_webqa_train1000_test250/webqa/corpus.jsonl",
       "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
-      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_test100.json"
+      "output": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_test_lastlogit100.json"
     }
   ]
 }
