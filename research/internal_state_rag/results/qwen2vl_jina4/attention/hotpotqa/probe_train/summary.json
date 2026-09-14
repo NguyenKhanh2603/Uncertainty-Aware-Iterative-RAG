@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "planned_queries": 509,
+  "completed_queries": 509,
+  "empty_draft_queries": 0,
+  "elapsed_seconds_this_process": 1015.9239477664232,
+  "rows": "research/internal_state_rag/results/qwen2vl_jina4/attention/hotpotqa/probe_train/queries.jsonl",
+  "manifest": "research/internal_state_rag/results/qwen2vl_jina4/attention/hotpotqa/probe_train/manifest.json"
+}
