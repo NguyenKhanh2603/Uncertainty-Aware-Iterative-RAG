@@ -58,6 +58,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--max-answer-tokens", type=int, default=12)
     parser.add_argument("--max-new-tokens", type=int, default=24)
+    parser.add_argument("--layers", default="14,18")
     parser.add_argument("--min-pixels", type=int, default=3136)
     parser.add_argument("--max-pixels", type=int, default=200704)
     parser.add_argument(
@@ -135,6 +136,7 @@ def main() -> None:
         "top_l": top_l,
         "max_answer_tokens": args.max_answer_tokens,
         "max_new_tokens": args.max_new_tokens,
+        "layers": [int(value) for value in args.layers.split(",") if value.strip()],
         "min_pixels": args.min_pixels,
         "max_pixels": args.max_pixels,
         "planned_queries": len(plan),
@@ -172,7 +174,8 @@ def main() -> None:
         client.model.config._attn_implementation = "sdpa"
         client.model.model.config._attn_implementation = "sdpa"
         client.model.model.language_model.config._attn_implementation = "sdpa"
-    extractor = QwenInternalStateExtractor(client)
+    attention_layers = [int(value) for value in args.layers.split(",") if value.strip()]
+    extractor = QwenInternalStateExtractor(client, layers=attention_layers)
     started = time.perf_counter()
 
     for query_index, qid in enumerate(plan, start=1):
