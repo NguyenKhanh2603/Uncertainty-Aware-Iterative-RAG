@@ -43,9 +43,15 @@ def mask_attention_heads(model: Any, heads: Sequence[Head]) -> Iterator[None]:
     for layer, head in heads:
         by_layer[int(layer)].append(int(head))
 
+    # Qwen2-VL wraps the text decoder under ``model.language_model`` while
+    # text-only Qwen/Llama checkpoints expose ``model.layers`` directly.
+    # Resolve both layouts here so the same intervention is genuinely applied
+    # to the decoder used by the current multimodal experiments.
     decoder = model.model
+    decoder = getattr(decoder, "language_model", decoder)
     layers = decoder.layers
-    num_heads = int(model.config.num_attention_heads)
+    config = getattr(decoder, "config", getattr(model, "config", None))
+    num_heads = int(getattr(config, "num_attention_heads", model.config.num_attention_heads))
     handles = []
     try:
         for layer_index, head_indices in by_layer.items():

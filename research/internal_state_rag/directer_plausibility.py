@@ -130,7 +130,13 @@ def teacher_forced_final_logits(
         next_id = torch.tensor(
             [[target_id]], device=input_ids.device, dtype=input_ids.dtype
         )
-        current_embedding = extractor.core.embed_tokens(next_id)
+        # Qwen2-VL stores the language-model embedding under
+        # ``model.language_model.embed_tokens``; text-only decoders expose it
+        # directly on ``core``.  The public model accessor handles both.
+        embedding = getattr(extractor.core, "embed_tokens", None)
+        if embedding is None:
+            embedding = extractor.model.get_input_embeddings()
+        current_embedding = embedding(next_id)
         current_position = current_position + 1
         running_mask = torch.cat(
             [
