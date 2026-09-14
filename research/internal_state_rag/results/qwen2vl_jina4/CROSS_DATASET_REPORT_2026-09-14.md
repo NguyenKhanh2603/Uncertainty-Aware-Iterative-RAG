@@ -135,6 +135,12 @@ The LM-head margin is consistently weak. On HotpotQA, validation assigns it exac
 4. Raising Top-L can raise the retrieval ceiling only when support is missing from the candidate set. It cannot repair pruning errors within an already retrievable Top-30. TAT-QA has more room for retrieval improvement (8.1% of queries missing support) than HotpotQA (0.4%).
 5. MMQA exposes a modality-calibration failure: at alpha 0.1, Jina-m0 retains 99.55% of table support but only 75.68% of image support, despite 98.65% image recall at fixed Top-10. The next supported experiment is modality-conditional conformal calibration, followed by an adaptive internal stopping/escalation rule.
 
+## MMQA follow-up: did modality-aware or adaptive calibration solve it?
+
+The follow-up tested modality-conditional conformal, modality-specific score maps, and a query-difficulty regressor using Qwen hidden/LM summaries. Probe-allocated Bonferroni calibration reaches 98.23% micro recall and 97.78% query-all coverage at 5.40 chunks, compared with 94.02% and 92.83% at 2.94 chunks for global alpha = 0.1. A similarly loose global alpha = 0.03 already reaches 97.89% recall and 97.36% query-all at 5.62 chunks. The modality rule has a favorable observed point, especially 100% image-support recall, but the paired recall gain at similar budget is not statistically established.
+
+Modality isotonic calibration is matched by ordinary global threshold relaxation. The internal query-difficulty model also fails: it retains 3.11 chunks while lowering micro recall from 94.02% to 93.01% and all-support coverage from 92.83% to 91.35%. These controls rule out two easy explanations. The remaining research direction is to supervise internal states with causal answer-value labels, such as answer-logit loss under chunk masking or individual-head direct-logit attribution, rather than another relevance-score fusion.
+
 ## Reproducibility
 
 - GPU: NVIDIA A100-PCIE-40GB.

@@ -62,6 +62,8 @@ The LM-head threshold retains nearly every image support but keeps 16.49 chunks 
 
 The strongest next change supported by these results is modality-conditional conformal calibration: calibrate separate thresholds for image, table, and text, with an explicit allocation of alpha across modalities. This targets the observed failure directly while preserving the Jina-m0 ordering.
 
+That follow-up is now complete. Probe-allocated Bonferroni calibration raises Jina+internal micro recall from 94.02% to 98.23% and query-all coverage from 92.83% to 97.78%, while chunks rise from 2.94 to 5.40. Against a similarly loose global alpha = 0.03 rule (5.62 chunks, 97.89% recall, 97.36% query-all), the observed gain is small and its paired recall interval includes zero. Modality-specific score maps and an internal-state query-difficulty regressor also fail to beat ordinary global threshold relaxation. See `MMQA_CONFORMAL_EXTENSIONS_REPORT_2026-09-14.md` for the full controlled comparison.
+
 ## Ranking quality before conformal calibration
 
 Metrics are conditional on retrievable queries.
@@ -108,4 +110,3 @@ Raw artifacts:
 - `mmqa_ablation_predictions.npz`: per-query scores, labels, modalities, masks, and chunk IDs.
 - `features/mmqa/*/features.npz`: Qwen projected hidden states and external scores for probe, calibration, and test.
 - `mmqa_jina_v4_top30_jina_m0.jsonl.gz`: complete multimodal reranking of 60,000 candidates.
-
