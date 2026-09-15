@@ -364,7 +364,7 @@ def main(
                 prompt,
                 chunks,
                 max_new_tokens=args.max_new_tokens,
-            ).strip()
+            )
             trace_answer = draft or "unknown"
             trace = extractor.extract(
                 prompt,
