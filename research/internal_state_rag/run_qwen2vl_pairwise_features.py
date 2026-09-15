@@ -56,6 +56,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-length", type=int, default=1024)
     parser.add_argument("--min-pixels", type=int, default=3136)
     parser.add_argument("--max-pixels", type=int, default=200704)
+    parser.add_argument(
+        "--max-queries",
+        type=int,
+        default=None,
+        help="Optionally evaluate only the first N queries in the frozen plan.",
+    )
     return parser.parse_args()
 
 
@@ -112,6 +118,10 @@ def main() -> None:
     args = parse_args()
     plan_payload = json.loads(args.feature_manifest.read_text(encoding="utf-8"))
     plan = [str(value) for value in plan_payload["plan"]]
+    if args.max_queries is not None:
+        if args.max_queries <= 0:
+            raise ValueError("--max-queries must be positive")
+        plan = plan[: args.max_queries]
     top_l = int(plan_payload["top_l"])
     layers = [int(value) for value in args.layers.split(",") if value.strip()]
     questions = load_keyed(args.questions, "qid")
