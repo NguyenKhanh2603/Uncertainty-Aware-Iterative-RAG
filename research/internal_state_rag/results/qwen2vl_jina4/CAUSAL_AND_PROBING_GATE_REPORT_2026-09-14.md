@@ -1,5 +1,12 @@
 # Causal internal evidence and Probing-RAG gate report
 
+> **Correction (2026-09-15):** The Probing-RAG gate table in this report used
+> an embedding-order Top-1 audit target while pruning used Jina-reranker order.
+> Its gate results are superseded by the reranker-aligned 7B evaluation in
+> `../qwen2vl_7b_jina4/QWEN2VL_7B_PROBING_GATE_100_REPORT_2026-09-15.md` and the
+> corrected `*_gate_conformal_reranker_aligned.json` 2B artifacts. The causal
+> LOO and head-masking sections below are unaffected.
+
 Date: 2026-09-14  
 Branch: `results/qwen2vl-jina4-four-datasets-2026-09-14`
 
@@ -138,4 +145,3 @@ alone means the model has enough evidence.
 - `run_qwen2vl_causal_evidence_pilot.py`
 - `run_qwen2vl_probing_gate_states.py`
 - `analyze_probing_gate_conformal.py`
-

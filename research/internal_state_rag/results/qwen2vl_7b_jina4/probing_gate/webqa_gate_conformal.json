@@ -1,0 +1,157 @@
+{
+  "status": "complete",
+  "method": "probing_rag_query_gate_mondrian_conformal_pruning",
+  "gate": {
+    "model_type": "logistic_standardized",
+    "risk_target": "no_support_in_jina_reranker_top1",
+    "probe_c": 0.1,
+    "gate_threshold": 0.5,
+    "probe": {
+      "queries": 100,
+      "positive_rate": 0.64,
+      "roc_auc": 0.9995659722222222,
+      "average_precision": 0.9997596153846153
+    },
+    "calibration": {
+      "queries": 100,
+      "positive_rate": 0.63,
+      "roc_auc": 0.5714285714285714,
+      "average_precision": 0.725934721665525
+    },
+    "test": {
+      "queries": 100,
+      "positive_rate": 0.6,
+      "roc_auc": 0.5275,
+      "average_precision": 0.6196284814296426
+    },
+    "hard_rate_calibration": 0.43,
+    "hard_rate_test": 0.48
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "score": "within-query z-normalized Jina reranker score",
+    "baseline": {
+      "threshold": 0.6570011052711225,
+      "finite_sample_order": 69,
+      "metrics": {
+        "retrieval_ceiling": 0.7,
+        "all_test_queries": {
+          "queries": 100,
+          "retrievable_queries": 70,
+          "retrieval_query_coverage_ceiling": 0.7,
+          "mean_chunks_kept": 8.13,
+          "chunk_precision_among_kept": 0.09471094710947109,
+          "query_any_support_coverage": 0.67,
+          "query_all_support_coverage": 0.62
+        },
+        "conditional_retrievable": {
+          "queries": 70,
+          "support_chunks_total": 85,
+          "support_chunks_retained": 77,
+          "mean_chunks_kept": 8.071428571428571,
+          "median_chunks_kept": 8.0,
+          "p90_chunks_kept": 10.100000000000001,
+          "fraction_of_top_l_kept": 0.26904761904761904,
+          "chunk_precision_among_kept": 0.13628318584070798,
+          "micro_support_recall": 0.9058823529411765,
+          "mean_support_recall": 0.9214285714285714,
+          "query_any_support_coverage": 0.9571428571428572,
+          "query_all_support_coverage": 0.8857142857142857
+        }
+      }
+    },
+    "probing_gate_mondrian": {
+      "strata": {
+        "easy": {
+          "calibration_retrievable_queries": 41,
+          "test_queries": 52,
+          "threshold": 0.7963397948091413,
+          "finite_sample_order": 38
+        },
+        "hard": {
+          "calibration_retrievable_queries": 34,
+          "test_queries": 48,
+          "threshold": 0.5145541983709283,
+          "finite_sample_order": 32
+        }
+      },
+      "metrics": {
+        "retrieval_ceiling": 0.7,
+        "all_test_queries": {
+          "queries": 100,
+          "retrievable_queries": 70,
+          "retrieval_query_coverage_ceiling": 0.7,
+          "mean_chunks_kept": 8.11,
+          "chunk_precision_among_kept": 0.09124537607891492,
+          "query_any_support_coverage": 0.63,
+          "query_all_support_coverage": 0.6
+        },
+        "conditional_retrievable": {
+          "queries": 70,
+          "support_chunks_total": 85,
+          "support_chunks_retained": 74,
+          "mean_chunks_kept": 8.0,
+          "median_chunks_kept": 8.0,
+          "p90_chunks_kept": 12.100000000000001,
+          "fraction_of_top_l_kept": 0.26666666666666666,
+          "chunk_precision_among_kept": 0.13214285714285715,
+          "micro_support_recall": 0.8705882352941177,
+          "mean_support_recall": 0.8785714285714286,
+          "query_any_support_coverage": 0.9,
+          "query_all_support_coverage": 0.8571428571428571
+        }
+      }
+    },
+    "probing_gate_rescue_heuristic": {
+      "rescue_k": 10,
+      "metrics": {
+        "retrieval_ceiling": 0.7,
+        "all_test_queries": {
+          "queries": 100,
+          "retrievable_queries": 70,
+          "retrieval_query_coverage_ceiling": 0.7,
+          "mean_chunks_kept": 9.11,
+          "chunk_precision_among_kept": 0.08562019758507135,
+          "query_any_support_coverage": 0.67,
+          "query_all_support_coverage": 0.63
+        },
+        "conditional_retrievable": {
+          "queries": 70,
+          "support_chunks_total": 85,
+          "support_chunks_retained": 78,
+          "mean_chunks_kept": 9.028571428571428,
+          "median_chunks_kept": 10.0,
+          "p90_chunks_kept": 10.100000000000001,
+          "fraction_of_top_l_kept": 0.30095238095238097,
+          "chunk_precision_among_kept": 0.12341772151898735,
+          "micro_support_recall": 0.9176470588235294,
+          "mean_support_recall": 0.9285714285714286,
+          "query_any_support_coverage": 0.9571428571428572,
+          "query_all_support_coverage": 0.9
+        }
+      },
+      "guarantee": "heuristic union; report separately from conformal Mondrian result"
+    }
+  },
+  "splits": {
+    "probe_queries": 100,
+    "calibration_queries": 100,
+    "test_queries": 100,
+    "probe_retrievable": 75,
+    "calibration_retrievable": 75,
+    "test_retrievable": 70,
+    "query_id_overlaps": {
+      "probe_calibration": 0,
+      "probe_test": 0,
+      "calibration_test": 0
+    }
+  },
+  "state_artifacts": {
+    "probe": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_probe_train_px262144_100.json",
+    "calibration": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_calibration_px262144_100.json",
+    "test": "research/internal_state_rag/results/qwen2vl_7b_jina4/probing_gate/webqa_test_px262144_100.json",
+    "probe_model": "/workspace/hf_cache/hub/models--Qwen--Qwen2-VL-7B-Instruct/snapshots/eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+    "calibration_model": "/workspace/hf_cache/hub/models--Qwen--Qwen2-VL-7B-Instruct/snapshots/eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+    "test_model": "/workspace/hf_cache/hub/models--Qwen--Qwen2-VL-7B-Instruct/snapshots/eed13092ef92e448dd6875b2a00151bd3f7db0ac"
+  }
+}
