@@ -1,4 +1,11 @@
-"""Evaluate the original cosine false-bank BY selector on one retrieval log."""
+"""Evaluate candidate-wise BY with a configurable retrieval score.
+
+The original experiment used ``cosine_score``.  Reranker outputs can be
+evaluated on the same fixed Top-L candidate pool by selecting a different
+``--score-field`` (for example ``jina_reranker_score`` or
+``selection_score``).  The score's own rank is used for the context cap unless
+``--order-field`` is supplied explicitly.
+"""
 
 from __future__ import annotations
 
@@ -20,6 +27,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--alphas", default="0.2,0.1,0.05")
     parser.add_argument("--max-context", type=int, default=10)
+    parser.add_argument(
+        "--score-field",
+        default="cosine_score",
+        help="Candidate field used for the false-score bank and BY p-values.",
+    )
+    parser.add_argument(
+        "--order-field",
+        default="",
+        help=(
+            "Candidate rank field used for the context cap. Empty selects "
+            "cosine_rank for cosine_score and rank otherwise."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -40,7 +60,7 @@ def load_rows(path: Path) -> dict[str, list[dict]]:
 
 
 def false_banks(
-    calibration: list[list[dict]], conditioning: str
+    calibration: list[list[dict]], conditioning: str, score_field: str
 ) -> tuple[dict[str, np.ndarray], dict[str, int]]:
     values: dict[str, list[float]] = defaultdict(list)
     for rows in calibration:
@@ -48,7 +68,7 @@ def false_banks(
             if row["support_label"] == "support":
                 continue
             key = str(row["modality"]) if conditioning == "modality" else "pooled"
-            values[key].append(float(row["cosine_score"]))
+            values[key].append(float(row[score_field]))
     banks = {key: np.sort(score) for key, score in values.items()}
     return banks, {key: len(score) for key, score in values.items()}
 
@@ -60,6 +80,8 @@ def select(
     conditioning: str,
     alpha: float,
     max_context: int,
+    score_field: str,
+    order_field: str,
 ) -> np.ndarray:
     mask = np.zeros((len(test), len(test[0])), dtype=bool)
     for query_index, rows in enumerate(test):
@@ -69,14 +91,14 @@ def select(
             bank = banks.get(key)
             if bank is None:
                 raise ValueError(f"No false-score bank for {key!r}")
-            score = float(row["cosine_score"])
+            score = float(row[score_field])
             greater_equal = len(bank) - int(np.searchsorted(bank, score, side="left"))
             p_values.append((1.0 + greater_equal) / (len(bank) + 1.0))
         rejected = benjamini_yekutieli(p_values, alpha).rejected_indices
         chosen = sorted(
             rejected,
             key=lambda index: (
-                int(rows[index].get("cosine_rank", rows[index]["rank"])),
+                int(rows[index][order_field]),
                 str(rows[index]["chunk_id"]),
             ),
         )[:max_context]
@@ -122,6 +144,19 @@ def metrics(labels: np.ndarray, mask: np.ndarray) -> dict[str, object]:
 def main() -> None:
     args = parse_args()
     grouped = load_rows(args.retrieval)
+    sample_row = next(iter(grouped.values()))[0]
+    if args.order_field:
+        order_field = args.order_field
+    elif args.score_field == "cosine_score" and "cosine_rank" in sample_row:
+        order_field = "cosine_rank"
+    else:
+        order_field = "rank"
+    for field in (args.score_field, order_field):
+        if field not in sample_row:
+            raise ValueError(
+                f"Field {field!r} is absent from retrieval rows; available fields: "
+                f"{sorted(sample_row)}"
+            )
     by_role: dict[str, list[list[dict]]] = defaultdict(list)
     for qid in sorted(grouped):
         rows = grouped[qid]
@@ -138,7 +173,7 @@ def main() -> None:
     results = {}
     bank_audit = {}
     for conditioning in ("pooled", "modality"):
-        banks, counts = false_banks(calibration, conditioning)
+        banks, counts = false_banks(calibration, conditioning, args.score_field)
         bank_audit[conditioning] = counts
         results[conditioning] = {}
         for alpha in (float(value) for value in args.alphas.split(",")):
@@ -148,13 +183,19 @@ def main() -> None:
                 conditioning=conditioning,
                 alpha=alpha,
                 max_context=args.max_context,
+                score_field=args.score_field,
+                order_field=order_field,
             )
             results[conditioning][str(alpha)] = metrics(labels, mask)
     output = {
         "status": "complete",
         "dataset": args.dataset,
-        "method": "cosine false-score p-values + candidate-wise BY + Top-K cap",
+        "method": (
+            f"{args.score_field} false-score p-values + candidate-wise BY + Top-K cap"
+        ),
         "retrieval": str(args.retrieval),
+        "score_field": args.score_field,
+        "order_field": order_field,
         "top_l": len(test[0]),
         "max_context": args.max_context,
         "role_counts": {role: len(rows) for role, rows in by_role.items()},
