@@ -28,6 +28,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--alphas", default="0.2,0.1,0.05")
     parser.add_argument("--max-context", type=int, default=10)
     parser.add_argument(
+        "--top-l",
+        type=int,
+        default=0,
+        help=(
+            "Evaluate only the highest-ranked prefix of each saved retrieval row. "
+            "Zero uses every candidate in the input. This supports a controlled "
+            "candidate-pool-size sweep without reusing p-values from a larger pool."
+        ),
+    )
+    parser.add_argument(
         "--score-field",
         default="cosine_score",
         help="Candidate field used for the false-score bank and BY p-values.",
@@ -43,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_rows(path: Path) -> dict[str, list[dict]]:
+def load_rows(path: Path, *, top_l: int) -> dict[str, list[dict]]:
     grouped: dict[str, list[dict]] = defaultdict(list)
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf-8") as handle:
@@ -53,6 +63,12 @@ def load_rows(path: Path) -> dict[str, list[dict]]:
                 grouped[str(row["qid"])].append(row)
     for rows in grouped.values():
         rows.sort(key=lambda row: (int(row["rank"]), str(row["chunk_id"])))
+        if top_l:
+            if len(rows) < top_l:
+                raise ValueError(
+                    f"Query has {len(rows)} candidates, fewer than requested --top-l={top_l}"
+                )
+            del rows[top_l:]
     top_l = {len(rows) for rows in grouped.values()}
     if len(top_l) != 1:
         raise ValueError(f"Inconsistent candidate counts: {sorted(top_l)}")
@@ -143,7 +159,9 @@ def metrics(labels: np.ndarray, mask: np.ndarray) -> dict[str, object]:
 
 def main() -> None:
     args = parse_args()
-    grouped = load_rows(args.retrieval)
+    if args.top_l < 0:
+        raise ValueError("--top-l must be non-negative")
+    grouped = load_rows(args.retrieval, top_l=args.top_l)
     sample_row = next(iter(grouped.values()))[0]
     if args.order_field:
         order_field = args.order_field
