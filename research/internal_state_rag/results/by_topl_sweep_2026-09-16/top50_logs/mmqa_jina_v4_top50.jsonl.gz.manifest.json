@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "mmqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/conformal_global_run/official_bundle_role_split_mmqa",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 2000,
+  "corpus_chunks": 25924,
+  "rows": 100000,
+  "top_l": 50,
+  "role_counts": {
+    "development": 212,
+    "calibration": 788,
+    "test": 1000
+  },
+  "source_split_role_counts": {
+    "train": {
+      "development": 212,
+      "calibration": 788,
+      "test": 0
+    },
+    "dev": {
+      "development": 0,
+      "calibration": 0,
+      "test": 1000
+    }
+  },
+  "split_policy": "official_holdout",
+  "split_policy_detail": "official train -> development/calibration; official dev/validation -> test",
+  "retrieved_support_rows": 2452,
+  "retriever_id": "jinaai/jina-embeddings-v4@853c867b65b749f3c3c72a06868140d842e04f06#dim=512#dtype=bfloat16",
+  "corpus_revision": "sha256:53ec079519b1ff771d95cf3a1659bc9a1371e3b6d6980778b7409e0b745e35c3",
+  "preprocess_hash": "sha256:37c73c59fd06e614843b0aecbdf6a9b91f87d652494eea9a4b8ce15de9ede71d",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 50,
+    "candidate_scope": "global_corpus",
+    "image_caption_fusion": false,
+    "max_image_pixels": 200704,
+    "min_per_modality": null,
+    "available_modalities": [
+      "image",
+      "table",
+      "text"
+    ]
+  },
+  "candidate_scope": "global_corpus",
+  "candidate_pool": {
+    "minimum": 25924,
+    "maximum": 25924,
+    "mean": 25924.0
+  },
+  "device": "cpu",
+  "hardware": {
+    "device": "cpu",
+    "cuda": false
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.0,
+    "load_records": 26.05,
+    "encode_corpus": 0.0,
+    "encode_queries": 0.0,
+    "rank_candidates": 5.107,
+    "write_log": 4.838,
+    "total": 40.147
+  },
+  "search_stats": {
+    "candidate_pairs": null,
+    "corpus_on_gpu": null
+  },
+  "output": "mmqa_jina_v4_top50.jsonl.gz"
+}

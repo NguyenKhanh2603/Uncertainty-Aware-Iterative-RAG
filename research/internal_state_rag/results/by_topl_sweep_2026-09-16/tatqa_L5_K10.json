@@ -1,0 +1,166 @@
+{
+  "status": "complete",
+  "dataset": "tatqa",
+  "method": "cosine_score false-score p-values + candidate-wise BY + Top-K cap",
+  "retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz",
+  "score_field": "cosine_score",
+  "order_field": "rank",
+  "top_l": 5,
+  "max_context": 10,
+  "role_counts": {
+    "test": 1000,
+    "development": 516,
+    "calibration": 484
+  },
+  "false_bank_counts": {
+    "pooled": {
+      "pooled": 2022
+    },
+    "modality": {
+      "table": 869,
+      "text": 1153
+    }
+  },
+  "results": {
+    "pooled": {
+      "0.05": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.121,
+        "mean_chunks_kept_retrievable": 0.12278308321964529,
+        "empty_context_rate_all_test": 0.944,
+        "chunk_precision": 0.36363636363636365,
+        "micro_support_recall_conditional": 0.05641025641025641,
+        "query_any_support_conditional": 0.058663028649386086,
+        "query_all_support_conditional": 0.054570259208731244,
+        "query_any_support_end_to_end": 0.043,
+        "query_all_support_end_to_end": 0.04,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 44,
+        "selected_chunks": 121
+      },
+      "0.1": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.196,
+        "mean_chunks_kept_retrievable": 0.17598908594815826,
+        "empty_context_rate_all_test": 0.918,
+        "chunk_precision": 0.30612244897959184,
+        "micro_support_recall_conditional": 0.07692307692307693,
+        "query_any_support_conditional": 0.08049113233287858,
+        "query_all_support_conditional": 0.07639836289222374,
+        "query_any_support_end_to_end": 0.059,
+        "query_all_support_end_to_end": 0.056,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 60,
+        "selected_chunks": 196
+      },
+      "0.2": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.333,
+        "mean_chunks_kept_retrievable": 0.3151432469304229,
+        "empty_context_rate_all_test": 0.881,
+        "chunk_precision": 0.26426426426426425,
+        "micro_support_recall_conditional": 0.11282051282051282,
+        "query_any_support_conditional": 0.11869031377899045,
+        "query_all_support_conditional": 0.11323328785811733,
+        "query_any_support_end_to_end": 0.087,
+        "query_all_support_end_to_end": 0.083,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 88,
+        "selected_chunks": 333
+      },
+      "0.5": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.845,
+        "mean_chunks_kept_retrievable": 0.732605729877217,
+        "empty_context_rate_all_test": 0.764,
+        "chunk_precision": 0.19763313609467456,
+        "micro_support_recall_conditional": 0.2141025641025641,
+        "query_any_support_conditional": 0.22100954979536153,
+        "query_all_support_conditional": 0.21282401091405184,
+        "query_any_support_end_to_end": 0.162,
+        "query_all_support_end_to_end": 0.156,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 167,
+        "selected_chunks": 845
+      }
+    },
+    "modality": {
+      "0.05": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.113,
+        "mean_chunks_kept_retrievable": 0.11186903137789904,
+        "empty_context_rate_all_test": 0.95,
+        "chunk_precision": 0.3185840707964602,
+        "micro_support_recall_conditional": 0.046153846153846156,
+        "query_any_support_conditional": 0.047748976807639835,
+        "query_all_support_conditional": 0.045020463847203276,
+        "query_any_support_end_to_end": 0.035,
+        "query_all_support_end_to_end": 0.033,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 36,
+        "selected_chunks": 113
+      },
+      "0.1": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.171,
+        "mean_chunks_kept_retrievable": 0.15552523874488403,
+        "empty_context_rate_all_test": 0.925,
+        "chunk_precision": 0.3216374269005848,
+        "micro_support_recall_conditional": 0.07051282051282051,
+        "query_any_support_conditional": 0.07366984993178717,
+        "query_all_support_conditional": 0.06821282401091405,
+        "query_any_support_end_to_end": 0.054,
+        "query_all_support_end_to_end": 0.05,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 55,
+        "selected_chunks": 171
+      },
+      "0.2": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.323,
+        "mean_chunks_kept_retrievable": 0.3069577080491132,
+        "empty_context_rate_all_test": 0.881,
+        "chunk_precision": 0.2724458204334365,
+        "micro_support_recall_conditional": 0.11282051282051282,
+        "query_any_support_conditional": 0.11869031377899045,
+        "query_all_support_conditional": 0.11186903137789904,
+        "query_any_support_end_to_end": 0.087,
+        "query_all_support_end_to_end": 0.082,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 88,
+        "selected_chunks": 323
+      },
+      "0.5": {
+        "all_test_queries": 1000,
+        "retrievable_queries": 733,
+        "retrieval_query_coverage_ceiling": 0.733,
+        "mean_chunks_kept_all_test": 0.833,
+        "mean_chunks_kept_retrievable": 0.7107776261937244,
+        "empty_context_rate_all_test": 0.772,
+        "chunk_precision": 0.19447779111644659,
+        "micro_support_recall_conditional": 0.2076923076923077,
+        "query_any_support_conditional": 0.21418826739427013,
+        "query_all_support_conditional": 0.20600272851296045,
+        "query_any_support_end_to_end": 0.157,
+        "query_all_support_end_to_end": 0.151,
+        "support_chunks_conditional": 780,
+        "support_chunks_retained_conditional": 162,
+        "selected_chunks": 833
+      }
+    }
+  }
+}
