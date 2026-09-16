@@ -64,8 +64,51 @@ p-values, BY trên 30 hypotheses/query, cap 10. Bảng là pooled bank ở `alph
 Alpha `.20/.10/.05`, pooled và modality-conditioned banks đều có trong
 [BY cosine vs Jina report](research/internal_state_rag/results/by_score_ablation_2026-09-16/BY_COSINE_VS_JINA_RERANKER_2026-09-16.md).
 
+### Sweep candidate pool Top-L (`alpha=.10`, pooled, `K=10`)
+
+Mỗi prefix tái tạo false-score calibration bank và BY decision đúng với `L`
+đó, không reuse p-value của Top-30. `Ceiling` là retrieval availability; `R`
+là conditional micro support recall.
+
+| Dataset | L | Ceiling | Mean chunks | P | R | Empty |
+|---|---:|---:|---:|---:|---:|---:|
+| TAT-QA | 5 / 10 / 20 / 30 | 73.3 / 80.6 / 88.2 / 91.9% | .196 / .263 / .226 / .208 | 30.61 / 22.05 / 23.45 / 25.00% | 7.69 / 6.61 / 5.44 / 5.08% | 91.8 / 92.7 / 93.6 / 93.7% |
+| HotpotQA | 5 / 10 / 20 / 30 | 98.3 / 98.9 / 99.4 / 99.6% | .262 / .277 / .257 / .238 | 69.08 / 64.26 / 65.76 / 69.33% | 11.32 / 10.41 / 9.42 / 9.04% | 83.8 / 84.1 / 84.7 / 85.1% |
+| MMQA | 5 / 10 / 20 / 30 | 91.3 / 93.1 / 94.3 / 94.8% | .091 / .093 / .072 / .065 | 56.04 / 52.69 / 50.00 / 50.77% | 4.87 / 4.44 / 3.10 / 2.78% | 94.5 / 94.7 / 96.0 / 96.3% |
+| WebQA | 5 / 10 / 20 / 30 | 40.8 / 54.8 / 66.4 / 72.8% | .020 / .016 / .016 / .000 | 20.00 / 0 / 0 / --% | .86 / 0 / 0 / 0% | 99.6 / 99.6 / 99.6 / 100.0% |
+
+Tăng L tăng retrieval ceiling nhưng giảm BY recall gần như đơn điệu: BY có nhiều
+hypotheses hơn và false bank nhận thêm lower-score negatives. Fresh full-corpus
+Top-50 xác nhận điều này, không chỉ là prefix artifact:
+
+| Dataset | L=30: Ceiling / P / R / Empty | L=50: Ceiling / P / R / Empty |
+|---|---|---|
+| TAT-QA | 91.9% / 25.00% / 5.08% / 93.7% | 94.2% / 26.13% / 4.90% / 93.8% |
+| HotpotQA | 99.6% / 69.33% / 9.04% / 85.1% | 99.7% / 69.27% / 7.63% / 86.9% |
+| MMQA | 94.8% / 50.77% / 2.78% / 96.3% | 95.6% / 52.63% / 2.46% / 96.7% |
+
+### Alpha sweep at fixed `L=30`, pooled, `K=10`
+
+Ô có dạng `mean chunks / P / R / empty`. Nới alpha tăng recall, nhưng precision
+giảm và vẫn không đưa BY thành high-recall selector.
+
+| Dataset | alpha=.05 | alpha=.10 | alpha=.20 | alpha=.50 |
+|---|---|---|---|---|
+| TAT-QA | .132 / 24.2% / 3.1% / 95.9% | .208 / 25.0% / 5.1% / 93.7% | .354 / 20.3% / 7.0% / 90.6% | .774 / 15.6% / 11.8% / 84.4% |
+| HotpotQA | .118 / 74.6% / 4.8% / 91.8% | .238 / 69.3% / 9.0% / 85.1% | .474 / 57.6% / 15.0% / 77.5% | 1.060 / 49.5% / 28.8% / 58.5% |
+| MMQA | .046 / 60.9% / 2.4% / 97.1% | .065 / 50.8% / 2.8% / 96.3% | .150 / 46.0% / 5.8% / 92.7% | .420 / 37.1% / 13.1% / 83.9% |
+| WebQA | .000 / -- / 0.0% / 100.0% | .000 / -- / 0.0% / 100.0% | .064 / 12.5% / .9% / 98.8% | .432 / 4.6% / 2.2% / 94.0% |
+
+Removing `K=10` at alpha `.50` also is not a solution: TAT-QA recall only goes
+from 11.83% to 13.78% while precision drops 15.63% to 7.34%; the other datasets
+change recall by at most 0.88 points. BY makes too few discoveries *before* the
+cap applies.
+
+- Detailed Top-L/alpha/cap report: [BY cosine Top-L sweep](research/internal_state_rag/results/by_topl_sweep_2026-09-16/BY_COSINE_TOPL_SWEEP_2026-09-16.md).
+- Raw sweep outputs: [directory](research/internal_state_rag/results/by_topl_sweep_2026-09-16/), including fresh [Top-50 retrieval logs](research/internal_state_rag/results/by_topl_sweep_2026-09-16/top50_logs/).
+
 - JSON mới nhất: [TAT-QA](research/internal_state_rag/results/by_score_ablation_2026-09-16/tatqa_by_cosine.json), [HotpotQA](research/internal_state_rag/results/by_score_ablation_2026-09-16/hotpotqa_by_cosine.json), [MMQA](research/internal_state_rag/results/by_score_ablation_2026-09-16/mmqa_by_cosine.json), [WebQA](research/internal_state_rag/results/by_score_ablation_2026-09-16/webqa_by_cosine.json).
-- Code: [analyze_current_cosine_by.py](research/internal_state_rag/analyze_current_cosine_by.py). Script hiện hỗ trợ `--score-field` và `--order-field` để tái sử dụng cùng BY logic.
+- Code: [analyze_current_cosine_by.py](research/internal_state_rag/analyze_current_cosine_by.py). Script hiện hỗ trợ `--score-field`, `--order-field`, và `--top-l` để tái tạo bank/decision cho từng candidate-pool size.
 
 ## 3. Conformal BY với Jina m0 reranker score
 
