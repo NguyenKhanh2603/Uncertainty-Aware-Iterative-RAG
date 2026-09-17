@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 DEFAULT_INPUT = Path(
@@ -23,16 +24,44 @@ def arguments() -> argparse.Namespace:
 
 
 def chunks(text: str, width: int, overlap: int):
+    """Pack complete sentences to approximately ``width`` characters.
+
+    Overlap is measured in source characters but the next chunk always starts
+    at a sentence boundary, matching CCE's stated boundary-handling rule.
+    """
     text = " ".join(text.split())
-    step = width - overlap
-    if step <= 0:
+    if width < 1 or not text:
+        return
+    if overlap >= width:
         raise ValueError("overlap must be less than chunk size")
-    for start in range(0, len(text), step):
-        chunk = text[start : start + width]
-        if chunk:
-            yield start, chunk
-        if start + width >= len(text):
-            break
+    sentences = [match.group(0).strip() for match in re.finditer(r"[^.!?]+(?:[.!?]+|$)", text) if match.group(0).strip()]
+    if not sentences:
+        sentences = [text]
+    locations = []
+    cursor = 0
+    for sentence in sentences:
+        location = text.find(sentence, cursor)
+        locations.append(location)
+        cursor = location + len(sentence)
+    index = 0
+    while index < len(sentences):
+        first = index
+        selected = []
+        length = 0
+        while index < len(sentences):
+            candidate = len(sentences[index]) + (1 if selected else 0)
+            if selected and length + candidate > width:
+                break
+            selected.append(sentences[index])
+            length += candidate
+            index += 1
+        if not selected:  # A single sentence longer than the requested size.
+            selected.append(sentences[index])
+            index += 1
+        yield locations[first], " ".join(selected)
+        next_start = max(locations[first] + 1, locations[index - 1] + len(sentences[index - 1]) - overlap)
+        while index < len(sentences) and locations[index] < next_start:
+            index += 1
 
 
 def main() -> None:
