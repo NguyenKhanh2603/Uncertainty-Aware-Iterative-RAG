@@ -1,0 +1,125 @@
+{
+  "status": "complete_score_only_comparison",
+  "dataset": "CoverageBench NeuCLIR 2024 report-generation topics",
+  "score": "released Qwen3-Embedding-8B initial retrieval score",
+  "not_downstream_f1": "No document text or generated reports are included; this measures evidence selection and nugget coverage.",
+  "split": {
+    "calibration_queries": 10,
+    "test_queries": 9,
+    "seed": 20260917
+  },
+  "top_l": 30,
+  "results": {
+    "0.05": {
+      "cce_positive": {
+        "threshold": 0.5676226615905762,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 24.0,
+        "context_reduction": 0.19999999999999996,
+        "empty_rate": 0.0,
+        "document_precision": 0.7731481481481481,
+        "document_recall_conditional": 0.8652849740932642,
+        "nugget_micro_coverage": 0.8952380952380953,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.5216497182846069,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 27.0,
+        "context_reduction": 0.09999999999999998,
+        "empty_rate": 0.0,
+        "document_precision": 0.757201646090535,
+        "document_recall_conditional": 0.9533678756476683,
+        "nugget_micro_coverage": 0.9809523809523809,
+        "query_all_nugget_coverage": 0.8888888888888888
+      },
+      "candidate_by": {
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 0.0,
+        "context_reduction": 1.0,
+        "empty_rate": 1.0,
+        "document_precision": 0.0,
+        "document_recall_conditional": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      }
+    },
+    "0.1": {
+      "cce_positive": {
+        "threshold": 0.5851583480834961,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 23.77777777777778,
+        "context_reduction": 0.20740740740740737,
+        "empty_rate": 0.0,
+        "document_precision": 0.7757009345794392,
+        "document_recall_conditional": 0.8601036269430051,
+        "nugget_micro_coverage": 0.8857142857142857,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.5216497182846069,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 27.0,
+        "context_reduction": 0.09999999999999998,
+        "empty_rate": 0.0,
+        "document_precision": 0.757201646090535,
+        "document_recall_conditional": 0.9533678756476683,
+        "nugget_micro_coverage": 0.9809523809523809,
+        "query_all_nugget_coverage": 0.8888888888888888
+      },
+      "candidate_by": {
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 3.2222222222222223,
+        "context_reduction": 0.8925925925925926,
+        "empty_rate": 0.8888888888888888,
+        "document_precision": 0.8620689655172413,
+        "document_recall_conditional": 0.12953367875647667,
+        "nugget_micro_coverage": 0.10476190476190476,
+        "query_all_nugget_coverage": 0.1111111111111111
+      }
+    },
+    "0.2": {
+      "cce_positive": {
+        "threshold": 0.6194590926170349,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 22.444444444444443,
+        "context_reduction": 0.2518518518518519,
+        "empty_rate": 0.1111111111111111,
+        "document_precision": 0.7970297029702971,
+        "document_recall_conditional": 0.8341968911917098,
+        "nugget_micro_coverage": 0.8380952380952381,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.595751941204071,
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 23.444444444444443,
+        "context_reduction": 0.21851851851851856,
+        "empty_rate": 0.1111111111111111,
+        "document_precision": 0.7772511848341233,
+        "document_recall_conditional": 0.8497409326424871,
+        "nugget_micro_coverage": 0.8380952380952381,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "candidate_by": {
+        "retrievable_queries": 9,
+        "retrieval_query_ceiling": 1.0,
+        "mean_documents_kept": 3.3333333333333335,
+        "context_reduction": 0.8888888888888888,
+        "empty_rate": 0.8888888888888888,
+        "document_precision": 0.8666666666666667,
+        "document_recall_conditional": 0.13471502590673576,
+        "nugget_micro_coverage": 0.10476190476190476,
+        "query_all_nugget_coverage": 0.1111111111111111
+      }
+    }
+  }
+}
