@@ -1,0 +1,33 @@
+{
+  "status": "matched_realized_context_budget_selection_proxy",
+  "comparison": {
+    "cce_positive": {
+      "alpha": 0.2,
+      "threshold": 0.5859375,
+      "mean_chunks_kept": 74.77777777777777,
+      "context_reduction": 0.25222222222222224,
+      "empty_rate": 0.0,
+      "inherited_chunk_precision": 0.799405646359584,
+      "inherited_chunk_recall": 0.7842565597667639,
+      "nugget_micro_coverage": 0.9203539823008849,
+      "query_all_nugget_coverage": 0.7777777777777778
+    },
+    "query_all_nugget": {
+      "alpha": 0.1,
+      "threshold": 0.58984375,
+      "mean_chunks_kept": 74.11111111111111,
+      "context_reduction": 0.25888888888888884,
+      "empty_rate": 0.0,
+      "inherited_chunk_precision": 0.8020989505247377,
+      "inherited_chunk_recall": 0.7798833819241983,
+      "nugget_micro_coverage": 0.9203539823008849,
+      "query_all_nugget_coverage": 0.7777777777777778
+    }
+  },
+  "matching": {
+    "absolute_mean_chunk_difference": 0.6666666666666572,
+    "same_calibration_test_split": true,
+    "thresholds_are_calibration_only": true,
+    "not_ARGUE_F1": "Public nugget-to-document labels are inherited by chunks; no report generator or LLM judge is used."
+  }
+}
