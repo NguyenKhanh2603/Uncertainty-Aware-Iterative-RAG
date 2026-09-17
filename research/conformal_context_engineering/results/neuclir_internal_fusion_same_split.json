@@ -1,0 +1,62 @@
+{
+  "status": "same_split_selection_proxy",
+  "alpha": 0.1,
+  "splits": {
+    "train": [
+      "308",
+      "309",
+      "365",
+      "367",
+      "373"
+    ],
+    "calibration": [
+      "300",
+      "303",
+      "334",
+      "351",
+      "382"
+    ],
+    "test": [
+      "310",
+      "335",
+      "343",
+      "352",
+      "372",
+      "377",
+      "380",
+      "383",
+      "388"
+    ]
+  },
+  "results": {
+    "cce_qwen3_cosine": {
+      "threshold": 0.54296875,
+      "mean_chunks_kept": 92.88888888888889,
+      "context_reduction": 0.07111111111111112,
+      "nugget_micro_coverage": 0.9512195121951219,
+      "query_all_nugget_coverage": 0.8888888888888888
+    },
+    "query_qwen3_cosine": {
+      "threshold": 0.625,
+      "mean_chunks_kept": 55.666666666666664,
+      "context_reduction": 0.44333333333333336,
+      "nugget_micro_coverage": 0.943089430894309,
+      "query_all_nugget_coverage": 0.7777777777777778
+    },
+    "query_lm_head": {
+      "threshold": 0.9999687671661377,
+      "mean_chunks_kept": 11.555555555555555,
+      "context_reduction": 0.8844444444444445,
+      "nugget_micro_coverage": 0.7479674796747967,
+      "query_all_nugget_coverage": 0.5555555555555556
+    },
+    "query_internal_fusion": {
+      "threshold": 0.7541658878326416,
+      "mean_chunks_kept": 20.88888888888889,
+      "context_reduction": 0.7911111111111111,
+      "nugget_micro_coverage": 0.8861788617886179,
+      "query_all_nugget_coverage": 0.4444444444444444
+    }
+  },
+  "note": "Document nugget labels inherited by chunks; this is not report F1."
+}
