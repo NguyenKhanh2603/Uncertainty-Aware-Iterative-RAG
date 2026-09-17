@@ -1,0 +1,38 @@
+{
+  "status": "pilot_frozen_internal_fusion_query_level",
+  "splits": {
+    "train_topics": [
+      "308",
+      "309",
+      "365",
+      "367",
+      "373"
+    ],
+    "calibration_topics": [
+      "300",
+      "303",
+      "334",
+      "351",
+      "382"
+    ],
+    "test_topics": [
+      "310",
+      "335",
+      "343",
+      "352",
+      "372",
+      "377",
+      "380",
+      "383",
+      "388"
+    ]
+  },
+  "alpha": 0.1,
+  "threshold": 0.5807830691337585,
+  "fusion": "z(Qwen3 cosine)+0.20 z(Qwen2.5 LM Yes-No)+0.75 z(logistic probe(final hidden))",
+  "mean_chunks_kept": 37.22222222222222,
+  "context_reduction": 0.6277777777777778,
+  "nugget_micro_coverage": 0.9349593495934959,
+  "query_all_nugget_coverage": 0.6666666666666666,
+  "note": "Pilot only: five train and five calibration topics are too small for a formal generalization claim."
+}
