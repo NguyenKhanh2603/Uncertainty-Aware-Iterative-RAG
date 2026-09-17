@@ -1,0 +1,105 @@
+{
+  "status": "selection_proxy_not_ARGUE_F1",
+  "score": "Qwen3-Embedding-8B on extracted English sentence-boundary chunks",
+  "labels": "public nugget-to-document qrels inherited by chunks",
+  "split": {
+    "calibration_topics": 10,
+    "test_topics": 9
+  },
+  "top_l": 100,
+  "results": {
+    "0.05": {
+      "cce_positive_inherited_labels": {
+        "threshold": 0.546875,
+        "mean_chunks_kept": 86.44444444444444,
+        "context_reduction": 0.13555555555555554,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.7750642673521851,
+        "inherited_chunk_recall": 0.8790087463556852,
+        "nugget_micro_coverage": 0.9380530973451328,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.58984375,
+        "mean_chunks_kept": 74.11111111111111,
+        "context_reduction": 0.25888888888888884,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.8020989505247377,
+        "inherited_chunk_recall": 0.7798833819241983,
+        "nugget_micro_coverage": 0.9203539823008849,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "candidate_by": {
+        "mean_chunks_kept": 0.0,
+        "context_reduction": 1.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      }
+    },
+    "0.1": {
+      "cce_positive_inherited_labels": {
+        "threshold": 0.55859375,
+        "mean_chunks_kept": 83.0,
+        "context_reduction": 0.17000000000000004,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.7804551539491299,
+        "inherited_chunk_recall": 0.8498542274052479,
+        "nugget_micro_coverage": 0.9380530973451328,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.58984375,
+        "mean_chunks_kept": 74.11111111111111,
+        "context_reduction": 0.25888888888888884,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.8020989505247377,
+        "inherited_chunk_recall": 0.7798833819241983,
+        "nugget_micro_coverage": 0.9203539823008849,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "candidate_by": {
+        "mean_chunks_kept": 0.0,
+        "context_reduction": 1.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      }
+    },
+    "0.2": {
+      "cce_positive_inherited_labels": {
+        "threshold": 0.5859375,
+        "mean_chunks_kept": 74.77777777777777,
+        "context_reduction": 0.25222222222222224,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.799405646359584,
+        "inherited_chunk_recall": 0.7842565597667639,
+        "nugget_micro_coverage": 0.9203539823008849,
+        "query_all_nugget_coverage": 0.7777777777777778
+      },
+      "query_all_nugget": {
+        "threshold": 0.6015625,
+        "mean_chunks_kept": 70.88888888888889,
+        "context_reduction": 0.2911111111111111,
+        "empty_rate": 0.0,
+        "inherited_chunk_precision": 0.8087774294670846,
+        "inherited_chunk_recall": 0.7521865889212828,
+        "nugget_micro_coverage": 0.911504424778761,
+        "query_all_nugget_coverage": 0.6666666666666666
+      },
+      "candidate_by": {
+        "mean_chunks_kept": 4.0,
+        "context_reduction": 0.96,
+        "empty_rate": 0.8888888888888888,
+        "inherited_chunk_precision": 0.8611111111111112,
+        "inherited_chunk_recall": 0.04518950437317784,
+        "nugget_micro_coverage": 0.09734513274336283,
+        "query_all_nugget_coverage": 0.0
+      }
+    }
+  }
+}
