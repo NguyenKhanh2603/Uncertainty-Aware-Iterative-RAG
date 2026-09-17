@@ -1,0 +1,134 @@
+{
+  "status": "complete_document_unit_proxy",
+  "not_an_exact_paper_reproduction": [
+    "uses official document qrels rather than released-or-unreleased Llama-3.3 snippet labels",
+    "uses TF-IDF cosine rather than Qwen3-Embedding-8B",
+    "does not run GPT-4o Conformal-LLM or downstream ARGUE generation",
+    "candidate pool is qrel-positive documents plus deterministic sampled corpus negatives"
+  ],
+  "dataset": "trec-ragtime/ragtime1 English",
+  "split": {
+    "unit": "topic title; duplicate request variants stay in one role",
+    "calibration_queries": 17,
+    "test_queries": 13
+  },
+  "candidate_pool": {
+    "top_k": 30,
+    "corpus_documents_scanned": 1000095,
+    "qrel_positive_documents": 1040,
+    "sampled_negative_documents": 25000
+  },
+  "results": {
+    "0.05": {
+      "cce_positive": {
+        "threshold": 0.11294692754745483,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 20.53846153846154,
+        "context_reduction": 0.3153846153846154,
+        "empty_rate": 0.0,
+        "chunk_precision": 0.7378277153558053,
+        "micro_relevant_recall_conditional": 0.9292452830188679,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.5833333333333334
+      },
+      "query_all_support": {
+        "threshold": 0.08098959922790527,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 26.23076923076923,
+        "context_reduction": 0.12564102564102564,
+        "empty_rate": 0.0,
+        "chunk_precision": 0.6187683284457478,
+        "micro_relevant_recall_conditional": 0.9952830188679245,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.9166666666666666
+      },
+      "candidate_by": {
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 0.0,
+        "context_reduction": 1.0,
+        "empty_rate": 1.0,
+        "chunk_precision": 0.0,
+        "micro_relevant_recall_conditional": 0.0,
+        "query_any_support_conditional": 0.0,
+        "query_all_support_conditional": 0.0
+      }
+    },
+    "0.1": {
+      "cce_positive": {
+        "threshold": 0.12634682655334473,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 17.615384615384617,
+        "context_reduction": 0.4128205128205128,
+        "empty_rate": 0.07692307692307693,
+        "chunk_precision": 0.8034934497816594,
+        "micro_relevant_recall_conditional": 0.8679245283018868,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.4166666666666667
+      },
+      "query_all_support": {
+        "threshold": 0.08098959922790527,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 26.23076923076923,
+        "context_reduction": 0.12564102564102564,
+        "empty_rate": 0.0,
+        "chunk_precision": 0.6187683284457478,
+        "micro_relevant_recall_conditional": 0.9952830188679245,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.9166666666666666
+      },
+      "candidate_by": {
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 0.0,
+        "context_reduction": 1.0,
+        "empty_rate": 1.0,
+        "chunk_precision": 0.0,
+        "micro_relevant_recall_conditional": 0.0,
+        "query_any_support_conditional": 0.0,
+        "query_all_support_conditional": 0.0
+      }
+    },
+    "0.2": {
+      "cce_positive": {
+        "threshold": 0.156691312789917,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 13.153846153846153,
+        "context_reduction": 0.5615384615384615,
+        "empty_rate": 0.07692307692307693,
+        "chunk_precision": 0.8771929824561403,
+        "micro_relevant_recall_conditional": 0.7075471698113207,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.16666666666666666
+      },
+      "query_all_support": {
+        "threshold": 0.09934592247009277,
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 23.307692307692307,
+        "context_reduction": 0.22307692307692306,
+        "empty_rate": 0.0,
+        "chunk_precision": 0.6765676567656765,
+        "micro_relevant_recall_conditional": 0.9669811320754716,
+        "query_any_support_conditional": 1.0,
+        "query_all_support_conditional": 0.5833333333333334
+      },
+      "candidate_by": {
+        "retrievable_queries": 12,
+        "retrieval_ceiling": 0.9230769230769231,
+        "mean_candidates_kept": 0.38461538461538464,
+        "context_reduction": 0.9871794871794872,
+        "empty_rate": 0.9230769230769231,
+        "chunk_precision": 1.0,
+        "micro_relevant_recall_conditional": 0.02358490566037736,
+        "query_any_support_conditional": 0.08333333333333333,
+        "query_all_support_conditional": 0.0
+      }
+    }
+  }
+}
