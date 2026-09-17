@@ -45,8 +45,11 @@ def load_topics(path: Path) -> dict[str, str]:
     rows = {}
     with path.open(encoding="utf-8") as handle:
         for line in handle:
-            qid, title, narrative = line.rstrip("\n").split("\t", maxsplit=2)
-            rows[qid] = f"{title}\n{narrative}"
+            fields = line.rstrip("\n").split("\t")
+            if len(fields) < 2:
+                raise ValueError(f"Malformed topic row: {line!r}")
+            qid, query_fields = fields[0], fields[1:]
+            rows[qid] = "\n".join(query_fields)
     return rows
 
 
