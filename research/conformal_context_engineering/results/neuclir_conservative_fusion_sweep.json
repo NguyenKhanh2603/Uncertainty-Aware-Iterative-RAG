@@ -1,0 +1,41 @@
+{
+  "alpha": 0.1,
+  "weights": {
+    "0": {
+      "threshold": 0.7143785953521729,
+      "mean_chunks_kept": 19.11111111111111,
+      "nugget_micro_coverage": 0.926829268292683,
+      "query_all_nugget_coverage": 0.6666666666666666
+    },
+    "0.05": {
+      "threshold": 0.7170271277427673,
+      "mean_chunks_kept": 19.11111111111111,
+      "nugget_micro_coverage": 0.926829268292683,
+      "query_all_nugget_coverage": 0.6666666666666666
+    },
+    "0.1": {
+      "threshold": 0.719660758972168,
+      "mean_chunks_kept": 18.88888888888889,
+      "nugget_micro_coverage": 0.926829268292683,
+      "query_all_nugget_coverage": 0.6666666666666666
+    },
+    "0.2": {
+      "threshold": 0.7248828411102295,
+      "mean_chunks_kept": 18.77777777777778,
+      "nugget_micro_coverage": 0.9024390243902439,
+      "query_all_nugget_coverage": 0.4444444444444444
+    },
+    "0.4": {
+      "threshold": 0.7256808280944824,
+      "mean_chunks_kept": 20.333333333333332,
+      "nugget_micro_coverage": 0.9024390243902439,
+      "query_all_nugget_coverage": 0.4444444444444444
+    },
+    "0.75": {
+      "threshold": 0.7541658878326416,
+      "mean_chunks_kept": 20.88888888888889,
+      "nugget_micro_coverage": 0.8861788617886179,
+      "query_all_nugget_coverage": 0.4444444444444444
+    }
+  }
+}
