@@ -1,0 +1,274 @@
+{
+  "status": "complete",
+  "protocol": "disjoint cached probe-train / calibration false-bank / test; pooled false bank; Top-30 BY",
+  "results": {
+    "hotpotqa": {
+      "selected_layer": 19,
+      "selected_c": 0.1,
+      "test_queries": 100,
+      "results": {
+        "0.1": {
+          "cosine": {
+            "mean_chunks_kept": 0.4,
+            "empty_rate": 0.65,
+            "precision": 0.925,
+            "conditional_support_recall": 0.20108695652173914,
+            "query_any_support": 0.34
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.42,
+            "empty_rate": 0.62,
+            "precision": 0.9285714285714286,
+            "conditional_support_recall": 0.21195652173913043,
+            "query_any_support": 0.37
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.44,
+            "empty_rate": 0.62,
+            "precision": 0.9318181818181818,
+            "conditional_support_recall": 0.22282608695652173,
+            "query_any_support": 0.37
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.48,
+            "empty_rate": 0.56,
+            "precision": 0.9375,
+            "conditional_support_recall": 0.24456521739130435,
+            "query_any_support": 0.43
+          }
+        },
+        "0.2": {
+          "cosine": {
+            "mean_chunks_kept": 1.16,
+            "empty_rate": 0.22,
+            "precision": 0.8448275862068966,
+            "conditional_support_recall": 0.532608695652174,
+            "query_any_support": 0.74
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 1.28,
+            "empty_rate": 0.2,
+            "precision": 0.84375,
+            "conditional_support_recall": 0.5869565217391305,
+            "query_any_support": 0.77
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 1.33,
+            "empty_rate": 0.17,
+            "precision": 0.8345864661654135,
+            "conditional_support_recall": 0.6032608695652174,
+            "query_any_support": 0.79
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 1.27,
+            "empty_rate": 0.21,
+            "precision": 0.8661417322834646,
+            "conditional_support_recall": 0.5978260869565217,
+            "query_any_support": 0.77
+          }
+        }
+      }
+    },
+    "mmqa": {
+      "selected_layer": 19,
+      "selected_c": 0.003,
+      "test_queries": 100,
+      "results": {
+        "0.1": {
+          "cosine": {
+            "mean_chunks_kept": 0.13,
+            "empty_rate": 0.87,
+            "precision": 0.8461538461538461,
+            "conditional_support_recall": 0.09734513274336283,
+            "query_any_support": 0.11827956989247312
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.09,
+            "empty_rate": 0.91,
+            "precision": 1.0,
+            "conditional_support_recall": 0.07964601769911504,
+            "query_any_support": 0.0967741935483871
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.1,
+            "empty_rate": 0.9,
+            "precision": 1.0,
+            "conditional_support_recall": 0.08849557522123894,
+            "query_any_support": 0.10752688172043011
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.12,
+            "empty_rate": 0.88,
+            "precision": 1.0,
+            "conditional_support_recall": 0.10619469026548672,
+            "query_any_support": 0.12903225806451613
+          }
+        },
+        "0.2": {
+          "cosine": {
+            "mean_chunks_kept": 0.41,
+            "empty_rate": 0.59,
+            "precision": 0.8780487804878049,
+            "conditional_support_recall": 0.3185840707964602,
+            "query_any_support": 0.3870967741935484
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.44,
+            "empty_rate": 0.57,
+            "precision": 0.8863636363636364,
+            "conditional_support_recall": 0.34513274336283184,
+            "query_any_support": 0.41935483870967744
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.42,
+            "empty_rate": 0.58,
+            "precision": 0.8809523809523809,
+            "conditional_support_recall": 0.3274336283185841,
+            "query_any_support": 0.3978494623655914
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.44,
+            "empty_rate": 0.58,
+            "precision": 0.9318181818181818,
+            "conditional_support_recall": 0.36283185840707965,
+            "query_any_support": 0.44086021505376344
+          }
+        }
+      }
+    },
+    "tatqa": {
+      "selected_layer": 19,
+      "selected_c": 0.03,
+      "test_queries": 100,
+      "results": {
+        "0.1": {
+          "cosine": {
+            "mean_chunks_kept": 0.12,
+            "empty_rate": 0.88,
+            "precision": 0.8333333333333334,
+            "conditional_support_recall": 0.09523809523809523,
+            "query_any_support": 0.10989010989010989
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.18,
+            "empty_rate": 0.83,
+            "precision": 0.8333333333333334,
+            "conditional_support_recall": 0.14285714285714285,
+            "query_any_support": 0.16483516483516483
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.14,
+            "empty_rate": 0.86,
+            "precision": 0.8571428571428571,
+            "conditional_support_recall": 0.11428571428571428,
+            "query_any_support": 0.13186813186813187
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.22,
+            "empty_rate": 0.79,
+            "precision": 0.8181818181818182,
+            "conditional_support_recall": 0.17142857142857143,
+            "query_any_support": 0.1978021978021978
+          }
+        },
+        "0.2": {
+          "cosine": {
+            "mean_chunks_kept": 0.16,
+            "empty_rate": 0.85,
+            "precision": 0.8125,
+            "conditional_support_recall": 0.12380952380952381,
+            "query_any_support": 0.14285714285714285
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.24,
+            "empty_rate": 0.77,
+            "precision": 0.7916666666666666,
+            "conditional_support_recall": 0.18095238095238095,
+            "query_any_support": 0.2087912087912088
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.2,
+            "empty_rate": 0.81,
+            "precision": 0.85,
+            "conditional_support_recall": 0.1619047619047619,
+            "query_any_support": 0.18681318681318682
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.3,
+            "empty_rate": 0.72,
+            "precision": 0.8,
+            "conditional_support_recall": 0.22857142857142856,
+            "query_any_support": 0.26373626373626374
+          }
+        }
+      }
+    },
+    "webqa": {
+      "selected_layer": 19,
+      "selected_c": 0.03,
+      "test_queries": 100,
+      "results": {
+        "0.1": {
+          "cosine": {
+            "mean_chunks_kept": 0.0,
+            "empty_rate": 1.0,
+            "precision": 0.0,
+            "conditional_support_recall": 0.0,
+            "query_any_support": 0.0
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.01,
+            "empty_rate": 0.99,
+            "precision": 1.0,
+            "conditional_support_recall": 0.011764705882352941,
+            "query_any_support": 0.014285714285714285
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.0,
+            "empty_rate": 1.0,
+            "precision": 0.0,
+            "conditional_support_recall": 0.0,
+            "query_any_support": 0.0
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.01,
+            "empty_rate": 0.99,
+            "precision": 1.0,
+            "conditional_support_recall": 0.011764705882352941,
+            "query_any_support": 0.014285714285714285
+          }
+        },
+        "0.2": {
+          "cosine": {
+            "mean_chunks_kept": 0.01,
+            "empty_rate": 0.99,
+            "precision": 1.0,
+            "conditional_support_recall": 0.011764705882352941,
+            "query_any_support": 0.014285714285714285
+          },
+          "cosine_plus_lm": {
+            "mean_chunks_kept": 0.03,
+            "empty_rate": 0.97,
+            "precision": 1.0,
+            "conditional_support_recall": 0.03529411764705882,
+            "query_any_support": 0.04285714285714286
+          },
+          "cosine_plus_hidden": {
+            "mean_chunks_kept": 0.02,
+            "empty_rate": 0.98,
+            "precision": 1.0,
+            "conditional_support_recall": 0.023529411764705882,
+            "query_any_support": 0.02857142857142857
+          },
+          "cosine_plus_lm_plus_hidden": {
+            "mean_chunks_kept": 0.03,
+            "empty_rate": 0.97,
+            "precision": 1.0,
+            "conditional_support_recall": 0.03529411764705882,
+            "query_any_support": 0.04285714285714286
+          }
+        }
+      }
+    }
+  }
+}
