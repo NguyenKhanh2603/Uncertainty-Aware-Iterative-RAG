@@ -18,7 +18,7 @@ def main():
  # Restrict every topic to the same Qwen3 Top-L order stored in the feature artifact.
  keep=np.zeros(len(d['qids']),bool)
  for q in qs: keep[np.where(d['qids']==q)[0][:a.top_l]]=True
- d={k:v[keep] for k,v in d.items()}; y=np.array([doc in rel[q] for q,doc in zip(d['qids'],d['docids'])])
+ d={k:v[keep] for k,v in d.items() if getattr(v, 'ndim', 0) > 0}; y=np.array([doc in rel[q] for q,doc in zip(d['qids'],d['docids'])])
  X=np.column_stack([d['cosine'],d['lm_yes_no'],d['hidden'].astype('float32')]); mt=np.isin(d['qids'],list(tr));scale=StandardScaler().fit(X[mt]);probe=LogisticRegression(C=.01,max_iter=1000,class_weight='balanced').fit(scale.transform(X[mt]),y[mt]);raw=probe.decision_function(scale.transform(X));scores={}
  for name,vals in [('cosine',d['cosine']),('cosine_plus_lm',None),('cosine_plus_hidden',None),('cosine_plus_lm_plus_hidden',None)]:
   s=np.empty(len(raw))
