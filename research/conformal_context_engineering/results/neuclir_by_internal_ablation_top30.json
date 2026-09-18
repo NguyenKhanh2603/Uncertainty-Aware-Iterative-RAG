@@ -1,0 +1,107 @@
+{
+  "status": "same_split_by_selection_proxy",
+  "top_l": 30,
+  "splits": {
+    "train": [
+      "308",
+      "309",
+      "365",
+      "367",
+      "373"
+    ],
+    "calibration": [
+      "300",
+      "303",
+      "334",
+      "351",
+      "382"
+    ],
+    "test": [
+      "310",
+      "335",
+      "343",
+      "352",
+      "372",
+      "377",
+      "380",
+      "383",
+      "388"
+    ]
+  },
+  "scores": {
+    "cosine": "Qwen3 cosine",
+    "lm": "Qwen2.5 Yes-No logit",
+    "hidden": "trained logistic probe over Qwen2.5 final hidden state"
+  },
+  "results": {
+    "0.1": {
+      "cosine": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_lm": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_hidden": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_lm_plus_hidden": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      }
+    },
+    "0.2": {
+      "cosine": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_lm": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_hidden": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      },
+      "cosine_plus_lm_plus_hidden": {
+        "mean_chunks_kept": 0.0,
+        "empty_rate": 1.0,
+        "inherited_chunk_precision": 0.0,
+        "inherited_chunk_recall": 0.0,
+        "nugget_micro_coverage": 0.0,
+        "query_all_nugget_coverage": 0.0
+      }
+    }
+  },
+  "note": "Public document nugget labels are inherited by chunks; BY tests candidate false-score banks."
+}
