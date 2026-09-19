@@ -159,7 +159,10 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def paths(dataset: str, root: Path) -> tuple[Path, Path, Path, Path]:
     bundle = root / f"official_bundle_role_split_{dataset}"
-    retrieval = root / "retrieval" / f"{dataset}_top30_global_retrieval.jsonl.gz"
+    # These are the exact frozen Jina-v4 logs from which the cached Qwen-7B
+    # feature plans were extracted.  The later global-retrieval files have a
+    # different role split and therefore cannot be used for these fixed qids.
+    retrieval = Path("research/internal_state_rag/results/qwen2vl_jina4") / f"{dataset}_jina_v4_top30.jsonl.gz"
     return bundle / dataset / "questions.jsonl", bundle / dataset / "corpus.jsonl", retrieval, bundle
 
 
