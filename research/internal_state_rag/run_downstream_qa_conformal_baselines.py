@@ -230,17 +230,21 @@ def main() -> None:
             run_manifest["datasets"][dataset] = {"status": "unavailable_source_files", "questions": str(questions_path), "corpus": str(corpus_path), "retrieval": str(retrieval_path)}
             continue
         plan = json.loads((args.feature_root / dataset / "test" / "manifest.json").read_text(encoding="utf-8"))["plan"]
+        calibration_plan = json.loads(
+            (args.feature_root / dataset / "calibration" / "manifest.json").read_text(encoding="utf-8")
+        )["plan"]
         if args.limit:
             plan = plan[: args.limit]
         questions = keyed(questions_path, "qid")
         corpus = keyed(corpus_path, "id")
         retrieval = grouped_retrieval(retrieval_path)
-        calibration = retrieval["calibration"]
+        calibration_lookup = retrieval["calibration"]
         test_lookup = retrieval["test"]
+        calibration = [calibration_lookup[str(qid)] for qid in calibration_plan]
         test = [test_lookup[str(qid)] for qid in plan]
-        if any(len(rows) != 30 for rows in test):
-            raise ValueError(f"{dataset}: frozen test plan does not have Top-30 rows")
-        masks, thresholds = selector_masks(list(calibration.values()), test, args.alpha)
+        if any(len(rows) != 30 for rows in calibration) or any(len(rows) != 30 for rows in test):
+            raise ValueError(f"{dataset}: frozen calibration/test plan does not have Top-30 rows")
+        masks, thresholds = selector_masks(calibration, test, args.alpha)
         output = args.output_dir / f"{dataset}_predictions.jsonl"
         completed = {str(row["qid"]): row for row in iter_jsonl(output)} if output.exists() else {}
         if client is None:
