@@ -19,6 +19,7 @@ import gzip
 import hashlib
 import json
 import os
+import random
 import shutil
 import tarfile
 import time
@@ -651,6 +652,7 @@ def prepare_hotpotqa(
     max_questions: int,
     *,
     max_questions_per_role: int | None = None,
+    selection_seed: int | None = None,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     corpus: dict[str, dict[str, Any]] = {}
@@ -668,8 +670,18 @@ def prepare_hotpotqa(
             progress = tqdm(
                 total=parquet.metadata.num_rows, desc=f"Parse HotpotQA {split}", unit="question"
             )
-            for batch in parquet.iter_batches(batch_size=1024):
-                for row in batch.to_pylist():
+            # The official validation file is the locally evaluable HotpotQA
+            # test proxy.  Materialize it only when a seeded benchmark subset
+            # is requested, shuffle before truncation, and retain the source
+            # order for all other roles.
+            if split == "validation" and selection_seed is not None:
+                selected_rows = parquet.read().to_pylist()
+                random.Random(selection_seed).shuffle(selected_rows)
+                batches = [selected_rows]
+            else:
+                batches = (batch.to_pylist() for batch in parquet.iter_batches(batch_size=1024))
+            for batch in batches:
+                for row in batch:
                     if limiter.role_full(role):
                         break
                     context = row.get("context") or {}
@@ -842,6 +854,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--datasets", default="mmqa,webqa,hotpotqa,tatqa")
+    parser.add_argument("--selection-seed", type=int, help="Shuffle official held-out records before limiting.")
     parser.add_argument(
         "--max-questions",
         type=int,
@@ -900,6 +913,7 @@ def main() -> None:
             downloads,
             args.max_questions,
             max_questions_per_role=args.max_questions_per_role,
+            selection_seed=args.selection_seed,
         ),
         "tatqa": lambda: prepare_tatqa(
             root,
