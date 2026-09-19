@@ -1,0 +1,81 @@
+{
+  "status": "complete",
+  "seed": 2027,
+  "dataset": "hotpotqa",
+  "alpha": 0.1,
+  "n_test": 100,
+  "thresholds": {
+    "by_cosine": null,
+    "ecir_cce_embedding": 0.586396336555481,
+    "conflare_retrieval_adapter": 0.5865499675273895,
+    "traq_retrieval_bonferroni_adapter": 0.5615580677986145
+  },
+  "results": {
+    "full_top30": {
+      "em": 0.36,
+      "f1": 0.4894761904761905,
+      "numerical_accuracy": 0.4,
+      "mean_chunks": 30.0,
+      "empty_rate": 0.0,
+      "precision": 0.061666666666666654,
+      "support_recall": 1.0,
+      "query_any_support": 1.0,
+      "query_all_support": 1.0
+    },
+    "by_cosine": {
+      "em": 0.12,
+      "f1": 0.22001120135902746,
+      "numerical_accuracy": 0.13,
+      "mean_chunks": 0.3,
+      "empty_rate": 0.78,
+      "precision": 0.20785714285714285,
+      "support_recall": 0.135,
+      "query_any_support": 0.22,
+      "query_all_support": 0.05
+    },
+    "ecir_cce_embedding": {
+      "em": 0.36,
+      "f1": 0.47409740259740263,
+      "numerical_accuracy": 0.39,
+      "mean_chunks": 8.39,
+      "empty_rate": 0.03,
+      "precision": 0.4566307157515549,
+      "support_recall": 0.86,
+      "query_any_support": 0.97,
+      "query_all_support": 0.75
+    },
+    "conflare_retrieval_adapter": {
+      "em": 0.36,
+      "f1": 0.47409740259740263,
+      "numerical_accuracy": 0.39,
+      "mean_chunks": 8.37,
+      "empty_rate": 0.03,
+      "precision": 0.45678389590473506,
+      "support_recall": 0.86,
+      "query_any_support": 0.97,
+      "query_all_support": 0.75
+    },
+    "traq_retrieval_bonferroni_adapter": {
+      "em": 0.4,
+      "f1": 0.5140974025974026,
+      "numerical_accuracy": 0.43,
+      "mean_chunks": 12.81,
+      "empty_rate": 0.01,
+      "precision": 0.348060479172244,
+      "support_recall": 0.91,
+      "query_any_support": 0.98,
+      "query_all_support": 0.84
+    },
+    "query_level_cosine_lm_hidden": {
+      "em": 0.42,
+      "f1": 0.5447251082251082,
+      "numerical_accuracy": 0.46,
+      "mean_chunks": 3.06,
+      "empty_rate": 0.0,
+      "precision": 0.6572142857142856,
+      "support_recall": 0.945,
+      "query_any_support": 1.0,
+      "query_all_support": 0.89
+    }
+  }
+}
