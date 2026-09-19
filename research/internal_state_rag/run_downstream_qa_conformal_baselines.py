@@ -147,8 +147,10 @@ class QwenDirectAnswerGenerator:
     during ordinary answer generation with the current transformers release.
     """
 
-    def __init__(self, model_path: Path):
-        self.processor = AutoProcessor.from_pretrained(str(model_path))
+    def __init__(self, model_path: Path, *, min_pixels: int, max_pixels: int):
+        self.processor = AutoProcessor.from_pretrained(
+            str(model_path), min_pixels=min_pixels, max_pixels=max_pixels
+        )
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
             str(model_path), torch_dtype=torch.float16, attn_implementation="sdpa"
         ).eval().to("cuda")
@@ -211,6 +213,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--alpha", type=float, default=0.1)
     parser.add_argument("--limit", type=int, default=0, help="0 evaluates every frozen test query")
     parser.add_argument("--max-new-tokens", type=int, default=24)
+    parser.add_argument("--min-pixels", type=int, default=3136)
+    parser.add_argument("--max-pixels", type=int, default=200704)
     return parser.parse_args()
 
 
@@ -220,7 +224,11 @@ def main() -> None:
     if not 0 < args.alpha < 1:
         raise ValueError("alpha must be in (0,1)")
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    run_manifest = {"status": "running", "model": str(args.model), "alpha": args.alpha, "max_new_tokens": args.max_new_tokens, "datasets": {}}
+    run_manifest = {
+        "status": "running", "model": str(args.model), "alpha": args.alpha,
+        "max_new_tokens": args.max_new_tokens, "min_pixels": args.min_pixels,
+        "max_pixels": args.max_pixels, "datasets": {},
+    }
     client: QwenDirectAnswerGenerator | None = None
     for dataset in chosen:
         if dataset not in DATASETS:
@@ -248,7 +256,9 @@ def main() -> None:
         output = args.output_dir / f"{dataset}_predictions.jsonl"
         completed = {str(row["qid"]): row for row in iter_jsonl(output)} if output.exists() else {}
         if client is None:
-            client = QwenDirectAnswerGenerator(args.model)
+            client = QwenDirectAnswerGenerator(
+                args.model, min_pixels=args.min_pixels, max_pixels=args.max_pixels
+            )
         for index, (qid, rows) in enumerate(zip(plan, test), start=1):
             qid = str(qid)
             if qid in completed:
