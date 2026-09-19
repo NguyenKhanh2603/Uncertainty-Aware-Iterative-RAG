@@ -19,9 +19,11 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import numpy as np
+import torch
+from qwen_vl_utils import process_vision_info
+from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
 
 from eval.metrics import exact_match, numerical_accuracy, token_f1
-from research.internal_state_rag.run_tatqa_smoke import ResearchTextClient, generate_answer
 from uncertainty_rag.core.conformal_selection import benjamini_yekutieli
 from uncertainty_rag.modality.base import ContextChunk
 
@@ -137,6 +139,39 @@ def metrics(prediction: str, gold: list[str]) -> dict[str, float]:
     return {"em": exact_match(prediction, gold), "f1": token_f1(prediction, gold), "numerical_accuracy": numerical_accuracy(prediction, gold)}
 
 
+class QwenDirectAnswerGenerator:
+    """Qwen's documented chat-template/generate/decode path.
+
+    This deliberately does not use the attention-alignment helper: it inserts
+    temporary markers intended for attribution, which produced malformed text
+    during ordinary answer generation with the current transformers release.
+    """
+
+    def __init__(self, model_path: Path):
+        self.processor = AutoProcessor.from_pretrained(str(model_path))
+        self.model = Qwen2VLForConditionalGeneration.from_pretrained(
+            str(model_path), torch_dtype=torch.float16, attn_implementation="sdpa"
+        ).eval().to("cuda")
+
+    @torch.inference_mode()
+    def generate(self, prompt: str, context: list[ContextChunk], max_new_tokens: int) -> str:
+        content: list[dict[str, str]] = [{"type": "text", "text": prompt + "\n\nContext:\n"}]
+        for chunk in context:
+            if chunk.modality == "image":
+                content.append({"type": "image", "image": str(chunk.content)})
+            else:
+                content.append({"type": "text", "text": str(chunk.content) + "\n"})
+        messages = [{"role": "user", "content": content}]
+        rendered = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        image_inputs, video_inputs = process_vision_info(messages)
+        inputs = self.processor(
+            text=[rendered], images=image_inputs, videos=video_inputs, padding=True, return_tensors="pt"
+        ).to("cuda")
+        generated = self.model.generate(**inputs, do_sample=False, max_new_tokens=max_new_tokens)
+        trimmed = [out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated)]
+        return self.processor.batch_decode(trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].strip()
+
+
 def append_jsonl(path: Path, row: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -186,7 +221,7 @@ def main() -> None:
         raise ValueError("alpha must be in (0,1)")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     run_manifest = {"status": "running", "model": str(args.model), "alpha": args.alpha, "max_new_tokens": args.max_new_tokens, "datasets": {}}
-    client: ResearchTextClient | None = None
+    client: QwenDirectAnswerGenerator | None = None
     for dataset in chosen:
         if dataset not in DATASETS:
             raise ValueError(f"Unknown dataset: {dataset}")
@@ -209,7 +244,7 @@ def main() -> None:
         output = args.output_dir / f"{dataset}_predictions.jsonl"
         completed = {str(row["qid"]): row for row in iter_jsonl(output)} if output.exists() else {}
         if client is None:
-            client = ResearchTextClient(str(args.model), device="cuda", load_in_4bit=False)
+            client = QwenDirectAnswerGenerator(args.model)
         for index, (qid, rows) in enumerate(zip(plan, test), start=1):
             qid = str(qid)
             if qid in completed:
@@ -221,7 +256,7 @@ def main() -> None:
             predictions, contexts = {}, {}
             for method in METHODS:
                 selected = chunks(rows, masks[method][index - 1], corpus, bundle_root)
-                prediction = generate_answer(client, prompt, selected, max_new_tokens=args.max_new_tokens)
+                prediction = client.generate(prompt, selected, max_new_tokens=args.max_new_tokens)
                 predictions[method] = prediction
                 contexts[method] = {"n_chunks": len(selected), "chunk_ids": [chunk.id for chunk in selected]}
             record = {"qid": qid, "gold_answers": gold, "predictions": predictions, "metrics": {name: metrics(prediction, gold) for name, prediction in predictions.items()}, "contexts": contexts}
