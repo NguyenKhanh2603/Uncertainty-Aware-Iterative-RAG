@@ -1,0 +1,419 @@
+{
+  "status": "complete_retrieval_component_adapter_benchmark",
+  "shared_score": "cached Jina v4 cosine; Top-L=30",
+  "methods": {
+    "ecir_cce_embedding": "finite-sample positive-chunk split conformal",
+    "conflare_retrieval_adapter": "official percentile distance threshold; gold calibration support replaces its synthetic LLM questions",
+    "traq_retrieval_bonferroni_adapter": "official TRAQ retrieval quantile at alpha/2; generation component cannot be compared without generated answer sets"
+  },
+  "results": {
+    "hotpotqa": {
+      "calibration_positive_chunks": 185,
+      "test_queries": 100,
+      "results": {
+        "0.05": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5566290616989136,
+            "mean_chunks_kept": 14.97,
+            "context_reduction": 0.501,
+            "empty_rate": 0.0,
+            "precision": 0.11422845691382766,
+            "conditional_support_recall": 0.9293478260869565,
+            "query_any_support": 1.0,
+            "query_all_support": 0.87
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5571320533752442,
+            "mean_chunks_kept": 14.83,
+            "context_reduction": 0.5056666666666667,
+            "empty_rate": 0.0,
+            "precision": 0.1153068105192178,
+            "conditional_support_recall": 0.9293478260869565,
+            "query_any_support": 1.0,
+            "query_all_support": 0.87
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5413310527801514,
+            "mean_chunks_kept": 18.0,
+            "context_reduction": 0.4,
+            "empty_rate": 0.0,
+            "precision": 0.09666666666666666,
+            "conditional_support_recall": 0.9456521739130435,
+            "query_any_support": 1.0,
+            "query_all_support": 0.9
+          }
+        },
+        "0.1": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5741243362426758,
+            "mean_chunks_kept": 11.19,
+            "context_reduction": 0.627,
+            "empty_rate": 0.01,
+            "precision": 0.14924039320822163,
+            "conditional_support_recall": 0.907608695652174,
+            "query_any_support": 0.99,
+            "query_all_support": 0.84
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5756383657455444,
+            "mean_chunks_kept": 10.8,
+            "context_reduction": 0.64,
+            "empty_rate": 0.01,
+            "precision": 0.15462962962962962,
+            "conditional_support_recall": 0.907608695652174,
+            "query_any_support": 0.99,
+            "query_all_support": 0.84
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5566290616989136,
+            "mean_chunks_kept": 14.97,
+            "context_reduction": 0.501,
+            "empty_rate": 0.0,
+            "precision": 0.11422845691382766,
+            "conditional_support_recall": 0.9293478260869565,
+            "query_any_support": 1.0,
+            "query_all_support": 0.87
+          }
+        },
+        "0.2": {
+          "ecir_cce_embedding": {
+            "threshold": 0.6059386134147644,
+            "mean_chunks_kept": 6.04,
+            "context_reduction": 0.7986666666666666,
+            "empty_rate": 0.04,
+            "precision": 0.25165562913907286,
+            "conditional_support_recall": 0.8260869565217391,
+            "query_any_support": 0.93,
+            "query_all_support": 0.7
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.6058378100395203,
+            "mean_chunks_kept": 6.05,
+            "context_reduction": 0.7983333333333333,
+            "empty_rate": 0.04,
+            "precision": 0.2512396694214876,
+            "conditional_support_recall": 0.8260869565217391,
+            "query_any_support": 0.93,
+            "query_all_support": 0.7
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5741243362426758,
+            "mean_chunks_kept": 11.19,
+            "context_reduction": 0.627,
+            "empty_rate": 0.01,
+            "precision": 0.14924039320822163,
+            "conditional_support_recall": 0.907608695652174,
+            "query_any_support": 0.99,
+            "query_all_support": 0.84
+          }
+        }
+      }
+    },
+    "mmqa": {
+      "calibration_positive_chunks": 124,
+      "test_queries": 100,
+      "results": {
+        "0.05": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5536381602287292,
+            "mean_chunks_kept": 20.43,
+            "context_reduction": 0.31899999999999995,
+            "empty_rate": 0.01,
+            "precision": 0.05384238864415076,
+            "conditional_support_recall": 0.9734513274336283,
+            "query_any_support": 1.0,
+            "query_all_support": 0.967741935483871
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5538309127092361,
+            "mean_chunks_kept": 20.41,
+            "context_reduction": 0.31966666666666665,
+            "empty_rate": 0.01,
+            "precision": 0.05389514943655071,
+            "conditional_support_recall": 0.9734513274336283,
+            "query_any_support": 1.0,
+            "query_all_support": 0.967741935483871
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5328680276870728,
+            "mean_chunks_kept": 24.41,
+            "context_reduction": 0.18633333333333335,
+            "empty_rate": 0.0,
+            "precision": 0.04588283490372798,
+            "conditional_support_recall": 0.9911504424778761,
+            "query_any_support": 1.0,
+            "query_all_support": 0.989247311827957
+          }
+        },
+        "0.1": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5828832387924194,
+            "mean_chunks_kept": 14.19,
+            "context_reduction": 0.527,
+            "empty_rate": 0.03,
+            "precision": 0.07399577167019028,
+            "conditional_support_recall": 0.9292035398230089,
+            "query_any_support": 0.967741935483871,
+            "query_all_support": 0.9139784946236559
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5880766034126282,
+            "mean_chunks_kept": 13.02,
+            "context_reduction": 0.5660000000000001,
+            "empty_rate": 0.03,
+            "precision": 0.07987711213517665,
+            "conditional_support_recall": 0.9203539823008849,
+            "query_any_support": 0.967741935483871,
+            "query_all_support": 0.9032258064516129
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5536381602287292,
+            "mean_chunks_kept": 20.43,
+            "context_reduction": 0.31899999999999995,
+            "empty_rate": 0.01,
+            "precision": 0.05384238864415076,
+            "conditional_support_recall": 0.9734513274336283,
+            "query_any_support": 1.0,
+            "query_all_support": 0.967741935483871
+          }
+        },
+        "0.2": {
+          "ecir_cce_embedding": {
+            "threshold": 0.6382102966308594,
+            "mean_chunks_kept": 4.7,
+            "context_reduction": 0.8433333333333333,
+            "empty_rate": 0.14,
+            "precision": 0.1829787234042553,
+            "conditional_support_recall": 0.7610619469026548,
+            "query_any_support": 0.8387096774193549,
+            "query_all_support": 0.7526881720430108
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.6379463911056519,
+            "mean_chunks_kept": 4.72,
+            "context_reduction": 0.8426666666666667,
+            "empty_rate": 0.14,
+            "precision": 0.18220338983050846,
+            "conditional_support_recall": 0.7610619469026548,
+            "query_any_support": 0.8387096774193549,
+            "query_all_support": 0.7526881720430108
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5828832387924194,
+            "mean_chunks_kept": 14.19,
+            "context_reduction": 0.527,
+            "empty_rate": 0.03,
+            "precision": 0.07399577167019028,
+            "conditional_support_recall": 0.9292035398230089,
+            "query_any_support": 0.967741935483871,
+            "query_all_support": 0.9139784946236559
+          }
+        }
+      }
+    },
+    "tatqa": {
+      "calibration_positive_chunks": 103,
+      "test_queries": 100,
+      "results": {
+        "0.05": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5600771307945251,
+            "mean_chunks_kept": 24.08,
+            "context_reduction": 0.19733333333333336,
+            "empty_rate": 0.03,
+            "precision": 0.04152823920265781,
+            "conditional_support_recall": 0.9523809523809523,
+            "query_any_support": 0.945054945054945,
+            "query_all_support": 0.945054945054945
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5609082043170929,
+            "mean_chunks_kept": 24.0,
+            "context_reduction": 0.19999999999999996,
+            "empty_rate": 0.03,
+            "precision": 0.041666666666666664,
+            "conditional_support_recall": 0.9523809523809523,
+            "query_any_support": 0.945054945054945,
+            "query_all_support": 0.945054945054945
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5367462038993835,
+            "mean_chunks_kept": 25.85,
+            "context_reduction": 0.1383333333333333,
+            "empty_rate": 0.01,
+            "precision": 0.0390715667311412,
+            "conditional_support_recall": 0.9619047619047619,
+            "query_any_support": 0.9560439560439561,
+            "query_all_support": 0.9560439560439561
+          }
+        },
+        "0.1": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5897385478019714,
+            "mean_chunks_kept": 20.1,
+            "context_reduction": 0.32999999999999996,
+            "empty_rate": 0.05,
+            "precision": 0.046766169154228855,
+            "conditional_support_recall": 0.8952380952380953,
+            "query_any_support": 0.9120879120879121,
+            "query_all_support": 0.8901098901098901
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.59063560962677,
+            "mean_chunks_kept": 20.02,
+            "context_reduction": 0.33266666666666667,
+            "empty_rate": 0.05,
+            "precision": 0.04695304695304695,
+            "conditional_support_recall": 0.8952380952380953,
+            "query_any_support": 0.9120879120879121,
+            "query_all_support": 0.8901098901098901
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5600771307945251,
+            "mean_chunks_kept": 24.08,
+            "context_reduction": 0.19733333333333336,
+            "empty_rate": 0.03,
+            "precision": 0.04152823920265781,
+            "conditional_support_recall": 0.9523809523809523,
+            "query_any_support": 0.945054945054945,
+            "query_all_support": 0.945054945054945
+          }
+        },
+        "0.2": {
+          "ecir_cce_embedding": {
+            "threshold": 0.617242693901062,
+            "mean_chunks_kept": 14.66,
+            "context_reduction": 0.5113333333333333,
+            "empty_rate": 0.08,
+            "precision": 0.06002728512960437,
+            "conditional_support_recall": 0.8380952380952381,
+            "query_any_support": 0.8681318681318682,
+            "query_all_support": 0.8351648351648352
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.6172929048538208,
+            "mean_chunks_kept": 14.66,
+            "context_reduction": 0.5113333333333333,
+            "empty_rate": 0.08,
+            "precision": 0.06002728512960437,
+            "conditional_support_recall": 0.8380952380952381,
+            "query_any_support": 0.8681318681318682,
+            "query_all_support": 0.8351648351648352
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5897385478019714,
+            "mean_chunks_kept": 20.1,
+            "context_reduction": 0.32999999999999996,
+            "empty_rate": 0.05,
+            "precision": 0.046766169154228855,
+            "conditional_support_recall": 0.8952380952380953,
+            "query_any_support": 0.9120879120879121,
+            "query_all_support": 0.8901098901098901
+          }
+        }
+      }
+    },
+    "webqa": {
+      "calibration_positive_chunks": 88,
+      "test_queries": 100,
+      "results": {
+        "0.05": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5444818735122681,
+            "mean_chunks_kept": 26.16,
+            "context_reduction": 0.128,
+            "empty_rate": 0.02,
+            "precision": 0.03172782874617737,
+            "conditional_support_recall": 0.9764705882352941,
+            "query_any_support": 0.9714285714285714,
+            "query_all_support": 0.9714285714285714
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5523464351892472,
+            "mean_chunks_kept": 25.4,
+            "context_reduction": 0.15333333333333332,
+            "empty_rate": 0.02,
+            "precision": 0.03228346456692913,
+            "conditional_support_recall": 0.9647058823529412,
+            "query_any_support": 0.9571428571428572,
+            "query_all_support": 0.9571428571428572
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.541312575340271,
+            "mean_chunks_kept": 26.43,
+            "context_reduction": 0.119,
+            "empty_rate": 0.02,
+            "precision": 0.03178206583427923,
+            "conditional_support_recall": 0.9882352941176471,
+            "query_any_support": 0.9857142857142858,
+            "query_all_support": 0.9857142857142858
+          }
+        },
+        "0.1": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5742910504341125,
+            "mean_chunks_kept": 21.98,
+            "context_reduction": 0.2673333333333333,
+            "empty_rate": 0.08,
+            "precision": 0.03548680618744313,
+            "conditional_support_recall": 0.9176470588235294,
+            "query_any_support": 0.9285714285714286,
+            "query_all_support": 0.9
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5756952047348023,
+            "mean_chunks_kept": 21.71,
+            "context_reduction": 0.2763333333333333,
+            "empty_rate": 0.08,
+            "precision": 0.03546752648549056,
+            "conditional_support_recall": 0.9058823529411765,
+            "query_any_support": 0.9142857142857143,
+            "query_all_support": 0.8857142857142857
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5444818735122681,
+            "mean_chunks_kept": 26.16,
+            "context_reduction": 0.128,
+            "empty_rate": 0.02,
+            "precision": 0.03172782874617737,
+            "conditional_support_recall": 0.9764705882352941,
+            "query_any_support": 0.9714285714285714,
+            "query_all_support": 0.9714285714285714
+          }
+        },
+        "0.2": {
+          "ecir_cce_embedding": {
+            "threshold": 0.5839539766311646,
+            "mean_chunks_kept": 20.32,
+            "context_reduction": 0.32266666666666666,
+            "empty_rate": 0.09,
+            "precision": 0.03543307086614173,
+            "conditional_support_recall": 0.8470588235294118,
+            "query_any_support": 0.8714285714285714,
+            "query_all_support": 0.8142857142857143
+          },
+          "conflare_retrieval_adapter": {
+            "threshold": 0.5850664854049683,
+            "mean_chunks_kept": 20.1,
+            "context_reduction": 0.32999999999999996,
+            "empty_rate": 0.09,
+            "precision": 0.035323383084577116,
+            "conditional_support_recall": 0.8352941176470589,
+            "query_any_support": 0.8571428571428571,
+            "query_all_support": 0.8
+          },
+          "traq_retrieval_bonferroni_adapter": {
+            "threshold": 0.5742910504341125,
+            "mean_chunks_kept": 21.98,
+            "context_reduction": 0.2673333333333333,
+            "empty_rate": 0.08,
+            "precision": 0.03548680618744313,
+            "conditional_support_recall": 0.9176470588235294,
+            "query_any_support": 0.9285714285714286,
+            "query_all_support": 0.9
+          }
+        }
+      }
+    }
+  }
+}
