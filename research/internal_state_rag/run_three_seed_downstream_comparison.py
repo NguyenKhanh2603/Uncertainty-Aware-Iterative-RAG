@@ -54,17 +54,23 @@ def main():
     parser.add_argument("--max-new-tokens", type=int, default=24)
     parser.add_argument("--min-pixels", type=int, default=3136)
     parser.add_argument("--max-pixels", type=int, default=200704)
+    parser.add_argument("--test-plan", type=Path, help="Optional manifest for a larger fixed test set.")
+    parser.add_argument("--fusion-predictions", type=Path, help="Optional NPZ from analysis on --test-plan.")
     args = parser.parse_args()
 
     base = args.feature_root / f"seed_{args.seed}" / args.dataset
-    calibration_qids, test_qids = plan(base / "calibration" / "manifest.json"), plan(base / "test" / "manifest.json")
+    if not base.exists() and args.seed == 1:
+        # The original completed seed predates the seed_{N} directory layout.
+        base = args.feature_root / args.dataset
+    calibration_qids = plan(base / "calibration" / "manifest.json")
+    test_qids = plan(args.test_plan) if args.test_plan else plan(base / "test" / "manifest.json")
     qpath, cpath, rpath, bundle = paths(args.dataset, args.data_root)
     questions, corpus, retrieval = keyed(qpath, "qid"), keyed(cpath, "id"), grouped_retrieval(rpath)
     calibration = [retrieval["calibration"][qid] for qid in calibration_qids]
     test = [retrieval["test"][qid] for qid in test_qids]
     masks, thresholds = selector_masks(calibration, test, args.alpha)
 
-    pred_path = args.analysis_root / f"seed_{args.seed}" / args.dataset / "fusion_predictions.npz"
+    pred_path = args.fusion_predictions or (args.analysis_root / f"seed_{args.seed}" / args.dataset / "fusion_predictions.npz")
     prediction_data = np.load(pred_path)
     if [str(q) for q in prediction_data["qids"].tolist()] != test_qids:
         raise ValueError("fusion prediction qids do not match feature plan")
