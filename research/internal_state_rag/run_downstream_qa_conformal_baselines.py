@@ -152,7 +152,12 @@ class QwenDirectAnswerGenerator:
             str(model_path), min_pixels=min_pixels, max_pixels=max_pixels
         )
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
-            str(model_path), torch_dtype=torch.float16, attn_implementation="sdpa"
+            str(model_path),
+            # Match the feature-extraction path that completed on this A100;
+            # it avoids a transient full-precision CPU copy while loading.
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            attn_implementation="sdpa",
         ).eval().to("cuda")
 
     @torch.inference_mode()
