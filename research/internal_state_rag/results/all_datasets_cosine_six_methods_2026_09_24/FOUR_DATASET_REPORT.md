@@ -1,4 +1,4 @@
-# Four-dataset pure-cosine conformal comparison
+# Four-dataset cosine and internal-signal conformal comparison
 
 ## Unified protocol
 
