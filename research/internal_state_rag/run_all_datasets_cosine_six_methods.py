@@ -224,6 +224,20 @@ def main() -> None:
             "and candidate-order validation. Use with one dataset per invocation."
         ),
     )
+    parser.add_argument(
+        "--internal-fusion-mask-key",
+        default="mask_cosine_internal_alpha_0.1",
+        help=(
+            "Boolean mask key in --internal-fusion-predictions. The default is the "
+            "pooled cosine+internal selector; a modality-conditioned artifact may "
+            "supply its separately named mask."
+        ),
+    )
+    parser.add_argument(
+        "--internal-fusion-method-name",
+        default="query_level_cosine_internal_fusion_alpha_0.10",
+        help="Selector name to publish for --internal-fusion-predictions.",
+    )
     parser.add_argument("--model", type=Path)
     parser.add_argument("--selection-only", action="store_true")
     parser.add_argument("--max-new-tokens", type=int, default=24)
@@ -260,13 +274,15 @@ def main() -> None:
                 raise ValueError(
                     "Internal-fusion artifact candidate ordering does not match frozen retrieval"
                 )
-            key = "mask_cosine_internal_alpha_0.1"
+            key = args.internal_fusion_mask_key
             if key not in artifact.files:
                 raise ValueError(f"Internal-fusion artifact is missing {key}")
             fusion_mask = artifact[key].astype(bool)
             if fusion_mask.shape != expected_chunk_ids.shape:
                 raise ValueError("Internal-fusion mask has the wrong shape")
-            fusion_method = "query_level_cosine_internal_fusion_alpha_0.10"
+            fusion_method = args.internal_fusion_method_name
+            if not fusion_method:
+                raise ValueError("--internal-fusion-method-name must not be empty")
             masks[fusion_method] = list(fusion_mask)
             thresholds[fusion_method] = {
                 "source": str(args.internal_fusion_predictions),

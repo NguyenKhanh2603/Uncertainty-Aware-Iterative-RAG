@@ -153,3 +153,15 @@ The exact dataset/log mapping and test-count guard are in [`prepare_full_interna
 ### Modality status
 
 The 19–20 September fusion experiments and the matched full-test internal-fusion column use **modality-aware model inputs but pooled score calibration**. Text/table candidates and image candidates are encoded through their respective Qwen2-VL input paths, but the query-wise z-scores, probe, fusion weights, and conformal threshold pool all Top-30 candidates within a dataset. Earlier MMQA-only modality-conditioned pilots are separate ablations: [`analyze_modality_conditional_conformal.py`](../../analyze_modality_conditional_conformal.py) and [`analyze_modality_score_calibration.py`](../../analyze_modality_score_calibration.py). They are not table rows in this report.
+
+### Queued modality-conditioned internal-fusion ablation
+
+The pooled `Query-level cosine + internal fusion` run remains unchanged. A second four-dataset ablation is queued behind it so the two runs never contend for the A100. It reuses the exact same frozen test feature tensors, 100 probe-train qids, 100 calibration qids, Qwen revision, and Top-L=30 candidates.
+
+Its primary selector is `Query-level cosine + internal fusion, Mondrian-Bonferroni (α=0.10)`. The score remains `z(cosine) + w_lm z(LM-head relevance) + w_hidden z(hidden-probe relevance)`: layer, regularization, and weights are inherited from the pooled run's probe-only OOF selection. Five-fold probe OOF scores choose how to allocate the total α=0.10 across the support modalities; the independent calibration role fits one all-support threshold per modality. The allocation sums to α=0.10, so the reported rule has a union-bound joint target. It will use `mask_cosine_internal_mondrian_bonferroni_probe_allocated` and the same downstream QA configuration.
+
+- Modality-conditioned analysis: [`analyze_modality_conditional_conformal.py`](../../analyze_modality_conditional_conformal.py)
+- Selector/downstream runner with exact qid and candidate-order checks: [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)
+- Resumable orchestration, including the pooled-run completion gate: [`run_full_query_level_internal_fusion_modality.sh`](../../run_full_query_level_internal_fusion_modality.sh)
+
+The modality set, allocations, and thresholds are determined from probe/calibration data only; the implementation does not derive them from test support labels.

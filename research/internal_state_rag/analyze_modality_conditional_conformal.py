@@ -47,6 +47,14 @@ def parse_args() -> argparse.Namespace:
         default="0.01,0.015,0.02,0.025,0.03,0.035,0.04,0.045,0.05,0.06,0.07,0.08,0.09,0.1,0.12,0.15,0.2",
         help="Global thresholds used for a descriptive budget-matched frontier.",
     )
+    parser.add_argument(
+        "--methods",
+        default="cosine_internal",
+        help=(
+            "Comma-separated score methods to evaluate. Defaults to the intended "
+            "cosine + LM-head + hidden-probe fusion only."
+        ),
+    )
     parser.add_argument("--seed", type=int, default=941)
     parser.add_argument("--bootstrap-samples", type=int, default=10_000)
     return parser.parse_args()
@@ -231,21 +239,32 @@ def main() -> None:
     train_modalities = train["modalities"].astype(str)
     cal_modalities = calibration["modalities"].astype(str)
     test_modalities = test["modalities"].astype(str)
-    support_modalities = sorted(
-        set(cal_modalities[cal_labels].tolist()) | set(test_modalities[test_labels].tolist())
-    )
+    # The test labels must never determine the modality set, allocation, or a
+    # threshold.  Every modality in this set has observed calibration support,
+    # so a finite-sample threshold can be fitted without borrowing test labels.
+    support_modalities = sorted(set(cal_modalities[cal_labels].tolist()))
+    if not support_modalities:
+        raise ValueError("Calibration contains no supported modality")
     global_alpha_grid = sorted(
         {float(value) for value in args.global_alpha_grid.split(",") if value.strip()}
     )
     if not global_alpha_grid or any(not 0 < value < 1 for value in global_alpha_grid):
         raise ValueError("global-alpha-grid values must be between zero and one")
 
-    methods = [
+    available_methods = [
         "jina_v4_cosine",
         "cosine_internal",
         "jina_m0_reranker",
         "reranker_internal",
     ]
+    methods = [name.strip() for name in args.methods.split(",") if name.strip()]
+    if not methods:
+        raise ValueError("--methods must name at least one score method")
+    unknown_methods = [name for name in methods if name not in available_methods]
+    if unknown_methods:
+        raise ValueError(
+            f"Unknown score method(s): {unknown_methods}; choices are {available_methods}"
+        )
     equal_allocation = {
         modality: args.alpha / len(support_modalities) for modality in support_modalities
     }
@@ -378,6 +397,8 @@ def main() -> None:
             "selected_layer": selected_layer,
             "selected_c": selected_c,
             "allocation_step": args.allocation_step,
+            "methods": methods,
+            "support_modalities_source": "calibration support labels only",
             "global_alpha_grid": global_alpha_grid,
             "budget_match_note": (
                 "nearest global point is selected by calibration mean chunks and is a "
