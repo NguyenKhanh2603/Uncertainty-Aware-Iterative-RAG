@@ -108,14 +108,20 @@ def iter_retrieval(path: Path) -> Iterable[dict[str, Any]]:
                 yield json.loads(line)
 
 
-def grouped_retrieval(path: Path) -> dict[str, dict[str, list[dict[str, Any]]]]:
+def grouped_retrieval(
+    path: Path,
+) -> tuple[dict[str, dict[str, list[dict[str, Any]]]], dict[str, list[dict[str, Any]]]]:
     result: dict[str, dict[str, list[dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
+    all_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in iter_retrieval(path):
         result[str(row["split_role"])][str(row["qid"])].append(row)
+        all_rows[str(row["qid"])].append(row)
     for by_qid in result.values():
         for rows in by_qid.values():
             rows.sort(key=lambda row: (int(row["rank"]), str(row["chunk_id"])))
-    return result
+    for rows in all_rows.values():
+        rows.sort(key=lambda row: (int(row["rank"]), str(row["chunk_id"])))
+    return result, dict(all_rows)
 
 
 def read_plan(path: Path) -> list[str]:
@@ -283,13 +289,17 @@ def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
 
 
 def load_dataset(dataset: str, test_queries: int) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
-    retrieval = grouped_retrieval(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz")
+    retrieval, all_rows = grouped_retrieval(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz")
     calibration_qids = read_plan(SPLITS / dataset / "calibration_manifest.json")
     test_qids = sorted(retrieval["test"])[:test_queries]
     if len(test_qids) != test_queries:
         raise ValueError(f"{dataset}: only {len(test_qids)} frozen test queries are available")
-    calibration = [retrieval["calibration"][qid] for qid in calibration_qids]
-    test = [retrieval["test"][qid] for qid in test_qids]
+    # The report's manifest assigns logical roles.  In the historical HotpotQA
+    # Jina log, 51 of those calibration qids retained a stale ``development``
+    # row label; selecting them by manifest qid reproduces the report's own
+    # filtering step without relabeling or dropping their frozen candidates.
+    calibration = [all_rows[qid] for qid in calibration_qids]
+    test = [all_rows[qid] for qid in test_qids]
     if any(len(rows) != 30 for rows in calibration + test):
         raise ValueError(f"{dataset}: all report rows must have exactly 30 candidates")
     return calibration_qids, calibration, test_qids, test
