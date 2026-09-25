@@ -109,3 +109,13 @@ All selectors use the same frozen Top-30 cosine candidates within each dataset. 
 - Current three-dataset aggregate: [`summary.json`](summary.json)
 - Pure HotpotQA aggregate: [`../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json)
 - Runner: [`../../run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)
+
+## Code for the matched internal-fusion column
+
+The next column is a separate selector, `z(cosine) + w_lm z(LM-head relevance) + w_hidden z(hidden-probe relevance)`. Its layer, logistic-probe regularization, and two fusion weights are selected only on the disjoint probe-training split; its all-support conformal threshold is calibrated only on the disjoint calibration split. The full-test runner verifies every qid and Top-30 chunk order before it generates an answer.
+
+- Frozen full-test plans: [`../../prepare_full_internal_fusion_plans.py`](../../prepare_full_internal_fusion_plans.py)
+- Qwen hidden-state and LM-head feature extraction: [`../../run_qwen2vl_pairwise_features.py`](../../run_qwen2vl_pairwise_features.py)
+- Disjoint probe fitting, fusion selection, and calibration: [`../../analyze_qwen2vl_jina_ablation.py`](../../analyze_qwen2vl_jina_ablation.py)
+- Cosine and internal-fusion selector/downstream runner: [`../../run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)
+- Resumable four-dataset orchestration: [`../../run_full_query_level_internal_fusion.sh`](../../run_full_query_level_internal_fusion.sh)

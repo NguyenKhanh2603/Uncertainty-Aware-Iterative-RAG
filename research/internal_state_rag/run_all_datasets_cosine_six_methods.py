@@ -215,6 +215,15 @@ def main() -> None:
             "others."
         ),
     )
+    parser.add_argument(
+        "--internal-fusion-predictions",
+        type=Path,
+        help=(
+            "Optional NPZ from analyze_qwen2vl_jina_ablation.py. It contributes the "
+            "query_level_cosine_internal_fusion_alpha_0.10 selector after exact qid "
+            "and candidate-order validation. Use with one dataset per invocation."
+        ),
+    )
     parser.add_argument("--model", type=Path)
     parser.add_argument("--selection-only", action="store_true")
     parser.add_argument("--max-new-tokens", type=int, default=24)
@@ -224,6 +233,8 @@ def main() -> None:
     names = [name.strip() for name in args.datasets.split(",") if name.strip()]
     if not names or any(name not in CONFIGS for name in names):
         raise ValueError(f"datasets must be a non-empty subset of {tuple(CONFIGS)}")
+    if args.internal_fusion_predictions is not None and len(names) != 1:
+        raise ValueError("--internal-fusion-predictions requires exactly one dataset")
     if not args.selection_only and args.model is None:
         raise ValueError("--model is required unless --selection-only is given")
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -233,6 +244,34 @@ def main() -> None:
         config = CONFIGS[name]
         calibration_qids, calibration, test_qids, test = load_dataset(config)
         masks, thresholds = all_masks(calibration, test)
+        if args.internal_fusion_predictions is not None:
+            if not args.internal_fusion_predictions.is_file():
+                raise FileNotFoundError(args.internal_fusion_predictions)
+            artifact = np.load(args.internal_fusion_predictions)
+            expected_qids = np.asarray(test_qids, dtype=str)
+            observed_qids = artifact["qids"].astype(str)
+            if not np.array_equal(observed_qids, expected_qids):
+                raise ValueError("Internal-fusion artifact qids do not match the frozen test plan")
+            expected_chunk_ids = np.asarray(
+                [[str(row["chunk_id"]) for row in rows] for rows in test], dtype=str
+            )
+            observed_chunk_ids = artifact["chunk_ids"].astype(str)
+            if not np.array_equal(observed_chunk_ids, expected_chunk_ids):
+                raise ValueError(
+                    "Internal-fusion artifact candidate ordering does not match frozen retrieval"
+                )
+            key = "mask_cosine_internal_alpha_0.1"
+            if key not in artifact.files:
+                raise ValueError(f"Internal-fusion artifact is missing {key}")
+            fusion_mask = artifact[key].astype(bool)
+            if fusion_mask.shape != expected_chunk_ids.shape:
+                raise ValueError("Internal-fusion mask has the wrong shape")
+            fusion_method = "query_level_cosine_internal_fusion_alpha_0.10"
+            masks[fusion_method] = list(fusion_mask)
+            thresholds[fusion_method] = {
+                "source": str(args.internal_fusion_predictions),
+                "mask_key": key,
+            }
         if args.methods is not None:
             requested = [method.strip() for method in args.methods.split(",") if method.strip()]
             if not requested:
