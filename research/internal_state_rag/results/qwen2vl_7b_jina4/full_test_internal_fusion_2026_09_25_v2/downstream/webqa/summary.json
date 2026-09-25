@@ -1,0 +1,62 @@
+{
+  "status": "complete",
+  "datasets": {
+    "webqa": {
+      "status": "complete",
+      "calibration_queries": 100,
+      "test_queries": 250,
+      "thresholds": {
+        "cce_alpha_0.10": 0.5742910504341125,
+        "conflare_alpha_0.10": 0.5756952047348023,
+        "traq_alpha_0.10": 0.5444818735122681,
+        "false_score_bank_size": 2912,
+        "support_score_bank_size": 88,
+        "query_level_cosine_alpha_0.10": {
+          "threshold": -0.5673327404376038,
+          "finite_sample_order": 69,
+          "retrievable_calibration_queries": 75,
+          "top1_fallback_queries": 0
+        },
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/webqa/fusion_predictions.npz",
+          "mask_key": "mask_cosine_internal_alpha_0.1"
+        }
+      },
+      "selection": {
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "mean_chunks": 7.624,
+          "empty_rate": 0.0,
+          "precision": 0.11070304302203568,
+          "support_recall": 0.9213973799126638,
+          "macro_precision": 0.12848770118770106,
+          "macro_support_recall": 0.95,
+          "query_any_support": 0.968,
+          "query_all_support": 0.932,
+          "selected_chunks": 1906,
+          "selected_supports": 211,
+          "reserve_supports": 229
+        }
+      },
+      "downstream": {
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "em": 0.004,
+          "f1": 0.13777691207094359,
+          "numerical_accuracy": 0.036
+        }
+      }
+    }
+  },
+  "protocol": {
+    "selector_families": [
+      "CCE",
+      "CONFLARE",
+      "TRAQ retrieval",
+      "BY cosine",
+      "query-level cosine",
+      "BH cosine"
+    ],
+    "top_l": 30,
+    "calibration_queries_per_dataset": 100,
+    "BH_note": "BH normally needs independence or suitable positive dependence; its rank cap is experimental."
+  }
+}

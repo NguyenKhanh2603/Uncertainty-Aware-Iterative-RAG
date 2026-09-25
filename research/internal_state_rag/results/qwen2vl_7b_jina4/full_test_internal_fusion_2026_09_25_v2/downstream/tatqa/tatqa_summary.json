@@ -1,0 +1,44 @@
+{
+  "status": "complete",
+  "calibration_queries": 100,
+  "test_queries": 1000,
+  "thresholds": {
+    "cce_alpha_0.10": 0.5897385478019714,
+    "conflare_alpha_0.10": 0.59063560962677,
+    "traq_alpha_0.10": 0.5600771307945251,
+    "false_score_bank_size": 2897,
+    "support_score_bank_size": 103,
+    "query_level_cosine_alpha_0.10": {
+      "threshold": 0.21060304914351102,
+      "finite_sample_order": 86,
+      "retrievable_calibration_queries": 94,
+      "top1_fallback_queries": 0
+    },
+    "query_level_cosine_internal_fusion_alpha_0.10": {
+      "source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/tatqa/fusion_predictions.npz",
+      "mask_key": "mask_cosine_internal_alpha_0.1"
+    }
+  },
+  "selection": {
+    "query_level_cosine_internal_fusion_alpha_0.10": {
+      "mean_chunks": 4.057,
+      "empty_rate": 0.0,
+      "precision": 0.22356421000739463,
+      "support_recall": 0.8866080156402737,
+      "macro_precision": 0.25920357142857053,
+      "macro_support_recall": 0.9160000000000001,
+      "query_any_support": 0.941,
+      "query_all_support": 0.891,
+      "selected_chunks": 4057,
+      "selected_supports": 907,
+      "reserve_supports": 1023
+    }
+  },
+  "downstream": {
+    "query_level_cosine_internal_fusion_alpha_0.10": {
+      "em": 0.231,
+      "f1": 0.3452657630982381,
+      "numerical_accuracy": 0.311
+    }
+  }
+}

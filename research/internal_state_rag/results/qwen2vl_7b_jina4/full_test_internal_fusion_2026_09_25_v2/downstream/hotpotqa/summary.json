@@ -1,0 +1,62 @@
+{
+  "status": "complete",
+  "datasets": {
+    "hotpotqa": {
+      "status": "complete",
+      "calibration_queries": 100,
+      "test_queries": 1000,
+      "thresholds": {
+        "cce_alpha_0.10": 0.4592403471469879,
+        "conflare_alpha_0.10": 0.4604645162820816,
+        "traq_alpha_0.10": 0.4241151511669159,
+        "false_score_bank_size": 2826,
+        "support_score_bank_size": 174,
+        "query_level_cosine_alpha_0.10": {
+          "threshold": 0.01120015186881498,
+          "finite_sample_order": 90,
+          "retrievable_calibration_queries": 99,
+          "top1_fallback_queries": 0
+        },
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/hotpotqa/fusion_predictions.npz",
+          "mask_key": "mask_cosine_internal_alpha_0.1"
+        }
+      },
+      "selection": {
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "mean_chunks": 3.398,
+          "empty_rate": 0.0,
+          "precision": 0.48822836962919364,
+          "support_recall": 0.9545454545454546,
+          "macro_precision": 0.5617174603174603,
+          "macro_support_recall": 0.957,
+          "query_any_support": 0.991,
+          "query_all_support": 0.923,
+          "selected_chunks": 3398,
+          "selected_supports": 1659,
+          "reserve_supports": 1738
+        }
+      },
+      "downstream": {
+        "query_level_cosine_internal_fusion_alpha_0.10": {
+          "em": 0.399,
+          "f1": 0.5257950353138434,
+          "numerical_accuracy": 0.422
+        }
+      }
+    }
+  },
+  "protocol": {
+    "selector_families": [
+      "CCE",
+      "CONFLARE",
+      "TRAQ retrieval",
+      "BY cosine",
+      "query-level cosine",
+      "BH cosine"
+    ],
+    "top_l": 30,
+    "calibration_queries_per_dataset": 100,
+    "BH_note": "BH normally needs independence or suitable positive dependence; its rank cap is experimental."
+  }
+}

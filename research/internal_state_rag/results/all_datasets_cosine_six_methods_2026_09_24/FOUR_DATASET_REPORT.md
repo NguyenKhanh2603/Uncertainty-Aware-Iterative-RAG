@@ -2,7 +2,7 @@
 
 ## Unified protocol
 
-Every query-level row in this table is **pure query-level cosine conformal selection**: per-query z-scored Top-30 cosine scores, calibrated on a disjoint 100-query split at α=0.10, with a deterministic Top-1 fallback only when no candidate passes. No internal hidden-state, LM-head, attention, reranker, or fusion feature is used in this report.
+Rows labelled **Query-level cosine** are pure query-level cosine conformal selection: per-query z-scored Top-30 cosine scores, calibrated on a disjoint 100-query split at α=0.10, with a deterministic Top-1 fallback only when no candidate passes. Rows labelled **Query-level cosine + internal fusion** use the separately reported Qwen LM-head and hidden-probe signals; their score calibration remains pooled within each dataset. All other selector rows are cosine-only.
 
 The HotpotQA query-level result was rerun on 25 September 2026 over all 1,000 test queries to make this definition match MMQA, TAT-QA, and WebQA. Its remaining selector rows are reused from the prior HotpotQA run only after asserting that the calibration thresholds and score-bank sizes exactly match the pure-cosine rerun.
 
@@ -21,12 +21,12 @@ Each file is the ordered qid list actually used; calibration and test are disjoi
 
 ## Run inventory
 
-| Dataset | Calibration qids | Test qids | Pure query-level downstream output |
-|---|---:|---:|---|
-| HotpotQA | [100](splits/hotpotqa/calibration_manifest.json) | [1,000](splits/hotpotqa/test_manifest.json) | [`hotpotqa_pure_query_level_cosine_1000_2026_09_25`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/REPORT.md) |
-| MMQA | [100](splits/mmqa/calibration_manifest.json) | [1,000](splits/mmqa/test_manifest.json) | [`mmqa_downstream_predictions.jsonl`](mmqa_downstream_predictions.jsonl) |
-| TAT-QA | [100](splits/tatqa/calibration_manifest.json) | [1,000](splits/tatqa/test_manifest.json) | [`tatqa_downstream_predictions.jsonl`](tatqa_downstream_predictions.jsonl) |
-| WebQA | [100](splits/webqa/calibration_manifest.json) | [250](splits/webqa/test_manifest.json) | [`webqa_downstream_predictions.jsonl`](webqa_downstream_predictions.jsonl) |
+| Dataset | Calibration qids | Test qids | Pure query-level downstream output | Pooled internal-fusion artifacts |
+|---|---:|---:|---|---|
+| HotpotQA | [100](splits/hotpotqa/calibration_manifest.json) | [1,000](splits/hotpotqa/test_manifest.json) | [`hotpotqa_pure_query_level_cosine_1000_2026_09_25`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/REPORT.md) | [`analysis`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/hotpotqa/fusion_analysis.json), [`QA`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/downstream/hotpotqa/summary.json) |
+| MMQA | [100](splits/mmqa/calibration_manifest.json) | [1,000](splits/mmqa/test_manifest.json) | [`mmqa_downstream_predictions.jsonl`](mmqa_downstream_predictions.jsonl) | [`analysis`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/mmqa/fusion_analysis.json), [`QA`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/downstream/mmqa/summary.json) |
+| TAT-QA | [100](splits/tatqa/calibration_manifest.json) | [1,000](splits/tatqa/test_manifest.json) | [`tatqa_downstream_predictions.jsonl`](tatqa_downstream_predictions.jsonl) | [`analysis`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/tatqa/fusion_analysis.json), [`QA`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/downstream/tatqa/summary.json) |
+| WebQA | [100](splits/webqa/calibration_manifest.json) | [250](splits/webqa/test_manifest.json) | [`webqa_downstream_predictions.jsonl`](webqa_downstream_predictions.jsonl) | [`analysis`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/analysis/webqa/fusion_analysis.json), [`QA`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/downstream/webqa/summary.json) |
 
 Each linked manifest contains the exact ordered qid list, source manifest, Top-L, and role. The eight materialized manifests were checked for duplicate qids and for calibration/test overlap; every dataset has zero overlap.
 
@@ -40,6 +40,7 @@ Each linked manifest contains the exact ordered qid list, source manifest, Top-L
 | CONFLARE (α=0.10) | 7.46 | 20.4% | 87.4% | 0.7% | 97.3% | 79.7% | 0.366 | 0.484 | 0.387 |
 | TRAQ retrieval (α=0.10) | 14.18 | 11.6% | 94.5% | 0.0% | 99.0% | 90.8% | 0.374 | 0.495 | 0.397 |
 | Query-level cosine (α=0.10) | 9.31 | 17.4% | 93.2% | 0.0% | 98.8% | 88.4% | 0.370 | 0.491 | 0.392 |
+| Query-level cosine + internal fusion (α=0.10; pooled) | 3.40 | 48.8% | 95.5% | 0.0% | 99.1% | 92.3% | 0.399 | 0.526 | 0.422 |
 | BY cosine (α=0.10) | 0.15 | 73.3% | 6.3% | 90.9% | 9.7% | 4.2% | 0.167 | 0.256 | 0.182 |
 | BY cosine (α=0.30) | 0.75 | 57.1% | 24.7% | 63.1% | 36.7% | 16.3% | 0.211 | 0.308 | 0.223 |
 | BY cosine (α=0.50) | 1.46 | 43.9% | 36.8% | 52.2% | 47.3% | 28.7% | 0.245 | 0.339 | 0.254 |
@@ -60,6 +61,7 @@ Each linked manifest contains the exact ordered qid list, source manifest, Top-L
 | CONFLARE (α=0.10) | 12.42 | 8.7% | 91.1% | 2.4% | 96.3% | 90.0% | 0.468 | 0.519 | 0.488 |
 | TRAQ retrieval (α=0.10) | 19.99 | 5.7% | 96.3% | 1.0% | 98.6% | 95.7% | 0.466 | 0.518 | 0.485 |
 | Query-level cosine (α=0.10) | 11.94 | 9.4% | 94.4% | 0.0% | 98.7% | 93.5% | 0.481 | 0.537 | 0.502 |
+| Query-level cosine + internal fusion (α=0.10; pooled) | 4.70 | 24.1% | 95.5% | 0.0% | 98.3% | 94.6% | 0.480 | 0.534 | 0.499 |
 | BY cosine (α=0.10) | 0.07 | 52.3% | 2.9% | 96.3% | 8.4% | 7.3% | 0.145 | 0.192 | 0.158 |
 | BY cosine (α=0.30) | 0.39 | 27.3% | 8.8% | 88.8% | 15.2% | 12.6% | 0.176 | 0.222 | 0.191 |
 | BY cosine (α=0.50) | 0.66 | 22.1% | 12.3% | 85.3% | 18.5% | 15.9% | 0.182 | 0.231 | 0.198 |
@@ -80,6 +82,7 @@ Each linked manifest contains the exact ordered qid list, source manifest, Top-L
 | CONFLARE (α=0.10) | 18.14 | 5.1% | 89.9% | 4.0% | 92.5% | 90.3% | 0.222 | 0.335 | 0.294 |
 | TRAQ retrieval (α=0.10) | 23.06 | 4.2% | 95.6% | 1.4% | 96.5% | 95.6% | 0.224 | 0.343 | 0.297 |
 | Query-level cosine (α=0.10) | 8.84 | 10.0% | 86.4% | 0.0% | 89.9% | 86.5% | 0.238 | 0.349 | 0.304 |
+| Query-level cosine + internal fusion (α=0.10; pooled) | 4.06 | 22.4% | 88.7% | 0.0% | 94.1% | 89.1% | 0.231 | 0.345 | 0.311 |
 | BY cosine (α=0.10) | 0.88 | 14.0% | 12.0% | 85.7% | 19.9% | 18.6% | 0.049 | 0.112 | 0.102 |
 | BY cosine (α=0.30) | 1.82 | 9.7% | 17.2% | 79.2% | 25.0% | 23.5% | 0.064 | 0.130 | 0.115 |
 | BY cosine (α=0.50) | 2.84 | 8.2% | 22.8% | 74.0% | 30.0% | 28.2% | 0.079 | 0.148 | 0.127 |
@@ -100,6 +103,7 @@ Each linked manifest contains the exact ordered qid list, source manifest, Top-L
 | CONFLARE (α=0.10) | 21.63 | 3.6% | 85.2% | 5.6% | 91.2% | 88.4% | 0.000 | 0.158 | 0.028 |
 | TRAQ retrieval (α=0.10) | 26.03 | 3.3% | 93.4% | 1.6% | 96.4% | 94.8% | 0.000 | 0.147 | 0.028 |
 | Query-level cosine (α=0.10) | 19.24 | 4.2% | 88.6% | 0.0% | 93.2% | 89.6% | 0.000 | 0.132 | 0.028 |
+| Query-level cosine + internal fusion (α=0.10; pooled) | 7.62 | 11.1% | 92.1% | 0.0% | 96.8% | 93.2% | 0.004 | 0.138 | 0.036 |
 | BY cosine (α=0.10) | 0.02 | 20.0% | 0.4% | 99.6% | 27.6% | 27.2% | 0.060 | 0.487 | 0.152 |
 | BY cosine (α=0.30) | 0.55 | 2.2% | 1.3% | 96.0% | 28.4% | 28.0% | 0.056 | 0.475 | 0.144 |
 | BY cosine (α=0.50) | 1.20 | 2.7% | 3.5% | 92.0% | 30.0% | 30.0% | 0.052 | 0.465 | 0.132 |
@@ -120,12 +124,13 @@ Each linked manifest contains the exact ordered qid list, source manifest, Top-L
 ## Reproducibility artifacts
 
 - Current three-dataset aggregate: [`summary.json`](summary.json)
+- Pooled full-test cosine + internal fusion: [`full_test_internal_fusion_2026_09_25_v2`](../qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/)
 - Pure HotpotQA aggregate: [`../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json)
 - Runner: [`../../run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)
 
 ## Code for the matched internal-fusion column
 
-The next column is a separate selector, `z(cosine) + w_lm z(LM-head relevance) + w_hidden z(hidden-probe relevance)`. Its layer, logistic-probe regularization, and two fusion weights are selected only on the disjoint probe-training split; its all-support conformal threshold is calibrated only on the disjoint calibration split. The full-test runner verifies every qid and Top-30 chunk order before it generates an answer.
+The completed `Query-level cosine + internal fusion` rows use a separate selector, `z(cosine) + w_lm z(LM-head relevance) + w_hidden z(hidden-probe relevance)`. Its layer, logistic-probe regularization, and two fusion weights are selected only on the disjoint probe-training split; its all-support conformal threshold is calibrated only on the disjoint calibration split. The full-test runner verifies every qid and Top-30 chunk order before it generates an answer.
 
 - Frozen full-test plans: [`../../prepare_full_internal_fusion_plans.py`](../../prepare_full_internal_fusion_plans.py)
 - Qwen hidden-state and LM-head feature extraction: [`../../run_qwen2vl_pairwise_features.py`](../../run_qwen2vl_pairwise_features.py)
@@ -135,7 +140,7 @@ The next column is a separate selector, `z(cosine) + w_lm z(LM-head relevance) +
 
 ## Executed code, method mapping, and configuration
 
-The pure-cosine table above was generated with the first runner below. The new internal-fusion row is running with the remaining files; it will be appended only after all four frozen test sets complete. Every row uses Qwen2-VL-7B-Instruct at revision `eed13092ef92e448dd6875b2a00151bd3f7db0ac`, greedy decoding with at most 24 new tokens, Top-L=30, and the A100 GPU. Calibration, probe training, and test qids are disjoint.
+The pure-cosine table above was generated with the first runner below. The pooled internal-fusion row was generated with the remaining files over every frozen test qid. Every row uses Qwen2-VL-7B-Instruct at revision `eed13092ef92e448dd6875b2a00151bd3f7db0ac`, greedy decoding with at most 24 new tokens, Top-L=30, and the A100 GPU. Calibration, probe training, and test qids are disjoint.
 
 | Table row / method | Selection implementation | Executed code | Frozen configuration |
 |---|---|---|---|
