@@ -1,0 +1,21 @@
+{
+  "report": "FULL_DOWNSTREAM_AND_SUPPORT_TABLE_2026-09-19.md",
+  "report_commit": "7ccb012a1d5c3390c879e3c3eb411bd20ed3f593",
+  "source_protocol": "100 calibration / 100 test queries per dataset at alpha=0.10",
+  "rows": 800,
+  "counts": {
+    "hotpotqa/calibration": 100,
+    "hotpotqa/test": 100,
+    "mmqa/calibration": 100,
+    "mmqa/test": 100,
+    "tatqa/calibration": 100,
+    "tatqa/test": 100,
+    "webqa/calibration": 100,
+    "webqa/test": 100
+  },
+  "zip_reconciliation": {
+    "calibration_ids_present_in_zip": 400,
+    "test_ids_present_in_zip": 0,
+    "note": "The report test IDs originate from its earlier held-out split; they are not members of file_zip_calibrate_split_20_09.zip."
+  }
+}

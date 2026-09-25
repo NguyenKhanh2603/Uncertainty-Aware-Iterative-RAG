@@ -1,20 +1,21 @@
 """Run end-to-end QA for the nine selectors in baseline_comparison_report_100_queries_detailed.
 
-The source report did not retain a separate test-qid manifest. Its published
-Fixed Top-10 values identify the deterministic source selection: the first 100
-lexicographically sorted qids having ``split_role == 'test'`` in each frozen
-Jina-v4 Top-30 log. This runner materializes that recovered manifest, validates
-its Fixed Top-10 row against the report, and evaluates every reported context
-selector with greedy Qwen2-VL-7B answer generation.
+The definitive protocol is the committed 800-row CSV in
+``research/internal_state_rag/protocols/baseline_report_100``:
+100 calibration and 100 held-out test qids per dataset.  The runner reads that
+CSV directly, rejects duplicate or overlapping qids, materializes the exact
+plans, and evaluates every reported context selector with greedy Qwen2-VL-7B
+answer generation.  It never infers a split from a retrieval-row role label.
 
-Calibration uses the exact committed 100-qid manifests. BH p-values use the
-calibration false-score bank matched by modality, matching the report's stated
-``--conditioning dataset,modality`` procedure. The post-BH cap keeps the
-smallest p-values (rank breaks ties), as in the report's simulate_bh.py.
+BH p-values use the calibration false-score bank matched by modality, matching
+the report's stated ``--conditioning dataset,modality`` procedure. The post-BH
+cap keeps the smallest p-values (rank breaks ties), as in the report's
+simulate_bh.py.
 """
 from __future__ import annotations
 
 import argparse
+import csv
 import gzip
 import json
 import math
@@ -40,7 +41,10 @@ from research.internal_state_rag.run_hotpotqa_cosine_six_methods import (
 
 
 DATASETS = ("hotpotqa", "mmqa", "tatqa", "webqa")
-SPLITS = Path("research/internal_state_rag/results/all_datasets_cosine_six_methods_2026_09_24/splits")
+SPLIT_CSV_PATH = Path(
+    "research/internal_state_rag/protocols/baseline_report_100/"
+    "report_100_calibration_100_test_question_ids_2026-09-19.csv"
+)
 LOGS = Path("research/internal_state_rag/results/qwen2vl_jina4")
 
 # The selection metrics published in baseline_comparison_report_100_queries_detailed.md.
@@ -176,12 +180,29 @@ def grouped_retrieval(
     return result, dict(all_rows)
 
 
-def read_plan(path: Path) -> list[str]:
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    plan = [str(qid) for qid in payload["plan"]]
-    if len(plan) != len(set(plan)):
-        raise ValueError(f"Duplicate qids in {path}")
-    return plan
+def csv_split_qids(dataset: str) -> tuple[list[str], list[str]]:
+    """Read the authoritative calibration/test plans from the supplied CSV."""
+
+    if dataset not in DATASETS:
+        raise ValueError(f"Unknown dataset: {dataset}")
+    if not SPLIT_CSV_PATH.is_file():
+        raise FileNotFoundError(f"Missing protocol CSV: {SPLIT_CSV_PATH}")
+    with SPLIT_CSV_PATH.open(encoding="utf-8", newline="") as source:
+        rows = list(csv.DictReader(source))
+    required = {"Dataset", "SplitRole", "QueryID"}
+    if not rows or not required.issubset(rows[0]):
+        raise ValueError(f"{SPLIT_CSV_PATH} is missing required columns {sorted(required)}")
+    plans = {
+        role: [str(row["QueryID"]) for row in rows if row["Dataset"] == dataset and row["SplitRole"] == role]
+        for role in ("calibration", "test")
+    }
+    for role, qids in plans.items():
+        if len(qids) != 100 or len(qids) != len(set(qids)):
+            raise ValueError(f"{dataset}/{role}: expected 100 unique qids in {SPLIT_CSV_PATH}")
+    overlap = set(plans["calibration"]).intersection(plans["test"])
+    if overlap:
+        raise ValueError(f"{dataset}: calibration/test qids overlap: {sorted(overlap)[:3]}")
+    return plans["calibration"], plans["test"]
 
 
 def false_banks_by_modality(calibration: Sequence[Sequence[dict[str, Any]]]) -> dict[str, np.ndarray]:
@@ -283,14 +304,14 @@ def materialize_split(output_dir: Path, dataset: str, calibration_qids: list[str
             "dataset": dataset,
             "role": "calibration",
             "n_queries": len(calibration_qids),
-            "source_manifest": str(SPLITS / dataset / "calibration_manifest.json"),
+            "source_protocol": str(SPLIT_CSV_PATH),
             "plan": calibration_qids,
         },
         "test_manifest.json": {
             "dataset": dataset,
             "role": "test",
             "n_queries": len(test_qids),
-            "source": "first lexicographically sorted split_role=test qids in frozen Jina-v4 Top-30 log",
+            "source_protocol": str(SPLIT_CSV_PATH),
             "source_retrieval": str(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz"),
             "plan": test_qids,
         },
@@ -350,10 +371,11 @@ def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
     lines = [
         "# Downstream QA for the 100-query baseline-comparison report", "",
         "**Source selection report:** [baseline_comparison_report_100_queries_detailed.md](https://github.com/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/docs/add-detailed-report/baseline_comparison_report_100_queries_detailed.md).<br>",
+        "**Authoritative split:** [`report_100_calibration_100_test_question_ids_2026-09-19.csv`](../../protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv).<br>",
         "**Runner:** [`run_baseline_report_100_downstream.py`](../../run_baseline_report_100_downstream.py).<br>",
-        "**Splits:** [`splits/`](splits/) contains the exact 100 calibration qids and recovered 100 test qids used here for each dataset.",
+        "**Splits:** [`splits/`](splits/) contains the exact 100 calibration qids and 100 held-out test qids used here for each dataset. Both plans come directly from `report_100_calibration_100_test_question_ids_2026-09-19.csv` in the supplied protocol archive.",
         "",
-        "This rerun reconstructs the source report's test plan from the frozen Jina-v4 Top-30 logs and verifies the published Fixed Top-10 row before Qwen generation. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the source report's modality-conditioned selection component: false-score calibration banks are stratified by `{dataset, modality}`, then BH is applied across the candidate set of each query.",
+        "This rerun reads the source report's explicit CSV protocol, verifies that calibration and held-out test qids are disjoint, then joins those qids to the frozen Jina-v4 Top-30 retrieval logs. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the source report's modality-conditioned selection component: false-score calibration banks are stratified by `{dataset, modality}`, then BH is applied across the candidate set of each query.",
         "",
     ]
     for dataset, result in results.items():
@@ -410,15 +432,13 @@ def validate_downstream_inputs(
 
 
 def load_dataset(dataset: str, test_queries: int) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
-    retrieval, all_rows = grouped_retrieval(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz")
-    calibration_qids = read_plan(SPLITS / dataset / "calibration_manifest.json")
-    test_qids = sorted(retrieval["test"])[:test_queries]
-    if len(test_qids) != test_queries:
-        raise ValueError(f"{dataset}: only {len(test_qids)} frozen test queries are available")
-    # The report's manifest assigns logical roles.  In the historical HotpotQA
-    # Jina log, 51 of those calibration qids retained a stale ``development``
-    # row label; selecting them by manifest qid reproduces the report's own
-    # filtering step without relabeling or dropping their frozen candidates.
+    _retrieval, all_rows = grouped_retrieval(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz")
+    calibration_qids, test_qids = csv_split_qids(dataset)
+    if test_queries != len(test_qids):
+        raise ValueError(f"{dataset}: requested {test_queries} but protocol contains {len(test_qids)} test qids")
+    missing = [qid for qid in calibration_qids + test_qids if qid not in all_rows]
+    if missing:
+        raise ValueError(f"{dataset}: frozen retrieval is missing protocol qids {missing[:3]}")
     calibration = [all_rows[qid] for qid in calibration_qids]
     test = [all_rows[qid] for qid in test_qids]
     if any(len(rows) != 30 for rows in calibration + test):
