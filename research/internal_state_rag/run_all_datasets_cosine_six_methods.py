@@ -206,6 +206,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--datasets", default="hotpotqa,mmqa,tatqa,webqa")
+    parser.add_argument(
+        "--methods",
+        default=None,
+        help=(
+            "Optional comma-separated subset of selector keys. This makes it possible "
+            "to recompute one selector's downstream answers without changing the "
+            "others."
+        ),
+    )
     parser.add_argument("--model", type=Path)
     parser.add_argument("--selection-only", action="store_true")
     parser.add_argument("--max-new-tokens", type=int, default=24)
@@ -224,6 +233,14 @@ def main() -> None:
         config = CONFIGS[name]
         calibration_qids, calibration, test_qids, test = load_dataset(config)
         masks, thresholds = all_masks(calibration, test)
+        if args.methods is not None:
+            requested = [method.strip() for method in args.methods.split(",") if method.strip()]
+            if not requested:
+                raise ValueError("--methods must name at least one selector")
+            unknown = [method for method in requested if method not in masks]
+            if unknown:
+                raise ValueError(f"Unknown selector(s): {unknown}; choices are {tuple(masks)}")
+            masks = {method: masks[method] for method in requested}
         state[name] = {
             "status": "selection_complete" if args.selection_only else "running",
             "calibration_queries": len(calibration_qids), "test_queries": len(test_qids),
