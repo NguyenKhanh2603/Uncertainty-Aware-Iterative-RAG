@@ -1,10 +1,12 @@
 # Downstream QA for the 100-query baseline-comparison report
 
 **Source selection report:** [baseline_comparison_report_100_queries_detailed.md](https://github.com/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/docs/add-detailed-report/baseline_comparison_report_100_queries_detailed.md).<br>
+**Authoritative split:** [`report_100_calibration_100_test_question_ids_2026-09-19.csv`](../../protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv).<br>
 **Runner:** [`run_baseline_report_100_downstream.py`](../../run_baseline_report_100_downstream.py).<br>
-**Splits:** [`splits/`](splits/) contains the exact 100 calibration qids and recovered 100 test qids used here for each dataset.
+**Splits:** [`splits/`](splits/) contains the exact 100 calibration qids and 100 held-out test qids used here for each dataset. Both plans come directly from `report_100_calibration_100_test_question_ids_2026-09-19.csv` in the supplied protocol archive.<br>
+**Leakage audit:** [`CSV_SPLIT_INTEGRITY.json`](CSV_SPLIT_INTEGRITY.json) verifies 100 unique calibration qids, 100 unique test qids, and zero within-dataset overlap for every dataset.
 
-This rerun reconstructs the source report's test plan from the frozen Jina-v4 Top-30 logs and verifies the published Fixed Top-10 row before Qwen generation. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the source report's modality-conditioned selection component: false-score calibration banks are stratified by `{dataset, modality}`, then BH is applied across the candidate set of each query.
+This rerun reads the source report's explicit CSV protocol, verifies that calibration and held-out test qids are disjoint, then joins those qids to the frozen Jina-v4 Top-30 retrieval logs. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the source report's modality-conditioned selection component: false-score calibration banks are stratified by `{dataset, modality}`, then BH is applied across the candidate set of each query.
 
 ## hotpotqa (complete; n=100)
 
@@ -12,28 +14,28 @@ This rerun reconstructs the source report's test plan from the frozen Jina-v4 To
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | fixed_top10 | 10.00 | 17.7% | 96.2% | 0.0% | 99.0% | 93.0% | 0.410 | 0.559 | 0.430 |
 | fixed_top20 | 20.00 | 9.2% | 99.5% | 0.0% | 99.0% | 99.0% | 0.340 | 0.513 | 0.360 |
-| cce_cosine_alpha_0.10 | 7.16 | 21.8% | 84.8% | 3.0% | 96.0% | 73.0% | 0.390 | 0.523 | 0.410 |
-| conflare_cosine_alpha_0.10 | 7.16 | 21.8% | 84.8% | 3.0% | 96.0% | 73.0% | 0.390 | 0.523 | 0.410 |
-| traq_cosine_alpha_0.10 | 11.54 | 14.5% | 90.8% | 1.0% | 99.0% | 84.0% | 0.430 | 0.573 | 0.450 |
-| bh_modality_cosine_alpha_0.10_ctx10 | 0.67 | 67.2% | 24.5% | 67.0% | 33.0% | 17.0% | 0.220 | 0.351 | 0.240 |
-| bh_modality_cosine_alpha_0.90_ctx10 | 8.60 | 18.3% | 85.3% | 9.0% | 90.0% | 81.0% | 0.410 | 0.562 | 0.430 |
-| bh_modality_cosine_alpha_0.99_ctx10 | 9.70 | 17.7% | 93.5% | 3.0% | 96.0% | 90.0% | 0.410 | 0.559 | 0.430 |
-| bh_modality_cosine_alpha_0.99_ctx20 | 19.40 | 9.2% | 96.7% | 3.0% | 96.0% | 96.0% | 0.350 | 0.523 | 0.370 |
+| cce_cosine_alpha_0.10 | 11.19 | 14.9% | 90.8% | 1.0% | 99.0% | 84.0% | 0.430 | 0.580 | 0.450 |
+| conflare_cosine_alpha_0.10 | 10.80 | 15.5% | 90.8% | 1.0% | 99.0% | 84.0% | 0.410 | 0.558 | 0.430 |
+| traq_cosine_alpha_0.10 | 14.97 | 11.4% | 92.9% | 0.0% | 100.0% | 87.0% | 0.390 | 0.542 | 0.420 |
+| bh_modality_cosine_alpha_0.10_ctx10 | 0.74 | 63.5% | 25.5% | 66.0% | 34.0% | 18.0% | 0.220 | 0.351 | 0.240 |
+| bh_modality_cosine_alpha_0.90_ctx10 | 8.19 | 18.6% | 82.6% | 11.0% | 88.0% | 77.0% | 0.410 | 0.550 | 0.420 |
+| bh_modality_cosine_alpha_0.99_ctx10 | 9.90 | 17.8% | 95.7% | 1.0% | 98.0% | 92.0% | 0.410 | 0.559 | 0.430 |
+| bh_modality_cosine_alpha_0.99_ctx20 | 19.80 | 9.2% | 98.9% | 1.0% | 98.0% | 98.0% | 0.340 | 0.513 | 0.360 |
 
-The following rows do not reproduce from the available frozen inputs and are **not** represented as historical downstream results: `cce_cosine_alpha_0.10`, `conflare_cosine_alpha_0.10`, `traq_cosine_alpha_0.10`, `bh_modality_cosine_alpha_0.10_ctx10`, `bh_modality_cosine_alpha_0.90_ctx10`, `bh_modality_cosine_alpha_0.99_ctx10`, `bh_modality_cosine_alpha_0.99_ctx20`.
+The recomputed selector masks match every rounded selection row published in the source report.
 
 ### Calibration and selection metadata
 
 ```json
 {
-  "support_score_bank_size": 181,
+  "support_score_bank_size": 185,
   "thresholds": {
-    "cce_cosine_alpha_0.10": 0.5981476306915283,
-    "conflare_cosine_alpha_0.10": 0.5981476306915283,
-    "traq_cosine_alpha_0.10": 0.5720229744911194
+    "cce_cosine_alpha_0.10": 0.5741243362426758,
+    "conflare_cosine_alpha_0.10": 0.5756383657455444,
+    "traq_cosine_alpha_0.10": 0.5566290616989136
   },
   "false_score_bank_sizes_by_modality": {
-    "text": 2819
+    "text": 2815
   },
   "bh": {
     "conditioning": [
@@ -44,7 +46,7 @@ The following rows do not reproduce from the available frozen inputs and are **n
     "note": "The post-BH cap is an experimental context policy; no capped-procedure FDR guarantee is claimed."
   },
   "published_selection_audit": {
-    "matches_all_evaluated_rows": false,
+    "matches_all_evaluated_rows": true,
     "evaluated_methods": [
       "fixed_top10",
       "fixed_top20",
@@ -56,15 +58,7 @@ The following rows do not reproduce from the available frozen inputs and are **n
       "bh_modality_cosine_alpha_0.99_ctx10",
       "bh_modality_cosine_alpha_0.99_ctx20"
     ],
-    "mismatched_methods": [
-      "cce_cosine_alpha_0.10",
-      "conflare_cosine_alpha_0.10",
-      "traq_cosine_alpha_0.10",
-      "bh_modality_cosine_alpha_0.10_ctx10",
-      "bh_modality_cosine_alpha_0.90_ctx10",
-      "bh_modality_cosine_alpha_0.99_ctx10",
-      "bh_modality_cosine_alpha_0.99_ctx20"
-    ],
+    "mismatched_methods": [],
     "rows": {
       "fixed_top10": {
         "published": {
@@ -104,12 +98,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.01
         },
         "recomputed": {
-          "mean_chunks": 7.16,
-          "precision": 0.218,
-          "support_recall": 0.848,
-          "empty_rate": 0.03
+          "mean_chunks": 11.19,
+          "precision": 0.149,
+          "support_recall": 0.9079999999999999,
+          "empty_rate": 0.01
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "conflare_cosine_alpha_0.10": {
         "published": {
@@ -119,12 +113,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.01
         },
         "recomputed": {
-          "mean_chunks": 7.16,
-          "precision": 0.218,
-          "support_recall": 0.848,
-          "empty_rate": 0.03
+          "mean_chunks": 10.8,
+          "precision": 0.155,
+          "support_recall": 0.9079999999999999,
+          "empty_rate": 0.01
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "traq_cosine_alpha_0.10": {
         "published": {
@@ -134,12 +128,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.0
         },
         "recomputed": {
-          "mean_chunks": 11.54,
-          "precision": 0.145,
-          "support_recall": 0.9079999999999999,
-          "empty_rate": 0.01
+          "mean_chunks": 14.97,
+          "precision": 0.114,
+          "support_recall": 0.929,
+          "empty_rate": 0.0
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "bh_modality_cosine_alpha_0.10_ctx10": {
         "published": {
@@ -149,12 +143,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.66
         },
         "recomputed": {
-          "mean_chunks": 0.67,
-          "precision": 0.672,
-          "support_recall": 0.245,
-          "empty_rate": 0.67
+          "mean_chunks": 0.74,
+          "precision": 0.635,
+          "support_recall": 0.255,
+          "empty_rate": 0.66
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "bh_modality_cosine_alpha_0.90_ctx10": {
         "published": {
@@ -164,12 +158,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.11
         },
         "recomputed": {
-          "mean_chunks": 8.6,
-          "precision": 0.183,
-          "support_recall": 0.853,
-          "empty_rate": 0.09
+          "mean_chunks": 8.19,
+          "precision": 0.18600000000000003,
+          "support_recall": 0.826,
+          "empty_rate": 0.11
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "bh_modality_cosine_alpha_0.99_ctx10": {
         "published": {
@@ -179,12 +173,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.01
         },
         "recomputed": {
-          "mean_chunks": 9.7,
-          "precision": 0.177,
-          "support_recall": 0.935,
-          "empty_rate": 0.03
+          "mean_chunks": 9.9,
+          "precision": 0.17800000000000002,
+          "support_recall": 0.9570000000000001,
+          "empty_rate": 0.01
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       },
       "bh_modality_cosine_alpha_0.99_ctx20": {
         "published": {
@@ -194,12 +188,12 @@ The following rows do not reproduce from the available frozen inputs and are **n
           "empty_rate": 0.01
         },
         "recomputed": {
-          "mean_chunks": 19.4,
+          "mean_chunks": 19.8,
           "precision": 0.092,
-          "support_recall": 0.9670000000000001,
-          "empty_rate": 0.03
+          "support_recall": 0.9890000000000001,
+          "empty_rate": 0.01
         },
-        "matches_published_rounding": false
+        "matches_published_rounding": true
       }
     }
   }

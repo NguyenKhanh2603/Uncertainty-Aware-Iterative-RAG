@@ -2,7 +2,7 @@
   "dataset": "webqa",
   "role": "calibration",
   "n_queries": 100,
-  "source_manifest": "research/internal_state_rag/results/all_datasets_cosine_six_methods_2026_09_24/splits/webqa/calibration_manifest.json",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "d5bc0bb60dba11ecb1e81171463288e9",
     "d5bc46260dba11ecb1e81171463288e9",

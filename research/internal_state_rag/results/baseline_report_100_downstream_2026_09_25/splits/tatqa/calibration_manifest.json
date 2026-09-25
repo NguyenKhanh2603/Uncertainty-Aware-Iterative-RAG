@@ -2,7 +2,7 @@
   "dataset": "tatqa",
   "role": "calibration",
   "n_queries": 100,
-  "source_manifest": "research/internal_state_rag/results/all_datasets_cosine_six_methods_2026_09_24/splits/tatqa/calibration_manifest.json",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "008b9936-2795-43fb-b82a-88760033f21d",
     "0111a37f-2265-4f8e-8fca-f201f9ad3b4c",

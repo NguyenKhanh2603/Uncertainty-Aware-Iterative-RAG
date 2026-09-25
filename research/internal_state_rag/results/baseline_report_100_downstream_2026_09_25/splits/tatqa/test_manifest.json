@@ -2,8 +2,7 @@
   "dataset": "tatqa",
   "role": "test",
   "n_queries": 100,
-  "source": "first lexicographically sorted split_role=test qids in frozen Jina-v4 Top-30 log",
-  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "004b1595-0b63-4e9b-bbea-04da5182e510",
     "005da8e4-571e-4612-9333-6c77d03ed838",
@@ -105,5 +104,6 @@
     "1622dca1-ac9d-404e-b621-8b1fb02c2350",
     "162f80b9-b689-4405-b6b2-5e98d3882ce7",
     "163f08ab-cfae-426a-9c03-4f84feba3bb6"
-  ]
+  ],
+  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/tatqa_jina_v4_top30.jsonl.gz"
 }

@@ -2,8 +2,7 @@
   "dataset": "webqa",
   "role": "test",
   "n_queries": 100,
-  "source": "first lexicographically sorted split_role=test qids in frozen Jina-v4 Top-30 log",
-  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "d5bbc8720dba11ecb1e81171463288e9",
     "d5bbca160dba11ecb1e81171463288e9",
@@ -105,5 +104,6 @@
     "d5c0d2ea0dba11ecb1e81171463288e9",
     "d5c0d5560dba11ecb1e81171463288e9",
     "d5c0d5c40dba11ecb1e81171463288e9"
-  ]
+  ],
+  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/webqa_jina_v4_top30.jsonl.gz"
 }

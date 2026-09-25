@@ -2,7 +2,7 @@
   "dataset": "mmqa",
   "role": "calibration",
   "n_queries": 100,
-  "source_manifest": "research/internal_state_rag/results/all_datasets_cosine_six_methods_2026_09_24/splits/mmqa/calibration_manifest.json",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "002671fe4b86221a7f34e11a3388afa6",
     "00451c6a3a418ae2821becc160c61d65",

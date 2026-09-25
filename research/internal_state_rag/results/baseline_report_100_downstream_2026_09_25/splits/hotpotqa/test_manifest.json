@@ -2,8 +2,7 @@
   "dataset": "hotpotqa",
   "role": "test",
   "n_queries": 100,
-  "source": "first lexicographically sorted split_role=test qids in frozen Jina-v4 Top-30 log",
-  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30.jsonl.gz",
+  "source_protocol": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
   "plan": [
     "5a70f1685542994082a3e40f",
     "5a71095e5542994082a3e4f3",
@@ -105,5 +104,6 @@
     "5a77c8905542995d831812ce",
     "5a77cb335542997042120b3a",
     "5a77cb5e55429967ab1052a7"
-  ]
+  ],
+  "source_retrieval": "research/internal_state_rag/results/qwen2vl_jina4/hotpotqa_jina_v4_top30.jsonl.gz"
 }

@@ -1,0 +1,28 @@
+{
+  "protocol_csv": "research/internal_state_rag/protocols/baseline_report_100/report_100_calibration_100_test_question_ids_2026-09-19.csv",
+  "protocol_sha256": "e63694f26bb998cb96a42dd1c8dee701c26c8c764dfeb407c27b6c6111e329f2",
+  "datasets": {
+    "hotpotqa": {
+      "calibration_queries": 100,
+      "test_queries": 100,
+      "overlap_count": 0
+    },
+    "mmqa": {
+      "calibration_queries": 100,
+      "test_queries": 100,
+      "overlap_count": 0
+    },
+    "tatqa": {
+      "calibration_queries": 100,
+      "test_queries": 100,
+      "overlap_count": 0
+    },
+    "webqa": {
+      "calibration_queries": 100,
+      "test_queries": 100,
+      "overlap_count": 0
+    }
+  },
+  "no_cross_dataset_claim": "Disjointness is validated within each dataset; query ID namespaces differ by dataset.",
+  "line_ending_normalization": "CSV content was extracted from the supplied ZIP and normalized from CRLF to LF before committing; fields and 800 rows are unchanged."
+}
