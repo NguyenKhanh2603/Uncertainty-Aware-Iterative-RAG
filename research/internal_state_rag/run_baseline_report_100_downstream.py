@@ -114,9 +114,11 @@ class DatasetConfig:
 CONFIGS = {
     "hotpotqa": DatasetConfig(
         "hotpotqa",
-        Path("data/official_seed42_hotpotqa_fixed/hotpotqa/questions.jsonl"),
-        Path("data/official_seed42_hotpotqa_fixed/hotpotqa/corpus.jsonl"),
-        Path("data/official_seed42_hotpotqa_fixed"),
+        # These qids are from the historical Jina development/test role split,
+        # not the later official-seed42 HotpotQA test bundle.
+        Path("data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/questions.jsonl"),
+        Path("data/conformal_global_run/official_bundle_role_split_hotpotqa/hotpotqa/corpus.jsonl"),
+        Path("data/conformal_global_run/official_bundle_role_split_hotpotqa"),
     ),
     "mmqa": DatasetConfig(
         "mmqa",
@@ -380,6 +382,29 @@ def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def validate_downstream_inputs(
+    config: DatasetConfig,
+    qids: Sequence[str],
+    test: Sequence[Sequence[dict[str, Any]]],
+) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    """Fail before model loading if a frozen qid, chunk, or image is absent."""
+
+    questions, corpus = keyed(config.questions, "qid"), keyed(config.corpus, "id")
+    missing_questions = [qid for qid in qids if qid not in questions]
+    if missing_questions:
+        raise ValueError(f"{config.name}: question bundle is missing qids {missing_questions[:3]}")
+    missing_chunks = sorted(
+        {str(row["chunk_id"]) for rows in test for row in rows}.difference(corpus)
+    )
+    if missing_chunks:
+        raise ValueError(f"{config.name}: corpus is missing chunks {missing_chunks[:3]}")
+    # This also resolves image paths for every frozen candidate before Qwen
+    # loads, preventing a multi-hour run from failing on a late image row.
+    for rows in test:
+        chunks(rows, np.ones(len(rows), dtype=bool), corpus, config.bundle_root)
+    return questions, corpus
+
+
 def load_dataset(dataset: str, test_queries: int) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
     retrieval, all_rows = grouped_retrieval(LOGS / f"{dataset}_jina_v4_top30.jsonl.gz")
     calibration_qids = read_plan(SPLITS / dataset / "calibration_manifest.json")
@@ -453,9 +478,13 @@ def main() -> None:
     if args.selection_only:
         return
 
+    resolved_inputs = {
+        dataset: validate_downstream_inputs(config, qids, test)
+        for dataset, qids, test, _masks, config in pending
+    }
     generator = QwenDirectAnswerGenerator(args.model, min_pixels=args.min_pixels, max_pixels=args.max_pixels)
     for dataset, qids, test, masks, config in pending:
-        questions, corpus = keyed(config.questions, "qid"), keyed(config.corpus, "id")
+        questions, corpus = resolved_inputs[dataset]
         prediction_path = args.output_dir / dataset / "downstream_predictions.jsonl"
         done = {str(row["qid"]): row for row in iter_jsonl(prediction_path)} if prediction_path.exists() else {}
         prediction_path.parent.mkdir(parents=True, exist_ok=True)
