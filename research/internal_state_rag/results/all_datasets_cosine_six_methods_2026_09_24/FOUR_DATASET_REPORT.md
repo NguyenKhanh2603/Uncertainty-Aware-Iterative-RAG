@@ -119,3 +119,20 @@ The next column is a separate selector, `z(cosine) + w_lm z(LM-head relevance) +
 - Disjoint probe fitting, fusion selection, and calibration: [`../../analyze_qwen2vl_jina_ablation.py`](../../analyze_qwen2vl_jina_ablation.py)
 - Cosine and internal-fusion selector/downstream runner: [`../../run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)
 - Resumable four-dataset orchestration: [`../../run_full_query_level_internal_fusion.sh`](../../run_full_query_level_internal_fusion.sh)
+
+## Executed code, method mapping, and configuration
+
+The pure-cosine table above was generated with the first runner below. The new internal-fusion row is running with the remaining files; it will be appended only after all four frozen test sets complete. Every row uses Qwen2-VL-7B-Instruct at revision `eed13092ef92e448dd6875b2a00151bd3f7db0ac`, greedy decoding with at most 24 new tokens, Top-L=30, and the A100 GPU. Calibration, probe training, and test qids are disjoint.
+
+| Table row / method | Selection implementation | Executed code | Frozen configuration |
+|---|---|---|---|
+| Fixed Top-10 / Top-20 | Retrieval-rank context | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | 10 or 20 highest-ranked candidates from the shared Top-30 log. |
+| ECIR CCE | Positive-support split-conformal cosine threshold | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | α=0.10; 100 disjoint calibration queries; the report calls this the retrieval component/adapter, not the complete CCE system. |
+| CONFLARE | Positive-support percentile cosine adapter | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | α=0.10; same 100-query calibration split and cosine candidates. |
+| TRAQ retrieval | Retrieval threshold with α/2 allocation | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | α=0.10; retrieval component/adapter, not TRAQ's complete answer-set procedure. |
+| BY cosine | Candidate p-values plus Benjamini--Yekutieli | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py), [`conformal_selection.py`](../../../../src/uncertainty_rag/core/conformal_selection.py) | Same false-score calibration bank; α∈{0.10, 0.30, 0.50}. |
+| BH cosine | Candidate p-values plus BH, then experimental rank cap | [`run_hotpotqa_cosine_six_methods.py`](../../run_hotpotqa_cosine_six_methods.py), [`conformal_selection.py`](../../../../src/uncertainty_rag/core/conformal_selection.py) | α∈{0.10,0.30,0.50,0.90,0.99}; ctx=10 except α=0.99 also ctx=20. |
+| Query-level cosine | Query-wise z-scored cosine and an all-support finite-sample threshold | [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | α=0.10; 100 calibration queries; deterministic Top-1 fallback if no candidate passes. |
+| Query-level cosine + internal fusion *(running)* | `z(cosine)+w_lm z(LM-head)+w_hidden z(hidden probe)` | [`run_qwen2vl_pairwise_features.py`](../../run_qwen2vl_pairwise_features.py), [`analyze_qwen2vl_jina_ablation.py`](../../analyze_qwen2vl_jina_ablation.py), [`run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py) | 100 disjoint probe-train queries choose layer, L2 regularization, and weights using grouped OOF AP; 100 different calibration queries set α=0.10 all-support threshold; test is 1,000/1,000/1,000/250 queries. |
+
+The exact dataset/log mapping and test-count guard are in [`prepare_full_internal_fusion_plans.py`](../../prepare_full_internal_fusion_plans.py). The runnable configuration, paths, pixel limits, batch sizes, model revision, output directories, and resume conditions are in [`run_full_query_level_internal_fusion.sh`](../../run_full_query_level_internal_fusion.sh). For WebQA, feature extraction uses `max_pixels=262144` to match its precomputed probe/calibration features; downstream QA still uses the common `max_pixels=200704` setting.
