@@ -1,0 +1,35 @@
+{
+  "hotpotqa": {
+    "status": "running",
+    "calibration_queries": 100,
+    "test_queries": 1000,
+    "thresholds": {
+      "cce_alpha_0.10": 0.4592403471469879,
+      "conflare_alpha_0.10": 0.4604645162820816,
+      "traq_alpha_0.10": 0.4241151511669159,
+      "false_score_bank_size": 2826,
+      "support_score_bank_size": 174,
+      "query_level_cosine_alpha_0.10": {
+        "threshold": 0.01120015186881498,
+        "finite_sample_order": 90,
+        "retrievable_calibration_queries": 99,
+        "top1_fallback_queries": 0
+      }
+    },
+    "selection": {
+      "query_level_cosine_alpha_0.10": {
+        "mean_chunks": 9.315,
+        "empty_rate": 0.0,
+        "precision": 0.17391304347826086,
+        "support_recall": 0.9321058688147296,
+        "macro_precision": 0.1835207237207243,
+        "macro_support_recall": 0.936,
+        "query_any_support": 0.988,
+        "query_all_support": 0.884,
+        "selected_chunks": 9315,
+        "selected_supports": 1620,
+        "reserve_supports": 1738
+      }
+    }
+  }
+}

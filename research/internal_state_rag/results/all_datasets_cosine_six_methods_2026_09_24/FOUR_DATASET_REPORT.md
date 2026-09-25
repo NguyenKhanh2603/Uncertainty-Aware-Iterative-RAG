@@ -1,27 +1,23 @@
-# Four-dataset cosine conformal comparison
+# Four-dataset pure-cosine conformal comparison
 
-## Scope
+## Unified protocol
 
-HotpotQA was already complete and was **not rerun**. This report combines that finished 1,000-query result with the newly completed remaining datasets: MMQA (1,000), TAT-QA (1,000), and WebQA (250; all test queries present in the frozen retrieval log).
+Every query-level row in this table is **pure query-level cosine conformal selection**: per-query z-scored Top-30 cosine scores, calibrated on a disjoint 100-query split at α=0.10, with a deterministic Top-1 fallback only when no candidate passes. No internal hidden-state, LM-head, attention, reranker, or fusion feature is used in this report.
 
-All rows within each dataset use its frozen Top-30 cosine candidate list and a disjoint 100-query calibration split. CCE, CONFLARE, TRAQ, BY, and BH consume the same cosine scores. BY adjusts for arbitrary dependence; BH normally needs independence or suitable positive dependence. The rank-capped BH context policy is experimental and no capped-procedure FDR guarantee is claimed.
+The HotpotQA query-level result was rerun on 25 September 2026 over all 1,000 test queries to make this definition match MMQA, TAT-QA, and WebQA. Its remaining selector rows are reused from the prior HotpotQA run only after asserting that the calibration thresholds and score-bank sizes exactly match the pure-cosine rerun.
 
-### Important comparability note
-
-The completed HotpotQA query-level row is **cosine + internal-model fusion**, whereas the newly run MMQA/TAT-QA/WebQA query-level row is **pure query-level cosine** (per-query z-scored threshold and deterministic Top-1 fallback). HotpotQA is displayed for completeness but that one row must not be interpreted as a pure-cosine four-dataset average.
+All selectors use the same frozen Top-30 cosine candidates within each dataset. CCE, CONFLARE, TRAQ, BY, and BH are cosine-only. BY accommodates arbitrary p-value dependence; BH ordinarily needs independence or suitable positive dependence. The rank cap after BH is experimental; this report makes no capped-procedure FDR guarantee.
 
 ## Run inventory
 
-| Dataset | Calibration | Test | Query-level row | Detailed report | Predictions |
-|---|---:|---:|---|---|---|
-| hotpotqa | 100 | 1000 | cosine + internal fusion | [HotpotQA report](../official_seed42_hotpot_six_methods/REPORT.md) | [JSONL](../official_seed42_hotpot_six_methods/downstream_predictions.jsonl) |
-| mmqa | 100 | 1000 | pure query-level cosine | [three-dataset report](REPORT.md) | [JSONL](mmqa_downstream_predictions.jsonl) |
-| tatqa | 100 | 1000 | pure query-level cosine | [three-dataset report](REPORT.md) | [JSONL](tatqa_downstream_predictions.jsonl) |
-| webqa | 100 | 250 | pure query-level cosine | [three-dataset report](REPORT.md) | [JSONL](webqa_downstream_predictions.jsonl) |
+| Dataset | Calibration | Test queries | Pure query-level downstream output |
+|---|---:|---:|---|
+| HotpotQA | 100 | 1,000 | [`hotpotqa_pure_query_level_cosine_1000_2026_09_25`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/REPORT.md) |
+| MMQA | 100 | 1,000 | [`mmqa_downstream_predictions.jsonl`](mmqa_downstream_predictions.jsonl) |
+| TAT-QA | 100 | 1,000 | [`tatqa_downstream_predictions.jsonl`](tatqa_downstream_predictions.jsonl) |
+| WebQA | 100 | 250 | [`webqa_downstream_predictions.jsonl`](webqa_downstream_predictions.jsonl) |
 
-## HOTPOTQA — completed (n=1000)
-
-Prior completed run retained exactly as-is; it uses cosine plus the existing internal-model fusion gate.
+## HOTPOTQA (n=1000)
 
 | Method | Chunks | Precision | Support recall | Empty | Any support | All support | EM | F1 | Numeric |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -30,7 +26,7 @@ Prior completed run retained exactly as-is; it uses cosine plus the existing int
 | ECIR CCE (α=0.10) | 7.62 | 20.0% | 87.6% | 0.7% | 97.4% | 80.0% | 0.364 | 0.482 | 0.385 |
 | CONFLARE (α=0.10) | 7.46 | 20.4% | 87.4% | 0.7% | 97.3% | 79.7% | 0.366 | 0.484 | 0.387 |
 | TRAQ retrieval (α=0.10) | 14.18 | 11.6% | 94.5% | 0.0% | 99.0% | 90.8% | 0.374 | 0.495 | 0.397 |
-| Query-level cosine + internal fusion (α=0.10) | 2.80 | 56.9% | 91.7% | 0.0% | 98.5% | 86.1% | 0.395 | 0.522 | 0.416 |
+| Query-level cosine (α=0.10) | 9.31 | 17.4% | 93.2% | 0.0% | 98.8% | 88.4% | 0.370 | 0.491 | 0.392 |
 | BY cosine (α=0.10) | 0.15 | 73.3% | 6.3% | 90.9% | 9.7% | 4.2% | 0.167 | 0.256 | 0.182 |
 | BY cosine (α=0.30) | 0.75 | 57.1% | 24.7% | 63.1% | 36.7% | 16.3% | 0.211 | 0.308 | 0.223 |
 | BY cosine (α=0.50) | 1.46 | 43.9% | 36.8% | 52.2% | 47.3% | 28.7% | 0.245 | 0.339 | 0.254 |
@@ -41,9 +37,7 @@ Prior completed run retained exactly as-is; it uses cosine plus the existing int
 | BH cosine (α=0.99, ctx=10) | 9.88 | 16.3% | 92.5% | 0.3% | 98.4% | 87.7% | 0.382 | 0.498 | 0.404 |
 | BH cosine (α=0.99, ctx=20) | 19.73 | 8.6% | 97.2% | 0.3% | 99.4% | 95.5% | 0.362 | 0.479 | 0.384 |
 
-## MMQA — completed (n=1000)
-
-This run uses the pure per-query z-scored cosine selector with deterministic Top-1 fallback.
+## MMQA (n=1000)
 
 | Method | Chunks | Precision | Support recall | Empty | Any support | All support | EM | F1 | Numeric |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -63,9 +57,7 @@ This run uses the pure per-query z-scored cosine selector with deterministic Top
 | BH cosine (α=0.99, ctx=10) | 9.76 | 11.1% | 91.3% | 1.9% | 96.5% | 90.2% | 0.468 | 0.522 | 0.489 |
 | BH cosine (α=0.99, ctx=20) | 19.51 | 5.8% | 96.1% | 1.9% | 97.7% | 95.7% | 0.465 | 0.515 | 0.482 |
 
-## TATQA — completed (n=1000)
-
-This run uses the pure per-query z-scored cosine selector with deterministic Top-1 fallback.
+## TATQA (n=1000)
 
 | Method | Chunks | Precision | Support recall | Empty | Any support | All support | EM | F1 | Numeric |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -85,9 +77,7 @@ This run uses the pure per-query z-scored cosine selector with deterministic Top
 | BH cosine (α=0.99, ctx=10) | 9.81 | 8.8% | 84.1% | 1.5% | 87.3% | 84.8% | 0.240 | 0.346 | 0.301 |
 | BH cosine (α=0.99, ctx=20) | 19.62 | 4.9% | 93.5% | 1.5% | 94.9% | 93.8% | 0.219 | 0.332 | 0.290 |
 
-## WEBQA — completed (n=250)
-
-This run uses the pure per-query z-scored cosine selector with deterministic Top-1 fallback.
+## WEBQA (n=250)
 
 | Method | Chunks | Precision | Support recall | Empty | Any support | All support | EM | F1 | Numeric |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -107,16 +97,15 @@ This run uses the pure per-query z-scored cosine selector with deterministic Top
 | BH cosine (α=0.99, ctx=10) | 9.28 | 6.2% | 62.9% | 7.2% | 78.4% | 70.0% | 0.000 | 0.149 | 0.036 |
 | BH cosine (α=0.99, ctx=20) | 18.56 | 4.1% | 82.5% | 7.2% | 89.2% | 85.6% | 0.000 | 0.152 | 0.036 |
 
-## Reading the tables
+## Metrics
 
-- **Precision / support recall** are chunk-level metrics measured against support labels in the frozen Top-30 candidate pool.
-- **Any support / all support** are query-level evidence-coverage rates.
-- **EM, F1, Numeric** are Qwen2-VL-7B-Instruct greedy downstream QA metrics (24 generated tokens); they are dataset-specific and should not be averaged across datasets.
-- **Empty** is the fraction of queries whose selector kept no context. Fixed Top-k and pure query-level cosine use their stated fallback behavior.
+- **Precision / support recall** are chunk-level evidence metrics within the frozen Top-30 candidate pool.
+- **Any support / all support** are query-level evidence coverage.
+- **EM, F1, Numeric** are Qwen2-VL-7B-Instruct greedy downstream QA measurements, generated with at most 24 new tokens. They must not be averaged across datasets.
+- The old [HotpotQA fusion report](../official_seed42_hotpot_six_methods/REPORT.md) is intentionally separate; it is an internal-model ablation, not a row in this pure-cosine comparison.
 
-## Files
+## Reproducibility artifacts
 
-- Selection and downstream aggregates: [`summary.json`](summary.json)
-- Per-dataset aggregates: [`mmqa_summary.json`](mmqa_summary.json), [`tatqa_summary.json`](tatqa_summary.json), [`webqa_summary.json`](webqa_summary.json)
-- The full new-run tables: [`REPORT.md`](REPORT.md)
+- Current three-dataset aggregate: [`summary.json`](summary.json)
+- Pure HotpotQA aggregate: [`../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/summary.json)
 - Runner: [`../../run_all_datasets_cosine_six_methods.py`](../../run_all_datasets_cosine_six_methods.py)

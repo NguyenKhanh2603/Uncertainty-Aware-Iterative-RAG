@@ -1,4 +1,4 @@
-# Four-dataset cosine conformal selector comparison
+# Cosine conformal selector comparison
 
 Every row within a dataset uses the same frozen Top-30 cosine candidates and its disjoint 100-query calibration plan. Query-level cosine is the pure per-query z-scored cosine threshold with a deterministic Top-1 empty-context fallback. BH context caps are experimental rank-ordered policies and have no claimed capped-procedure FDR guarantee.
 
