@@ -1,0 +1,343 @@
+{
+  "status": "complete",
+  "test_queries": 100,
+  "calibration_queries": 100,
+  "selection": {
+    "fixed_top10": {
+      "mean_chunks": 10.0,
+      "empty_rate": 0.0,
+      "precision": 0.089,
+      "support_recall": 0.8476190476190476,
+      "macro_precision": 0.08899999999999988,
+      "macro_support_recall": 0.865,
+      "query_any_support": 0.89,
+      "query_all_support": 0.84,
+      "selected_chunks": 1000,
+      "selected_supports": 89,
+      "reserve_supports": 105
+    },
+    "fixed_top20": {
+      "mean_chunks": 20.0,
+      "empty_rate": 0.0,
+      "precision": 0.0505,
+      "support_recall": 0.9619047619047619,
+      "macro_precision": 0.05049999999999993,
+      "macro_support_recall": 0.965,
+      "query_any_support": 0.97,
+      "query_all_support": 0.96,
+      "selected_chunks": 2000,
+      "selected_supports": 101,
+      "reserve_supports": 105
+    },
+    "cce_cosine_alpha_0.10": {
+      "mean_chunks": 20.1,
+      "empty_rate": 0.05,
+      "precision": 0.046766169154228855,
+      "support_recall": 0.8952380952380953,
+      "macro_precision": 0.09674276186776182,
+      "macro_support_recall": 0.91,
+      "query_any_support": 0.92,
+      "query_all_support": 0.9,
+      "selected_chunks": 2010,
+      "selected_supports": 94,
+      "reserve_supports": 105
+    },
+    "conflare_cosine_alpha_0.10": {
+      "mean_chunks": 20.02,
+      "empty_rate": 0.05,
+      "precision": 0.04695304695304695,
+      "support_recall": 0.8952380952380953,
+      "macro_precision": 0.10373161297430801,
+      "macro_support_recall": 0.91,
+      "query_any_support": 0.92,
+      "query_all_support": 0.9,
+      "selected_chunks": 2002,
+      "selected_supports": 94,
+      "reserve_supports": 105
+    },
+    "traq_cosine_alpha_0.10": {
+      "mean_chunks": 24.08,
+      "empty_rate": 0.03,
+      "precision": 0.04152823920265781,
+      "support_recall": 0.9523809523809523,
+      "macro_precision": 0.06884976162468416,
+      "macro_support_recall": 0.95,
+      "query_any_support": 0.95,
+      "query_all_support": 0.95,
+      "selected_chunks": 2408,
+      "selected_supports": 100,
+      "reserve_supports": 105
+    },
+    "bh_modality_cosine_alpha_0.10_ctx10": {
+      "mean_chunks": 1.15,
+      "empty_rate": 0.77,
+      "precision": 0.12173913043478261,
+      "support_recall": 0.13333333333333333,
+      "macro_precision": 0.08533333333333333,
+      "macro_support_recall": 0.21,
+      "query_any_support": 0.23,
+      "query_all_support": 0.19,
+      "selected_chunks": 115,
+      "selected_supports": 14,
+      "reserve_supports": 105
+    },
+    "bh_modality_cosine_alpha_0.90_ctx10": {
+      "mean_chunks": 8.39,
+      "empty_rate": 0.11,
+      "precision": 0.08820023837902265,
+      "support_recall": 0.7047619047619048,
+      "macro_precision": 0.10399999999999986,
+      "macro_support_recall": 0.74,
+      "query_any_support": 0.77,
+      "query_all_support": 0.71,
+      "selected_chunks": 839,
+      "selected_supports": 74,
+      "reserve_supports": 105
+    },
+    "bh_modality_cosine_alpha_0.99_ctx10": {
+      "mean_chunks": 9.7,
+      "empty_rate": 0.03,
+      "precision": 0.088659793814433,
+      "support_recall": 0.819047619047619,
+      "macro_precision": 0.0859999999999999,
+      "macro_support_recall": 0.83,
+      "query_any_support": 0.85,
+      "query_all_support": 0.81,
+      "selected_chunks": 970,
+      "selected_supports": 86,
+      "reserve_supports": 105
+    },
+    "bh_modality_cosine_alpha_0.99_ctx20": {
+      "mean_chunks": 19.4,
+      "empty_rate": 0.03,
+      "precision": 0.051030927835051546,
+      "support_recall": 0.9428571428571428,
+      "macro_precision": 0.04949999999999994,
+      "macro_support_recall": 0.94,
+      "query_any_support": 0.94,
+      "query_all_support": 0.94,
+      "selected_chunks": 1940,
+      "selected_supports": 99,
+      "reserve_supports": 105
+    }
+  },
+  "metadata": {
+    "support_score_bank_size": 103,
+    "thresholds": {
+      "cce_cosine_alpha_0.10": 0.5897385478019714,
+      "conflare_cosine_alpha_0.10": 0.59063560962677,
+      "traq_cosine_alpha_0.10": 0.5600771307945251
+    },
+    "false_score_bank_sizes_by_modality": {
+      "table": 1283,
+      "text": 1614
+    },
+    "bh": {
+      "conditioning": [
+        "dataset",
+        "modality"
+      ],
+      "procedure": "BH p-value step-up, then smallest-p-value context cap; rank breaks ties",
+      "note": "The post-BH cap is an experimental context policy; no capped-procedure FDR guarantee is claimed."
+    },
+    "published_selection_audit": {
+      "matches_all_evaluated_rows": true,
+      "evaluated_methods": [
+        "fixed_top10",
+        "fixed_top20",
+        "cce_cosine_alpha_0.10",
+        "conflare_cosine_alpha_0.10",
+        "traq_cosine_alpha_0.10",
+        "bh_modality_cosine_alpha_0.10_ctx10",
+        "bh_modality_cosine_alpha_0.90_ctx10",
+        "bh_modality_cosine_alpha_0.99_ctx10",
+        "bh_modality_cosine_alpha_0.99_ctx20"
+      ],
+      "mismatched_methods": [],
+      "rows": {
+        "fixed_top10": {
+          "published": {
+            "mean_chunks": 10.0,
+            "precision": 0.089,
+            "support_recall": 0.848,
+            "empty_rate": 0.0
+          },
+          "recomputed": {
+            "mean_chunks": 10.0,
+            "precision": 0.08900000000000001,
+            "support_recall": 0.848,
+            "empty_rate": 0.0
+          },
+          "matches_published_rounding": true
+        },
+        "fixed_top20": {
+          "published": {
+            "mean_chunks": 20.0,
+            "precision": 0.051,
+            "support_recall": 0.962,
+            "empty_rate": 0.0
+          },
+          "recomputed": {
+            "mean_chunks": 20.0,
+            "precision": 0.051,
+            "support_recall": 0.9620000000000001,
+            "empty_rate": 0.0
+          },
+          "matches_published_rounding": true
+        },
+        "cce_cosine_alpha_0.10": {
+          "published": {
+            "mean_chunks": 20.1,
+            "precision": 0.047,
+            "support_recall": 0.895,
+            "empty_rate": 0.05
+          },
+          "recomputed": {
+            "mean_chunks": 20.1,
+            "precision": 0.047,
+            "support_recall": 0.895,
+            "empty_rate": 0.05
+          },
+          "matches_published_rounding": true
+        },
+        "conflare_cosine_alpha_0.10": {
+          "published": {
+            "mean_chunks": 20.02,
+            "precision": 0.047,
+            "support_recall": 0.895,
+            "empty_rate": 0.05
+          },
+          "recomputed": {
+            "mean_chunks": 20.02,
+            "precision": 0.047,
+            "support_recall": 0.895,
+            "empty_rate": 0.05
+          },
+          "matches_published_rounding": true
+        },
+        "traq_cosine_alpha_0.10": {
+          "published": {
+            "mean_chunks": 24.08,
+            "precision": 0.042,
+            "support_recall": 0.952,
+            "empty_rate": 0.03
+          },
+          "recomputed": {
+            "mean_chunks": 24.08,
+            "precision": 0.042,
+            "support_recall": 0.9520000000000001,
+            "empty_rate": 0.03
+          },
+          "matches_published_rounding": true
+        },
+        "bh_modality_cosine_alpha_0.10_ctx10": {
+          "published": {
+            "mean_chunks": 1.15,
+            "precision": 0.122,
+            "support_recall": 0.133,
+            "empty_rate": 0.77
+          },
+          "recomputed": {
+            "mean_chunks": 1.15,
+            "precision": 0.122,
+            "support_recall": 0.133,
+            "empty_rate": 0.77
+          },
+          "matches_published_rounding": true
+        },
+        "bh_modality_cosine_alpha_0.90_ctx10": {
+          "published": {
+            "mean_chunks": 8.39,
+            "precision": 0.088,
+            "support_recall": 0.705,
+            "empty_rate": 0.11
+          },
+          "recomputed": {
+            "mean_chunks": 8.39,
+            "precision": 0.08800000000000001,
+            "support_recall": 0.705,
+            "empty_rate": 0.11
+          },
+          "matches_published_rounding": true
+        },
+        "bh_modality_cosine_alpha_0.99_ctx10": {
+          "published": {
+            "mean_chunks": 9.7,
+            "precision": 0.089,
+            "support_recall": 0.819,
+            "empty_rate": 0.03
+          },
+          "recomputed": {
+            "mean_chunks": 9.7,
+            "precision": 0.08900000000000001,
+            "support_recall": 0.8190000000000001,
+            "empty_rate": 0.03
+          },
+          "matches_published_rounding": true
+        },
+        "bh_modality_cosine_alpha_0.99_ctx20": {
+          "published": {
+            "mean_chunks": 19.4,
+            "precision": 0.051,
+            "support_recall": 0.943,
+            "empty_rate": 0.03
+          },
+          "recomputed": {
+            "mean_chunks": 19.4,
+            "precision": 0.051,
+            "support_recall": 0.943,
+            "empty_rate": 0.03
+          },
+          "matches_published_rounding": true
+        }
+      }
+    }
+  },
+  "downstream": {
+    "fixed_top10": {
+      "em": 0.19,
+      "f1": 0.2924888585119205,
+      "numerical_accuracy": 0.27
+    },
+    "fixed_top20": {
+      "em": 0.15,
+      "f1": 0.2532659894269824,
+      "numerical_accuracy": 0.23
+    },
+    "cce_cosine_alpha_0.10": {
+      "em": 0.15,
+      "f1": 0.25645896653996564,
+      "numerical_accuracy": 0.23
+    },
+    "conflare_cosine_alpha_0.10": {
+      "em": 0.15,
+      "f1": 0.26312563320663235,
+      "numerical_accuracy": 0.24
+    },
+    "traq_cosine_alpha_0.10": {
+      "em": 0.14,
+      "f1": 0.24779235296030863,
+      "numerical_accuracy": 0.22
+    },
+    "bh_modality_cosine_alpha_0.10_ctx10": {
+      "em": 0.04,
+      "f1": 0.10652130472718709,
+      "numerical_accuracy": 0.1
+    },
+    "bh_modality_cosine_alpha_0.90_ctx10": {
+      "em": 0.16,
+      "f1": 0.25117679628906364,
+      "numerical_accuracy": 0.23
+    },
+    "bh_modality_cosine_alpha_0.99_ctx10": {
+      "em": 0.19,
+      "f1": 0.2865307264668319,
+      "numerical_accuracy": 0.26
+    },
+    "bh_modality_cosine_alpha_0.99_ctx20": {
+      "em": 0.13,
+      "f1": 0.24856941707823618,
+      "numerical_accuracy": 0.23
+    }
+  }
+}

@@ -349,7 +349,11 @@ def audit_published_selection(dataset: str, summary: dict[str, dict[str, float]]
 def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
     lines = [
         "# Downstream QA for the 100-query baseline-comparison report", "",
-        "This rerun reconstructs the report's test plan from the frozen Jina-v4 Top-30 logs and verifies the published Fixed Top-10 row before Qwen generation. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the report's modality-conditioned selection component.",
+        "**Source selection report:** [baseline_comparison_report_100_queries_detailed.md](https://github.com/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/docs/add-detailed-report/baseline_comparison_report_100_queries_detailed.md).<br>",
+        "**Runner:** [`run_baseline_report_100_downstream.py`](../../run_baseline_report_100_downstream.py).<br>",
+        "**Splits:** [`splits/`](splits/) contains the exact 100 calibration qids and recovered 100 test qids used here for each dataset.",
+        "",
+        "This rerun reconstructs the source report's test plan from the frozen Jina-v4 Top-30 logs and verifies the published Fixed Top-10 row before Qwen generation. Every row uses greedy Qwen2-VL-7B-Instruct output with at most 24 new tokens. CCE, CONFLARE, and TRAQ are retrieval adapters; BH is the source report's modality-conditioned selection component: false-score calibration banks are stratified by `{dataset, modality}`, then BH is applied across the candidate set of each query.",
         "",
     ]
     for dataset, result in results.items():
