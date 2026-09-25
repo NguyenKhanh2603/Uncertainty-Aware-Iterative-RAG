@@ -10,12 +10,14 @@ All selectors use the same frozen Top-30 cosine candidates within each dataset. 
 
 ## Run inventory
 
-| Dataset | Calibration | Test queries | Pure query-level downstream output |
+| Dataset | Calibration qids | Test qids | Pure query-level downstream output |
 |---|---:|---:|---|
-| HotpotQA | 100 | 1,000 | [`hotpotqa_pure_query_level_cosine_1000_2026_09_25`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/REPORT.md) |
-| MMQA | 100 | 1,000 | [`mmqa_downstream_predictions.jsonl`](mmqa_downstream_predictions.jsonl) |
-| TAT-QA | 100 | 1,000 | [`tatqa_downstream_predictions.jsonl`](tatqa_downstream_predictions.jsonl) |
-| WebQA | 100 | 250 | [`webqa_downstream_predictions.jsonl`](webqa_downstream_predictions.jsonl) |
+| HotpotQA | [100](splits/hotpotqa/calibration_manifest.json) | [1,000](splits/hotpotqa/test_manifest.json) | [`hotpotqa_pure_query_level_cosine_1000_2026_09_25`](../hotpotqa_pure_query_level_cosine_1000_2026_09_25/REPORT.md) |
+| MMQA | [100](splits/mmqa/calibration_manifest.json) | [1,000](splits/mmqa/test_manifest.json) | [`mmqa_downstream_predictions.jsonl`](mmqa_downstream_predictions.jsonl) |
+| TAT-QA | [100](splits/tatqa/calibration_manifest.json) | [1,000](splits/tatqa/test_manifest.json) | [`tatqa_downstream_predictions.jsonl`](tatqa_downstream_predictions.jsonl) |
+| WebQA | [100](splits/webqa/calibration_manifest.json) | [250](splits/webqa/test_manifest.json) | [`webqa_downstream_predictions.jsonl`](webqa_downstream_predictions.jsonl) |
+
+Each linked manifest contains the exact ordered qid list, source manifest, Top-L, and role. The eight materialized manifests were checked for duplicate qids and for calibration/test overlap; every dataset has zero overlap.
 
 ## HOTPOTQA (n=1000)
 
