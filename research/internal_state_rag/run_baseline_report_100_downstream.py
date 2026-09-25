@@ -52,6 +52,56 @@ PUBLISHED_FIXED_TOP10 = {
     "webqa": {"mean_chunks": 10.00, "precision": 0.058, "support_recall": 0.682},
 }
 
+# These are transcribed from baseline_comparison_report_100_queries_detailed.md.
+# The audit is descriptive: downstream generation always uses the materialized
+# masks, never an aggregate number copied from this table.
+PUBLISHED_SELECTION = {
+    "hotpotqa": {
+        "fixed_top10": (10.00, 0.177, 0.962, 0.000),
+        "fixed_top20": (20.00, 0.092, 0.995, 0.000),
+        "cce_cosine_alpha_0.10": (11.19, 0.149, 0.908, 0.010),
+        "conflare_cosine_alpha_0.10": (10.80, 0.155, 0.908, 0.010),
+        "traq_cosine_alpha_0.10": (14.97, 0.114, 0.929, 0.000),
+        "bh_modality_cosine_alpha_0.10_ctx10": (0.74, 0.635, 0.255, 0.660),
+        "bh_modality_cosine_alpha_0.90_ctx10": (8.19, 0.186, 0.826, 0.110),
+        "bh_modality_cosine_alpha_0.99_ctx10": (9.90, 0.178, 0.957, 0.010),
+        "bh_modality_cosine_alpha_0.99_ctx20": (19.80, 0.092, 0.989, 0.010),
+    },
+    "mmqa": {
+        "fixed_top10": (10.00, 0.109, 0.965, 0.000),
+        "fixed_top20": (20.00, 0.055, 0.973, 0.000),
+        "cce_cosine_alpha_0.10": (14.19, 0.074, 0.929, 0.030),
+        "conflare_cosine_alpha_0.10": (13.02, 0.080, 0.920, 0.030),
+        "traq_cosine_alpha_0.10": (20.43, 0.054, 0.973, 0.010),
+        "bh_modality_cosine_alpha_0.10_ctx10": (0.21, 0.286, 0.053, 0.930),
+        "bh_modality_cosine_alpha_0.90_ctx10": (7.79, 0.118, 0.814, 0.150),
+        "bh_modality_cosine_alpha_0.99_ctx10": (9.41, 0.109, 0.912, 0.050),
+        "bh_modality_cosine_alpha_0.99_ctx20": (18.81, 0.055, 0.920, 0.050),
+    },
+    "tatqa": {
+        "fixed_top10": (10.00, 0.089, 0.848, 0.000),
+        "fixed_top20": (20.00, 0.051, 0.962, 0.000),
+        "cce_cosine_alpha_0.10": (20.10, 0.047, 0.895, 0.050),
+        "conflare_cosine_alpha_0.10": (20.02, 0.047, 0.895, 0.050),
+        "traq_cosine_alpha_0.10": (24.08, 0.042, 0.952, 0.030),
+        "bh_modality_cosine_alpha_0.10_ctx10": (1.15, 0.122, 0.133, 0.770),
+        "bh_modality_cosine_alpha_0.90_ctx10": (8.39, 0.088, 0.705, 0.110),
+        "bh_modality_cosine_alpha_0.99_ctx10": (9.70, 0.089, 0.819, 0.030),
+        "bh_modality_cosine_alpha_0.99_ctx20": (19.40, 0.051, 0.943, 0.030),
+    },
+    "webqa": {
+        "fixed_top10": (10.00, 0.058, 0.682, 0.000),
+        "fixed_top20": (20.00, 0.040, 0.929, 0.000),
+        "cce_cosine_alpha_0.10": (21.98, 0.035, 0.918, 0.080),
+        "conflare_cosine_alpha_0.10": (21.71, 0.035, 0.906, 0.080),
+        "traq_cosine_alpha_0.10": (26.16, 0.032, 0.976, 0.020),
+        "bh_modality_cosine_alpha_0.10_ctx10": (0.33, 0.030, 0.012, 0.950),
+        "bh_modality_cosine_alpha_0.90_ctx10": (7.69, 0.064, 0.576, 0.230),
+        "bh_modality_cosine_alpha_0.99_ctx10": (9.10, 0.066, 0.706, 0.090),
+        "bh_modality_cosine_alpha_0.99_ctx20": (18.20, 0.041, 0.871, 0.090),
+    },
+}
+
 
 @dataclass(frozen=True)
 class DatasetConfig:
@@ -261,6 +311,36 @@ def validate_published_fixed_top10(dataset: str, summary: dict[str, dict[str, fl
             )
 
 
+def audit_published_selection(dataset: str, summary: dict[str, dict[str, float]]) -> dict[str, Any]:
+    """Compare materialized masks with the report's rounded selection table."""
+
+    fields = ("mean_chunks", "precision", "support_recall", "empty_rate")
+    rows = {}
+    for method, published in PUBLISHED_SELECTION[dataset].items():
+        if method not in summary:
+            continue
+        observed = summary[method]
+        expected = dict(zip(fields, published, strict=True))
+        rounded_observed = {
+            "mean_chunks": round(observed["mean_chunks"], 2),
+            "precision": round(observed["precision"] * 100, 1) / 100,
+            "support_recall": round(observed["support_recall"] * 100, 1) / 100,
+            "empty_rate": round(observed["empty_rate"] * 100, 1) / 100,
+        }
+        rows[method] = {
+            "published": expected,
+            "recomputed": rounded_observed,
+            "matches_published_rounding": rounded_observed == expected,
+        }
+    mismatches = [method for method, row in rows.items() if not row["matches_published_rounding"]]
+    return {
+        "matches_all_evaluated_rows": not mismatches,
+        "evaluated_methods": list(rows),
+        "mismatched_methods": mismatches,
+        "rows": rows,
+    }
+
+
 def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
     lines = [
         "# Downstream QA for the 100-query baseline-comparison report", "",
@@ -284,6 +364,15 @@ def write_report(path: Path, results: dict[str, dict[str, Any]]) -> None:
                 f"{values['support_recall']:.1%} | {values['empty_rate']:.1%} | "
                 f"{values['query_any_support']:.1%} | {values['query_all_support']:.1%} | {tail}"
             )
+        audit = result["metadata"]["published_selection_audit"]
+        if audit["matches_all_evaluated_rows"]:
+            lines.extend(["", "The recomputed selector masks match every rounded selection row published in the source report."])
+        else:
+            lines.extend([
+                "",
+                "The following rows do not reproduce from the available frozen inputs and are **not** represented as historical downstream results: "
+                + ", ".join(f"`{method}`" for method in audit["mismatched_methods"]) + ".",
+            ])
         lines.extend(["", "### Calibration and selection metadata", "", "```json", json.dumps(result["metadata"], indent=2), "```", ""])
     path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -343,6 +432,7 @@ def main() -> None:
         if "fixed_top10" in masks:
             validate_published_fixed_top10(dataset, summary)
         materialize_split(args.output_dir, dataset, calibration_qids, test_qids)
+        metadata["published_selection_audit"] = audit_published_selection(dataset, summary)
         results[dataset] = {
             "status": "selection_complete" if args.selection_only else "running",
             "test_queries": len(test_qids),
