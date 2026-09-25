@@ -330,7 +330,10 @@ def audit_published_selection(dataset: str, summary: dict[str, dict[str, float]]
         rows[method] = {
             "published": expected,
             "recomputed": rounded_observed,
-            "matches_published_rounding": rounded_observed == expected,
+            "matches_published_rounding": all(
+                math.isclose(rounded_observed[field], expected[field], abs_tol=1e-12)
+                for field in fields
+            ),
         }
     mismatches = [method for method, row in rows.items() if not row["matches_published_rounding"]]
     return {
