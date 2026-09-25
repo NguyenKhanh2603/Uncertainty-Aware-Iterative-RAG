@@ -14,7 +14,10 @@ cd "$repo_root"
 python_bin=".venv-cu118/bin/python"
 model="/workspace/hf_cache/hub/models--Qwen--Qwen2-VL-7B-Instruct/snapshots/eed13092ef92e448dd6875b2a00151bd3f7db0ac"
 revision="eed13092ef92e448dd6875b2a00151bd3f7db0ac"
-base="research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25"
+# A prior role-split HotpotQA feature cache has different qids from the current
+# official-seed test plan. Keep it untouched and write this exact-plan run to a
+# new directory rather than mixing or overwriting artifacts.
+base="research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2"
 plans="$base/plans"
 features="$base/features"
 analysis="$base/analysis"
@@ -35,7 +38,7 @@ for dataset in "${datasets[@]}"; do
       corpus="data/official_seed42_hotpotqa_fixed/hotpotqa/corpus.jsonl"
       bundle="data/official_seed42_hotpotqa_fixed"
       retrieval="research/internal_state_rag/results/official_seed42_hotpotqa_cosine_top30.jsonl.gz"
-      test_features="research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_1000_features/hotpotqa/features.npz"
+      test_features="$features/$dataset/features.npz"
       max_pixels=200704; image_batch_size=2
       ;;
     mmqa|tatqa)
@@ -58,7 +61,7 @@ for dataset in "${datasets[@]}"; do
     *) echo "unknown dataset: $dataset" >&2; exit 2 ;;
   esac
 
-  if [[ "$dataset" != hotpotqa && ! -f "$test_features" ]]; then
+  if [[ ! -f "$test_features" ]]; then
     PYTHONPATH=src:. "$python_bin" research/internal_state_rag/run_qwen2vl_pairwise_features.py \
       --model "$model" --model-revision "$revision" \
       --feature-manifest "$plans/$dataset/manifest.json" \
