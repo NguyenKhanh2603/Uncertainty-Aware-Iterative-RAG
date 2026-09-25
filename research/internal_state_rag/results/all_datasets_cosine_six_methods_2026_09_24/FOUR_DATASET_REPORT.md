@@ -8,6 +8,17 @@ The HotpotQA query-level result was rerun on 25 September 2026 over all 1,000 te
 
 All selectors use the same frozen Top-30 cosine candidates within each dataset. CCE, CONFLARE, TRAQ, BY, and BH are cosine-only. BY accommodates arbitrary p-value dependence; BH ordinarily needs independence or suitable positive dependence. The rank cap after BH is experimental; this report makes no capped-procedure FDR guarantee.
 
+## Calibration and test qid files
+
+| Dataset | Calibration qids | Test qids |
+|---|---|---|
+| HotpotQA | [`calibration_manifest.json`](splits/hotpotqa/calibration_manifest.json) — 100 | [`test_manifest.json`](splits/hotpotqa/test_manifest.json) — 1,000 |
+| MMQA | [`calibration_manifest.json`](splits/mmqa/calibration_manifest.json) — 100 | [`test_manifest.json`](splits/mmqa/test_manifest.json) — 1,000 |
+| TAT-QA | [`calibration_manifest.json`](splits/tatqa/calibration_manifest.json) — 100 | [`test_manifest.json`](splits/tatqa/test_manifest.json) — 1,000 |
+| WebQA | [`calibration_manifest.json`](splits/webqa/calibration_manifest.json) — 100 | [`test_manifest.json`](splits/webqa/test_manifest.json) — 250 |
+
+Each file is the ordered qid list actually used; calibration and test are disjoint for every dataset.
+
 ## Run inventory
 
 | Dataset | Calibration qids | Test qids | Pure query-level downstream output |
