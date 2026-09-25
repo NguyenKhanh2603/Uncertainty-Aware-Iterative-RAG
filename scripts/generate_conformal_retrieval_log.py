@@ -180,6 +180,46 @@ def save_embedding_cache(
     )
     temporary_metadata.replace(metadata_path)
 
+import os
+import tempfile
+from typing import Any
+from PIL import Image
+
+from concurrent.futures import ThreadPoolExecutor
+
+def _load_single(p: str) -> Any:
+    try:
+        with Image.open(p) as img:
+            img = img.convert("RGB")
+            w, h = img.size
+            scale = 512.0 / min(w, h)
+            new_w, new_h = max(512, int(w * scale)), max(512, int(h * scale))
+            img = img.resize((new_w, new_h), Image.Resampling.BICUBIC)
+            left = (new_w - 512) // 2
+            top = (new_h - 512) // 2
+            return img.crop((left, top, left + 512, top + 512))
+    except Exception as e:
+        print(f"Warning: failed to load image {p} ({e}). Using blank image.", flush=True)
+        return Image.new("RGB", (512, 512), color="black")
+
+def load_images_safe(paths: Sequence[str]) -> list[Any]:
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        return list(pool.map(_load_single, paths))
+
+def fast_encode_image_batch(model, paths, truncate_dim):
+    images = load_images_safe(paths)
+    tensors = [torch.from_numpy(np.array(img)).permute(2, 0, 1).float() / 255.0 for img in images]
+    batch_tensor = torch.stack(tensors).to(model.device)
+    mean = torch.tensor([0.48145466, 0.4578275, 0.40821073], device=model.device).view(1, 3, 1, 1)
+    std = torch.tensor([0.26862954, 0.26130258, 0.27577711], device=model.device).view(1, 3, 1, 1)
+    batch_tensor = (batch_tensor - mean) / std
+    with torch.inference_mode():
+        embeddings = model.get_image_features(pixel_values=batch_tensor)
+        if truncate_dim:
+            embeddings = embeddings[:, :truncate_dim]
+        embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+    return embeddings.cpu().numpy()
+
 
 def encode_corpus(
     model,
@@ -193,19 +233,27 @@ def encode_corpus(
     text_indices = [index for index, chunk in enumerate(corpus) if chunk.modality != "image"]
     image_indices = [index for index, chunk in enumerate(corpus) if chunk.modality == "image"]
 
-    text_vectors = encode_with_backoff(
-        [corpus[index].content for index in text_indices],
-        encode_batch=lambda batch: model.encode_text(list(batch), truncate_dim=truncate_dim),
-        initial_batch_size=text_batch_size,
-        description="Encode text/table corpus",
-    )
+    import pathlib
+    text_ckpt = pathlib.Path(f"text_vectors_checkpoint_{len(corpus)}.npy")
+    
+    if text_ckpt.exists():
+        print(f"Loading text vectors checkpoint from {text_ckpt}", flush=True)
+        text_vectors = np.load(text_ckpt)
+    else:
+        text_vectors = encode_with_backoff(
+            [corpus[index].content for index in text_indices],
+            encode_batch=lambda batch: model.encode_text(list(batch), truncate_dim=truncate_dim),
+            initial_batch_size=text_batch_size,
+            description="Encode text/table corpus",
+        )
+        np.save(text_ckpt, text_vectors)
     if len(text_vectors):
         vectors = np.empty((len(corpus), text_vectors.shape[1]), dtype=np.float32)
         vectors[text_indices] = text_vectors
 
     image_vectors = encode_with_backoff(
         [corpus[index].content for index in image_indices],
-        encode_batch=lambda batch: model.encode_image(list(batch), truncate_dim=truncate_dim),
+        encode_batch=lambda batch: fast_encode_image_batch(model, batch, truncate_dim),
         initial_batch_size=image_batch_size,
         description="Encode image corpus",
     )
@@ -604,6 +652,10 @@ def main() -> None:
         bundle_root=bundle_root,
         dataset=args.dataset,
     )
+    if len(queries) > 10000:
+        import random
+        random.seed(args.split_seed)
+        queries = random.sample(queries, 10000)
     timings["load_records"] = time.perf_counter() - stage_started
     corpus_revision_id = corpus_revision(
         tqdm(corpus, desc="Fingerprint official corpus", unit="chunk")

@@ -149,7 +149,7 @@ class SummaryAccumulator:
         self.queries = 0
         self.reserve_candidates = 0
         self.reserve_supports = 0
-        self.by_rejections = 0
+        self.bh_rejections = 0
         self.selected = 0
         self.selected_supports = 0
         self.selected_false = 0
@@ -179,7 +179,7 @@ class SummaryAccumulator:
         self.queries += 1
         self.reserve_candidates += int(result["reserve_size"])
         self.reserve_supports += int(result["reserve_supports"])
-        self.by_rejections += int(result["by_rejections"])
+        self.bh_rejections += int(result["bh_rejections"])
         self.selected += int(result["selected_count"])
         self.selected_supports += int(result["selected_supports"])
         self.selected_false += int(result["selected_false"])
@@ -187,7 +187,7 @@ class SummaryAccumulator:
         self.empty_contexts += int(result["selected_count"] == 0)
         self.backfill_chunks += int(result["backfill_count"])
         self.backfill_queries += int(result["backfill_count"] > 0)
-        self.capped_queries += int(result["by_rejections"] > result["selected_count"])
+        self.capped_queries += int(result["bh_rejections"] > result["selected_count"])
         self.baseline += int(result["baseline_count"])
         self.baseline_supports += int(result["baseline_supports"])
         self.baseline_false += int(result["baseline_false"])
@@ -240,7 +240,7 @@ class SummaryAccumulator:
             "reserve_candidates": self.reserve_candidates,
             "average_reserve_size": self._ratio(self.reserve_candidates, self.queries),
             "reserve_supports": self.reserve_supports,
-            "by_rejections": self.by_rejections,
+            "bh_rejections": self.bh_rejections,
             "selected_chunks": self.selected,
             "average_selected_chunks": self._ratio(self.selected, self.queries),
             "empty_contexts": self.empty_contexts,
@@ -290,7 +290,7 @@ def parse_args() -> argparse.Namespace:
     source.add_argument("--input", type=Path, nargs="+")
     parser.add_argument("--bank", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
-    parser.add_argument("--split-role", choices=("development", "test"), default="development")
+    parser.add_argument("--split-role", choices=("development", "test", "calibration"), default="development")
     parser.add_argument("--alpha", type=float, default=0.10)
     parser.add_argument("--max-context", type=int, default=10)
     parser.add_argument("--allow-underpowered-banks", action="store_true")

@@ -50,7 +50,7 @@ class SweepMetrics:
     queries: int = 0
     reserve_candidates: int = 0
     reserve_supports: int = 0
-    by_rejections: int = 0
+    bh_rejections: int = 0
     selected: int = 0
     selected_supports: int = 0
     selected_false: int = 0
@@ -70,7 +70,7 @@ class SweepMetrics:
         base: Mapping[str, Any],
         decisions: list[Mapping[str, Any]],
         selected: set[int],
-        by_rejections: int,
+        bh_rejections: int,
         max_context: int,
     ) -> None:
         supports = sum(decisions[index]["support_label"] == "support" for index in selected)
@@ -82,7 +82,7 @@ class SweepMetrics:
         self.queries += 1
         self.reserve_candidates += len(decisions)
         self.reserve_supports += int(base["reserve_supports"])
-        self.by_rejections += by_rejections
+        self.bh_rejections += bh_rejections
         self.selected += len(selected)
         self.selected_supports += supports
         self.selected_false += false
@@ -90,7 +90,7 @@ class SweepMetrics:
         self.empty += int(not selected)
         self.backfill_chunks += backfills
         self.backfill_queries += int(backfills > 0)
-        self.capped_queries += int(by_rejections > len(selected))
+        self.capped_queries += int(bh_rejections > len(selected))
         self.query_fdp_sum += fdp
         if selected:
             self.nonempty_query_fdp_sum += fdp
@@ -114,7 +114,7 @@ class SweepMetrics:
         return {
             "queries": self.queries,
             "average_reserve_size": self.ratio(self.reserve_candidates, self.queries),
-            "by_rejections": self.by_rejections,
+            "bh_rejections": self.bh_rejections,
             "selected_chunks": self.selected,
             "average_selected_chunks": self.ratio(self.selected, self.queries),
             "empty_context_rate": self.ratio(self.empty, self.queries),
@@ -177,14 +177,14 @@ def main() -> None:
             strategies.add(strategy)
             decisions = base["decisions"]
             for alpha in alphas:
-                selected, by_rejections = selected_indices(
+                selected, bh_rejections = selected_indices(
                     decisions, alpha=alpha, max_context=args.max_context
                 )
                 overall[(strategy, alpha)].update(
-                    base, decisions, selected, by_rejections, args.max_context
+                    base, decisions, selected, bh_rejections, args.max_context
                 )
                 by_dataset[(strategy, alpha, base["dataset"])].update(
-                    base, decisions, selected, by_rejections, args.max_context
+                    base, decisions, selected, bh_rejections, args.max_context
                 )
 
     json_results: dict[str, Any] = {}

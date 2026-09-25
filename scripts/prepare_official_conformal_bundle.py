@@ -325,6 +325,8 @@ def prepare_mmqa(root: Path, downloads: Path, max_questions: int) -> dict[str, A
             if item.get("doc_id") is not None
         ]
         candidates.extend(support)
+        candidates = [c for c in candidates if c in corpus]
+        support = [s for s in support if s in corpus]
         query_rows.append(
             {
                 "qid": str(row["qid"]),

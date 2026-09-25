@@ -4,9 +4,9 @@ The reference banks estimate the null distribution for the hypothesis that a
 retrieved candidate is false evidence.  A small p-value therefore supports
 rejecting that null and admitting the candidate to the context.
 
-The Benjamini--Yekutieli (BY) step-up rule implemented here is valid under
+The Benjamini--Hochberg (BH) step-up rule implemented here is valid under
 arbitrary p-value dependence before a context-size cap is applied.  Choosing at
-most K of the BY rejections is useful for the end-to-end experiment, but the
+most K of the BH rejections is useful for the end-to-end experiment, but the
 proposal still requires a proof for that capped procedure.  Outputs expose this
 distinction instead of claiming a guarantee that has not been established.
 """
@@ -28,13 +28,12 @@ from uncertainty_rag.core.conformal_retrieval import (
 
 
 @dataclass(frozen=True)
-class BYResult:
-    """Indices rejected by the Benjamini--Yekutieli step-up procedure."""
+class BHResult:
+    """Indices rejected by the Benjamini--Hochberg step-up procedure."""
 
     rejected_indices: tuple[int, ...]
     cutoff_rank: int
     cutoff_p_value: float | None
-    harmonic_number: float
 
 
 def backfill_rejected_indices(
@@ -47,7 +46,7 @@ def backfill_rejected_indices(
 
     The first tuple is the final context and the second is the no-backfill
     ablation.  Both are returned in retrieval order.  A reserve candidate is
-    never admitted unless it was rejected by the same query-level BY test.
+    never admitted unless it was rejected by the same query-level BH test.
     """
 
     if max_context < 1:
@@ -71,31 +70,29 @@ def backfill_rejected_indices(
     return tuple(selected), tuple(accepted_top_k)
 
 
-def benjamini_yekutieli(p_values: Sequence[float], alpha: float) -> BYResult:
-    """Apply BY to dependent p-values and return indices in input order."""
+def benjamini_hochberg(p_values: Sequence[float], alpha: float) -> BHResult:
+    """Apply BH to dependent p-values and return indices in input order."""
 
     if not 0 < alpha < 1:
         raise ConformalDataError("alpha must be strictly between 0 and 1")
     if any(not isfinite(value) or not 0 <= value <= 1 for value in p_values):
         raise ConformalDataError("p-values must be finite and in [0, 1]")
     if not p_values:
-        return BYResult((), 0, None, 0.0)
+        return BHResult((), 0, None)
 
     count = len(p_values)
-    harmonic = sum(1.0 / index for index in range(1, count + 1))
     ordered = sorted(range(count), key=lambda index: (p_values[index], index))
     cutoff_rank = 0
     for rank, index in enumerate(ordered, start=1):
-        threshold = rank * alpha / (count * harmonic)
+        threshold = rank * alpha / count
         if p_values[index] <= threshold:
             cutoff_rank = rank
 
     rejected = frozenset(ordered[:cutoff_rank])
-    return BYResult(
+    return BHResult(
         rejected_indices=tuple(index for index in range(count) if index in rejected),
         cutoff_rank=cutoff_rank,
         cutoff_p_value=(p_values[ordered[cutoff_rank - 1]] if cutoff_rank else None),
-        harmonic_number=harmonic,
     )
 
 
@@ -208,7 +205,7 @@ def select_query_context(
     max_context: int,
     allow_underpowered: bool = False,
 ) -> dict[str, Any]:
-    """Score one query, run BY, and form an experimental at-most-K context."""
+    """Score one query, run BH, and form an experimental at-most-K context."""
 
     if max_context < 1:
         raise ConformalDataError("max_context must be positive")
@@ -224,12 +221,12 @@ def select_query_context(
     if len(set(ranks)) != len(ranks):
         raise ConformalDataError("Query contains duplicate retrieval ranks")
 
-    by = benjamini_yekutieli([item["p_value"] for item in scored], alpha)
-    by_rejected = set(by.rejected_indices)
+    bh = benjamini_hochberg([item["p_value"] for item in scored], alpha)
+    bh_rejected = set(bh.rejected_indices)
     selected_in_context_order, no_backfill_indices = backfill_rejected_indices(
         [candidate.rank for candidate in candidates],
         [candidate.chunk_id for candidate in candidates],
-        by.rejected_indices,
+        bh.rejected_indices,
         max_context,
     )
     selected = set(selected_in_context_order)
@@ -241,8 +238,8 @@ def select_query_context(
             reason = "missing_bank"
         elif item["bank_status"] == "underpowered_blocked":
             reason = "underpowered_bank"
-        elif index not in by_rejected:
-            reason = "by_not_rejected"
+        elif index not in bh_rejected:
+            reason = "bh_not_rejected"
         elif index not in selected:
             reason = "context_cap"
         elif candidate.rank > max_context:
@@ -261,7 +258,7 @@ def select_query_context(
                 "bank_size": item["bank_size"],
                 "bank_status": item["bank_status"],
                 "p_value": item["p_value"],
-                "by_rejected": index in by_rejected,
+                "bh_rejected": index in bh_rejected,
                 "selected": index in selected,
                 "decision_reason": reason,
             }
@@ -290,10 +287,9 @@ def select_query_context(
         "max_context": max_context,
         "reserve_size": len(candidates),
         "reserve_supports": reserve_supports,
-        "by_rejections": len(by_rejected),
-        "by_cutoff_rank": by.cutoff_rank,
-        "by_cutoff_p_value": by.cutoff_p_value,
-        "by_harmonic_number": by.harmonic_number,
+        "bh_rejections": len(bh_rejected),
+        "bh_cutoff_rank": bh.cutoff_rank,
+        "bh_cutoff_p_value": bh.cutoff_p_value,
         "selected_count": len(selected),
         "selected_supports": selected_supports,
         "selected_false": selected_false,
@@ -310,6 +306,6 @@ def select_query_context(
         "baseline_supports": baseline_supports,
         "baseline_false": baseline_false,
         "formal_capped_risk_guarantee": False,
-        "procedure": "BY_then_rank_ordered_verified_backfill_experimental",
+        "procedure": "BH_then_rank_ordered_verified_backfill_experimental",
         "decisions": decisions,
     }

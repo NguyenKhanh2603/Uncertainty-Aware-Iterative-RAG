@@ -22,7 +22,7 @@ from tqdm import tqdm
 from uncertainty_rag.core.conformal_retrieval import ConformalDataError
 from uncertainty_rag.core.conformal_selection import (
     backfill_rejected_indices,
-    benjamini_yekutieli,
+    benjamini_hochberg,
 )
 
 METHODS = ("fixed_top_k", "conformal_no_backfill", "conformal_backfill")
@@ -45,11 +45,11 @@ def policy_indices(
         key=lambda index: (int(decisions[index]["rank"]), str(decisions[index]["chunk_id"])),
     )
     top_k = set(retrieval_order[:max_context])
-    by = benjamini_yekutieli([float(item["p_value"]) for item in decisions], alpha)
+    bh = benjamini_hochberg([float(item["p_value"]) for item in decisions], alpha=alpha)
     with_backfill, without_backfill = backfill_rejected_indices(
         [int(item["rank"]) for item in decisions],
         [str(item["chunk_id"]) for item in decisions],
-        by.rejected_indices,
+        bh.rejected_indices,
         max_context,
     )
     return {
