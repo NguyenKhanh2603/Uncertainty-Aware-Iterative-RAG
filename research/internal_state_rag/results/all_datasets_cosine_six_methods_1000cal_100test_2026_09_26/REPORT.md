@@ -34,8 +34,8 @@ All selection metrics use the frozen Jina Top-30 candidate pool. A `support` is 
 - **Precision:** micro precision, `retained support chunks / all retained chunks`.
 - **Recall:** micro support recall, `retained support chunks / all labelled support chunks in Top-30`. It cannot recover evidence absent from Top-30.
 - **Empty:** fraction of queries for which a selector retains no chunk. Fixed Top-K and query-level cosine use their documented non-empty policies; pointwise selectors may be empty.
-- **Any support:** fraction of all test queries for which at least one support is retained, with a query that has no labelled support in Top-30 treated as vacuously retaining no available support. The retrieval ceiling for each dataset is available in its summary JSON.
-- **All support:** fraction of all test queries whose labelled Top-30 support set is a subset of the retained context; a query with no labelled Top-30 support is vacuously covered. This is why all-support should be read alongside Recall and the retrieval ceiling.
+- **Any support:** legacy retrieval-pool coverage: at least one support is retained for a query with labelled Top-30 support. A query with no labelled support in Top-30 is counted as covered because no available support can be lost. The retrieval ceiling for each dataset is available in its summary JSON.
+- **All support:** fraction of all test queries whose labelled Top-30 support set is a subset of the retained context; a query with no labelled Top-30 support is likewise counted as covered. This is why all-support should be read alongside Recall and the retrieval ceiling.
 - **EM / F1 / Numeric:** mean Exact Match, token-level F1, and numerical accuracy of the same deterministic Qwen direct-answer evaluation over the 100 held-out qids. These are downstream diagnostics, not conformal coverage guarantees.
 
 Rows marked **†** are the separately run literature-protocol records: they retain the same qids and Top-30 candidates but use CCE's positive-pair unit, CONFLARE's one-relevant-record unit, and TRAQ's Bonferroni retrieval unit. TRAQ's row is retrieval-only, not its full semantic answer-prediction-set system.
