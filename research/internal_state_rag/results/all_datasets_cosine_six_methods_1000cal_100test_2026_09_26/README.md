@@ -6,7 +6,14 @@ This is the inverse-scale companion to `all_datasets_cosine_six_methods_2026_09_
 
 `SPLIT_INTEGRITY.json` and the per-dataset manifests record every qid and confirm zero calibration/test overlap. HotpotQA uses its official-seed calibration role. MMQA, TATQA, and WebQA each use the union of their frozen `calibration` and `development` roles, which contains exactly 1,000 queries; all four datasets use the first 100 lexicographically sorted qids from their frozen `test` role for evaluation.
 
-The result table contains Fixed Top-K, CCE, CONFLARE, TRAQ-retrieval, query-level cosine, BY cosine, and BH cosine. It deliberately excludes the internal-fusion row: that method selects a hidden-state probe and fusion weights on an additional, disjoint probe-training set. Reusing its old 100-query calibration artifact would violate this inverse calibration protocol.
+The result table contains Fixed Top-K, CCE-style, CONFLARE-style, and
+TRAQ-style **positive-cosine proxies**, query-level cosine, BY cosine, and BH
+cosine. The first three are shared-score ablations, not exact reproductions of
+the three papers; their calibration rules and limitations are documented in
+[BASELINE_SCOPE.md](BASELINE_SCOPE.md). It deliberately excludes the
+internal-fusion row: that method selects a hidden-state probe and fusion
+weights on an additional, disjoint probe-training set. Reusing its old
+100-query calibration artifact would violate this inverse calibration protocol.
 
 ## Reproducibility and split audit
 

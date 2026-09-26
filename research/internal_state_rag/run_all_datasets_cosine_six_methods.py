@@ -3,9 +3,11 @@
 Every selector for a dataset receives its frozen Top-30 cosine log and the
 same disjoint calibration plan.  ``--plan-root`` may replace the historical
 100-calibration/full-test manifests with an explicitly materialized protocol.
-The six selector families are CCE,
-CONFLARE, TRAQ retrieval, candidate-level BY, query-level cosine conformal,
-and candidate-level BH.  BH's rank cap is explicitly experimental.
+The three literature-inspired rows are intentionally cosine-threshold proxies,
+not reproductions of CCE, CONFLARE, or TRAQ: they use the same frozen Jina
+cosine score and support labels available in this repository.  The remaining
+families are candidate-level BY, query-level cosine conformal, and
+candidate-level BH.  BH's rank cap is explicitly experimental.
 
 The downstream prediction files are append-only.  Re-running the command
 resumes the first query missing from each dataset, then refreshes REPORT.md.
@@ -127,6 +129,13 @@ def query_level_cosine_mask(
 def all_masks(
     calibration: list[list[dict[str, Any]]], test: list[list[dict[str, Any]]]
 ) -> tuple[dict[str, list[np.ndarray]], dict[str, Any]]:
+    """Build the baseline masks on shared Jina cosine candidates.
+
+    ``cce``, ``conflare``, and ``traq`` keys are retained for compatibility
+    with already-materialized results.  They are positive-score quantile
+    proxies only; the original methods require different scorer and/or
+    calibration constructions and must not be reported as exact reproductions.
+    """
     bank = false_bank(calibration)
     support = np.asarray([
         float(row["cosine_score"]) for rows in calibration for row in rows

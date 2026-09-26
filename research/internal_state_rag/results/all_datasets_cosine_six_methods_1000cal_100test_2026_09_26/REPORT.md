@@ -2,6 +2,13 @@
 
 Every row within a dataset uses the same frozen Top-30 cosine candidates and its disjoint calibration plan. Query-level cosine is the pure per-query z-scored cosine threshold with a deterministic Top-1 empty-context fallback. BH context caps are experimental rank-ordered policies and have no claimed capped-procedure FDR guarantee.
 
+> **Baseline scope:** `CCE`, `CONFLARE`, and `TRAQ` labels below are
+> shared-Jina-cosine threshold proxies, rather than faithful executions of the
+> original papers. In particular, CCE and CONFLARE use nearly the same
+> positive-score quantile here, so their rows are expected to be nearly
+> identical. See [BASELINE_SCOPE.md](BASELINE_SCOPE.md) before interpreting
+> them as a literature comparison.
+
 ## Exact 1,000-calibration / 100-test splits
 
 The qid lists used for every row are versioned here. Each calibration manifest
@@ -24,9 +31,9 @@ The shared split-level provenance and no-overlap audit is in
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | fixed_top10 | 10.00 | 16.0% | 93.0% | 0.0% | 99.0% | 88.0% | 0.430 | 0.538 | 0.450 |
 | fixed_top20 | 20.00 | 8.4% | 97.7% | 0.0% | 100.0% | 96.0% | 0.390 | 0.504 | 0.410 |
-| cce_alpha_0.10 | 8.75 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
-| conflare_alpha_0.10 | 8.74 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
-| traq_alpha_0.10 | 14.53 | 11.2% | 94.8% | 0.0% | 98.0% | 92.0% | 0.430 | 0.539 | 0.450 |
+| CCE-style positive-cosine proxy (α=0.10) | 8.75 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
+| CONFLARE-style positive-cosine proxy (α=0.10) | 8.74 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
+| TRAQ-style loose-positive-cosine proxy (α=0.10) | 14.53 | 11.2% | 94.8% | 0.0% | 98.0% | 92.0% | 0.430 | 0.539 | 0.450 |
 | query_level_cosine_alpha_0.10 | 10.60 | 15.1% | 93.0% | 0.0% | 99.0% | 88.0% | 0.420 | 0.537 | 0.440 |
 | by_cosine_alpha_0.10 | 0.17 | 70.6% | 7.0% | 88.0% | 14.0% | 5.0% | 0.130 | 0.233 | 0.130 |
 | by_cosine_alpha_0.30 | 0.42 | 71.4% | 17.4% | 73.0% | 29.0% | 12.0% | 0.170 | 0.266 | 0.170 |
@@ -44,9 +51,9 @@ The shared split-level provenance and no-overlap audit is in
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | fixed_top10 | 10.00 | 10.9% | 96.5% | 0.0% | 100.0% | 96.0% | 0.470 | 0.512 | 0.490 |
 | fixed_top20 | 20.00 | 5.5% | 97.3% | 0.0% | 100.0% | 97.0% | 0.460 | 0.497 | 0.480 |
-| cce_alpha_0.10 | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
-| conflare_alpha_0.10 | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
-| traq_alpha_0.10 | 18.34 | 5.9% | 95.6% | 2.0% | 98.0% | 95.0% | 0.480 | 0.521 | 0.500 |
+| CCE-style positive-cosine proxy (α=0.10) | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
+| CONFLARE-style positive-cosine proxy (α=0.10) | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
+| TRAQ-style loose-positive-cosine proxy (α=0.10) | 18.34 | 5.9% | 95.6% | 2.0% | 98.0% | 95.0% | 0.480 | 0.521 | 0.500 |
 | query_level_cosine_alpha_0.10 | 9.05 | 12.0% | 96.5% | 0.0% | 100.0% | 96.0% | 0.510 | 0.552 | 0.530 |
 | by_cosine_alpha_0.10 | 0.05 | 80.0% | 3.5% | 95.0% | 11.0% | 9.0% | 0.160 | 0.196 | 0.170 |
 | by_cosine_alpha_0.30 | 0.24 | 45.8% | 9.7% | 88.0% | 18.0% | 16.0% | 0.190 | 0.225 | 0.200 |
@@ -64,9 +71,9 @@ The shared split-level provenance and no-overlap audit is in
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | fixed_top10 | 10.00 | 8.9% | 84.8% | 0.0% | 89.0% | 84.0% | 0.190 | 0.292 | 0.270 |
 | fixed_top20 | 20.00 | 5.1% | 96.2% | 0.0% | 97.0% | 96.0% | 0.150 | 0.253 | 0.230 |
-| cce_alpha_0.10 | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
-| conflare_alpha_0.10 | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
-| traq_alpha_0.10 | 23.00 | 4.3% | 95.2% | 4.0% | 95.0% | 95.0% | 0.140 | 0.243 | 0.220 |
+| CCE-style positive-cosine proxy (α=0.10) | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
+| CONFLARE-style positive-cosine proxy (α=0.10) | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
+| TRAQ-style loose-positive-cosine proxy (α=0.10) | 23.00 | 4.3% | 95.2% | 4.0% | 95.0% | 95.0% | 0.140 | 0.243 | 0.220 |
 | query_level_cosine_alpha_0.10 | 11.30 | 8.1% | 87.6% | 0.0% | 91.0% | 87.0% | 0.180 | 0.292 | 0.260 |
 | by_cosine_alpha_0.10 | 0.40 | 10.0% | 3.8% | 94.0% | 13.0% | 12.0% | 0.030 | 0.100 | 0.100 |
 | by_cosine_alpha_0.30 | 1.04 | 6.7% | 6.7% | 90.0% | 16.0% | 15.0% | 0.040 | 0.113 | 0.110 |
@@ -84,9 +91,9 @@ The shared split-level provenance and no-overlap audit is in
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | fixed_top10 | 10.00 | 5.8% | 68.2% | 0.0% | 81.0% | 74.0% | 0.000 | 0.125 | 0.050 |
 | fixed_top20 | 20.00 | 4.0% | 92.9% | 0.0% | 97.0% | 94.0% | 0.000 | 0.128 | 0.050 |
-| cce_alpha_0.10 | 19.82 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
-| conflare_alpha_0.10 | 19.80 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
-| traq_alpha_0.10 | 23.72 | 3.4% | 94.1% | 5.0% | 96.0% | 95.0% | 0.000 | 0.154 | 0.060 |
+| CCE-style positive-cosine proxy (α=0.10) | 19.82 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
+| CONFLARE-style positive-cosine proxy (α=0.10) | 19.80 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
+| TRAQ-style loose-positive-cosine proxy (α=0.10) | 23.72 | 3.4% | 94.1% | 5.0% | 96.0% | 95.0% | 0.000 | 0.154 | 0.060 |
 | query_level_cosine_alpha_0.10 | 17.63 | 4.4% | 90.6% | 0.0% | 96.0% | 92.0% | 0.000 | 0.125 | 0.050 |
 | by_cosine_alpha_0.10 | 0.00 | 0.0% | 0.0% | 100.0% | 30.0% | 30.0% | 0.020 | 0.462 | 0.110 |
 | by_cosine_alpha_0.30 | 0.93 | 1.1% | 1.2% | 95.0% | 31.0% | 31.0% | 0.020 | 0.449 | 0.110 |
