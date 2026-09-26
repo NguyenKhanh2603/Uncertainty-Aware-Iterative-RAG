@@ -51,13 +51,11 @@ Rows marked **†** are the separately run literature-protocol records: they ret
 | CONFLARE-style positive-cosine proxy (α=0.10) | 8.74 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
 | TRAQ-style loose-positive-cosine proxy (α=0.10) | 14.53 | 11.2% | 94.8% | 0.0% | 98.0% | 92.0% | 0.430 | 0.539 | 0.450 |
 | query_level_cosine_alpha_0.10 | 10.60 | 15.1% | 93.0% | 0.0% | 99.0% | 88.0% | 0.420 | 0.537 | 0.440 |
-<!-- literature-protocol-1000cal-start -->
 | Fixed Top-10† | 10.00 | 16.0% | 93.0% | 0.0% | 99.0% | 88.0% | pending | pending | pending |
 | CCE Conformal-Embedding (Jina adaptation)† | 8.75 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | pending | pending | pending |
 | CONFLARE source-question (Jina adaptation)† | 2.14 | 57.0% | 70.9% | 8.0% | 89.0% | 56.0% | pending | pending | pending |
 | TRAQ retrieval, Bonferroni (Jina adaptation)† | 3.39 | 41.3% | 81.4% | 3.0% | 93.0% | 72.0% | pending | pending | pending |
 | Query-level all-support cosine† | 10.60 | 15.1% | 93.0% | 0.0% | 99.0% | 88.0% | pending | pending | pending |
-<!-- literature-protocol-1000cal-end -->
 | by_cosine_alpha_0.10 | 0.17 | 70.6% | 7.0% | 88.0% | 14.0% | 5.0% | 0.130 | 0.233 | 0.130 |
 | by_cosine_alpha_0.30 | 0.42 | 71.4% | 17.4% | 73.0% | 29.0% | 12.0% | 0.170 | 0.266 | 0.170 |
 | by_cosine_alpha_0.50 | 0.74 | 58.1% | 25.0% | 65.0% | 37.0% | 19.0% | 0.210 | 0.309 | 0.210 |
@@ -78,13 +76,11 @@ Rows marked **†** are the separately run literature-protocol records: they ret
 | CONFLARE-style positive-cosine proxy (α=0.10) | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
 | TRAQ-style loose-positive-cosine proxy (α=0.10) | 18.34 | 5.9% | 95.6% | 2.0% | 98.0% | 95.0% | 0.480 | 0.521 | 0.500 |
 | query_level_cosine_alpha_0.10 | 9.05 | 12.0% | 96.5% | 0.0% | 100.0% | 96.0% | 0.510 | 0.552 | 0.530 |
-<!-- literature-protocol-1000cal-start -->
 | Fixed Top-10† | 10.00 | 10.9% | 96.5% | 0.0% | 100.0% | 96.0% | pending | pending | pending |
 | CCE Conformal-Embedding (Jina adaptation)† | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | pending | pending | pending |
 | CONFLARE source-question (Jina adaptation)† | 5.70 | 16.0% | 80.5% | 8.0% | 90.0% | 80.0% | pending | pending | pending |
 | TRAQ retrieval, Bonferroni (Jina adaptation)† | 9.97 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | pending | pending | pending |
 | Query-level all-support cosine† | 9.05 | 12.0% | 96.5% | 0.0% | 100.0% | 96.0% | pending | pending | pending |
-<!-- literature-protocol-1000cal-end -->
 | by_cosine_alpha_0.10 | 0.05 | 80.0% | 3.5% | 95.0% | 11.0% | 9.0% | 0.160 | 0.196 | 0.170 |
 | by_cosine_alpha_0.30 | 0.24 | 45.8% | 9.7% | 88.0% | 18.0% | 16.0% | 0.190 | 0.225 | 0.200 |
 | by_cosine_alpha_0.50 | 0.40 | 37.5% | 13.3% | 82.0% | 22.0% | 20.0% | 0.190 | 0.234 | 0.200 |
@@ -105,13 +101,11 @@ Rows marked **†** are the separately run literature-protocol records: they ret
 | CONFLARE-style positive-cosine proxy (α=0.10) | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
 | TRAQ-style loose-positive-cosine proxy (α=0.10) | 23.00 | 4.3% | 95.2% | 4.0% | 95.0% | 95.0% | 0.140 | 0.243 | 0.220 |
 | query_level_cosine_alpha_0.10 | 11.30 | 8.1% | 87.6% | 0.0% | 91.0% | 87.0% | 0.180 | 0.292 | 0.260 |
-<!-- literature-protocol-1000cal-start -->
 | Fixed Top-10† | 10.00 | 8.9% | 84.8% | 0.0% | 89.0% | 84.0% | pending | pending | pending |
 | CCE Conformal-Embedding (Jina adaptation)† | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | pending | pending | pending |
 | CONFLARE source-question (Jina adaptation)† | 16.52 | 5.6% | 87.6% | 7.0% | 90.0% | 88.0% | pending | pending | pending |
 | TRAQ retrieval, Bonferroni (Jina adaptation)† | 21.57 | 4.5% | 92.4% | 4.0% | 94.0% | 92.0% | pending | pending | pending |
 | Query-level all-support cosine† | 11.30 | 8.1% | 87.6% | 0.0% | 91.0% | 87.0% | pending | pending | pending |
-<!-- literature-protocol-1000cal-end -->
 | by_cosine_alpha_0.10 | 0.40 | 10.0% | 3.8% | 94.0% | 13.0% | 12.0% | 0.030 | 0.100 | 0.100 |
 | by_cosine_alpha_0.30 | 1.04 | 6.7% | 6.7% | 90.0% | 16.0% | 15.0% | 0.040 | 0.113 | 0.110 |
 | by_cosine_alpha_0.50 | 2.85 | 6.0% | 16.2% | 80.0% | 25.0% | 22.0% | 0.040 | 0.102 | 0.090 |
@@ -132,13 +126,11 @@ Rows marked **†** are the separately run literature-protocol records: they ret
 | CONFLARE-style positive-cosine proxy (α=0.10) | 19.80 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
 | TRAQ-style loose-positive-cosine proxy (α=0.10) | 23.72 | 3.4% | 94.1% | 5.0% | 96.0% | 95.0% | 0.000 | 0.154 | 0.060 |
 | query_level_cosine_alpha_0.10 | 17.63 | 4.4% | 90.6% | 0.0% | 96.0% | 92.0% | 0.000 | 0.125 | 0.050 |
-<!-- literature-protocol-1000cal-start -->
 | Fixed Top-10† | 10.00 | 5.8% | 68.2% | 0.0% | 81.0% | 74.0% | pending | pending | pending |
 | CCE Conformal-Embedding (Jina adaptation)† | 19.82 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | pending | pending | pending |
 | CONFLARE source-question (Jina adaptation)† | 18.27 | 3.8% | 82.4% | 10.0% | 89.0% | 85.0% | pending | pending | pending |
 | TRAQ retrieval, Bonferroni (Jina adaptation)† | 22.17 | 3.5% | 91.8% | 8.0% | 95.0% | 93.0% | pending | pending | pending |
 | Query-level all-support cosine† | 17.63 | 4.4% | 90.6% | 0.0% | 96.0% | 92.0% | pending | pending | pending |
-<!-- literature-protocol-1000cal-end -->
 | by_cosine_alpha_0.10 | 0.00 | 0.0% | 0.0% | 100.0% | 30.0% | 30.0% | 0.020 | 0.462 | 0.110 |
 | by_cosine_alpha_0.30 | 0.93 | 1.1% | 1.2% | 95.0% | 31.0% | 31.0% | 0.020 | 0.449 | 0.110 |
 | by_cosine_alpha_0.50 | 1.06 | 1.9% | 2.4% | 94.0% | 32.0% | 32.0% | 0.020 | 0.443 | 0.110 |
