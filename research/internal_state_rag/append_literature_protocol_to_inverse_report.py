@@ -23,8 +23,6 @@ from research.internal_state_rag.run_literature_protocol_1000cal import (
 
 
 DATASETS = ("hotpotqa", "mmqa", "tatqa", "webqa")
-START = "<!-- literature-protocol-1000cal-start -->"
-END = "<!-- literature-protocol-1000cal-end -->"
 METRIC_START = "<!-- metric-definitions-start -->"
 METRIC_END = "<!-- metric-definitions-end -->"
 
@@ -101,17 +99,27 @@ def insert_rows(text: str, dataset: str, rows: list[str]) -> str:
     if end < 0:
         end = len(text)
     section = text[start:end]
-    block = "\n".join([START, *rows, END])
-    if START in section:
-        section = replace_bounded(section, START, END, block)
-    else:
-        # The existing query-level cosine row is the last non-BY row.  Insert
-        # after it so the new entries remain in the same selection table.
-        anchor = "| query_level_cosine_alpha_0.10 |"
-        row_end = section.find("\n", section.find(anchor))
-        if row_end < 0 or anchor not in section:
-            raise RuntimeError(f"{dataset}: cannot find query-level row anchor")
-        section = section[: row_end + 1] + block + "\n" + section[row_end + 1 :]
+    # GitHub-flavored Markdown tables cannot contain an HTML marker line: it
+    # terminates the table and makes the following rows render as prose.  Rows
+    # are instead identified by their unique display prefixes on re-runs.
+    prefixes = tuple(f"| {DISPLAY[method]}† |" for method in METHODS)
+    section_lines = [
+        line
+        for line in section.splitlines(keepends=True)
+        if not line.startswith(prefixes)
+        and line.strip()
+        not in {"<!-- literature-protocol-1000cal-start -->", "<!-- literature-protocol-1000cal-end -->"}
+    ]
+    section = "".join(section_lines)
+    block = "\n".join(rows)
+    # The existing query-level cosine row is the last non-BY row. Insert after
+    # it so the new entries remain in the same Markdown table.
+    anchor = "| query_level_cosine_alpha_0.10 |"
+    anchor_start = section.find(anchor)
+    row_end = section.find("\n", anchor_start)
+    if anchor_start < 0 or row_end < 0:
+        raise RuntimeError(f"{dataset}: cannot find query-level row anchor")
+    section = section[: row_end + 1] + block + "\n" + section[row_end + 1 :]
     return text[:start] + section + text[end:]
 
 
