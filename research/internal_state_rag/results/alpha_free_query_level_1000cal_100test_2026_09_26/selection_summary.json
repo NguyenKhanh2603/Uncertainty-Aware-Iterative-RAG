@@ -1,0 +1,330 @@
+{
+  "hotpotqa": {
+    "calibration_queries": 1000,
+    "dataset": "hotpotqa",
+    "methods": {
+      "query_level_budget10_all_support": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.27962697035347783,
+          "held_out_evidence_f1_std": 0.008119902108174907,
+          "held_out_mean_chunks_mean": 9.887
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.28138265615524555,
+          "mean_chunks": 9.81,
+          "precision": 0.1655453618756371,
+          "query_all_support_conditional": 0.8910191725529768,
+          "query_any_support_conditional": 0.992936427850656,
+          "support_recall": 0.9371032890940566
+        },
+        "definition": "Query-level cosine, calibration-selected all-support under 10-chunk budget",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.27562446167097326,
+          "mean_chunks": 9.89,
+          "precision": 0.16177957532861476,
+          "query_all_support_conditional": 0.8775510204081632,
+          "query_any_support_conditional": 0.9897959183673469,
+          "support_recall": 0.9302325581395349
+        },
+        "threshold": -0.03109235562995325
+      },
+      "query_level_conformal_alpha_0.10_reference": {
+        "calibration": {
+          "finite_sample_order": 893,
+          "retrievable_calibration_queries": 991,
+          "threshold": -0.08596044143713166,
+          "top1_fallback_queries": 0
+        },
+        "definition": "Existing query-level all-support conformal reference; alpha=0.10.",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.2597402597402597,
+          "mean_chunks": 10.6,
+          "precision": 0.1509433962264151,
+          "query_all_support_conditional": 0.8775510204081632,
+          "query_any_support_conditional": 0.9897959183673469,
+          "support_recall": 0.9302325581395349
+        }
+      },
+      "query_level_f1_calibrated": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.7134394514991051,
+          "held_out_evidence_f1_std": 0.021426398566794676,
+          "held_out_mean_chunks_mean": 1.5230000000000001
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.7150290786654423,
+          "mean_chunks": 1.534,
+          "precision": 0.7614080834419817,
+          "query_all_support_conditional": 0.4661957618567104,
+          "query_any_support_conditional": 0.9283551967709385,
+          "support_recall": 0.6739757645701097
+        },
+        "definition": "Query-level cosine, calibration-selected evidence F1 (alpha-free at test)",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.7305389221556886,
+          "mean_chunks": 1.62,
+          "precision": 0.7530864197530864,
+          "query_all_support_conditional": 0.5306122448979592,
+          "query_any_support_conditional": 0.9081632653061225,
+          "support_recall": 0.7093023255813954
+        },
+        "threshold": 2.0949528497220156
+      }
+    },
+    "test_queries": 100,
+    "top_l": 30
+  },
+  "mmqa": {
+    "calibration_queries": 1000,
+    "dataset": "mmqa",
+    "methods": {
+      "query_level_budget10_all_support": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.19810699898088918,
+          "held_out_evidence_f1_std": 0.0042767194410759405,
+          "held_out_mean_chunks_mean": 9.834000000000001
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.1977942505875972,
+          "mean_chunks": 9.87,
+          "precision": 0.11084093211752787,
+          "query_all_support_conditional": 0.9050701186623517,
+          "query_any_support_conditional": 0.9665587918015103,
+          "support_recall": 0.9177852348993288
+        },
+        "definition": "Query-level cosine, calibration-selected all-support under 10-chunk budget",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.2026022304832714,
+          "mean_chunks": 9.63,
+          "precision": 0.11318795430944964,
+          "query_all_support_conditional": 0.956989247311828,
+          "query_any_support_conditional": 1.0,
+          "support_recall": 0.9646017699115044
+        },
+        "threshold": -0.0006473518727360385
+      },
+      "query_level_conformal_alpha_0.10_reference": {
+        "calibration": {
+          "finite_sample_order": 836,
+          "retrievable_calibration_queries": 927,
+          "threshold": 0.04547165129619883,
+          "top1_fallback_queries": 0
+        },
+        "definition": "Existing query-level all-support conformal reference; alpha=0.10.",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.21414538310412573,
+          "mean_chunks": 9.05,
+          "precision": 0.12044198895027625,
+          "query_all_support_conditional": 0.956989247311828,
+          "query_any_support_conditional": 1.0,
+          "support_recall": 0.9646017699115044
+        }
+      },
+      "query_level_f1_calibrated": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.6775984180558987,
+          "held_out_evidence_f1_std": 0.03544198383099385,
+          "held_out_mean_chunks_mean": 1.066
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.6775907883082374,
+          "mean_chunks": 1.066,
+          "precision": 0.7176360225140713,
+          "query_all_support_conditional": 0.5814455231930961,
+          "query_any_support_conditional": 0.8047464940668824,
+          "support_recall": 0.6417785234899329
+        },
+        "definition": "Query-level cosine, calibration-selected evidence F1 (alpha-free at test)",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.6820276497695853,
+          "mean_chunks": 1.04,
+          "precision": 0.7115384615384616,
+          "query_all_support_conditional": 0.6236559139784946,
+          "query_any_support_conditional": 0.7956989247311828,
+          "support_recall": 0.6548672566371682
+        },
+        "threshold": 2.9657069278725783
+      }
+    },
+    "test_queries": 100,
+    "top_l": 30
+  },
+  "tatqa": {
+    "calibration_queries": 1000,
+    "dataset": "tatqa",
+    "methods": {
+      "query_level_budget10_all_support": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.175533280665838,
+          "held_out_evidence_f1_std": 0.0034323895509360955,
+          "held_out_mean_chunks_mean": 9.833000000000002
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.17528131003567834,
+          "mean_chunks": 9.87,
+          "precision": 0.09706180344478217,
+          "query_all_support_conditional": 0.8916046758767269,
+          "query_any_support_conditional": 0.9341126461211477,
+          "support_recall": 0.9029217719132894
+        },
+        "definition": "Query-level cosine, calibration-selected all-support under 10-chunk budget",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.16216216216216214,
+          "mean_chunks": 10.05,
+          "precision": 0.08955223880597014,
+          "query_all_support_conditional": 0.8351648351648352,
+          "query_any_support_conditional": 0.8901098901098901,
+          "support_recall": 0.8571428571428571
+        },
+        "threshold": 0.09750651587043506
+      },
+      "query_level_conformal_alpha_0.10_reference": {
+        "calibration": {
+          "finite_sample_order": 848,
+          "retrievable_calibration_queries": 941,
+          "threshold": -0.03361823925974544,
+          "top1_fallback_queries": 0
+        },
+        "definition": "Existing query-level all-support conformal reference; alpha=0.10.",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.14898785425101216,
+          "mean_chunks": 11.3,
+          "precision": 0.08141592920353982,
+          "query_all_support_conditional": 0.8571428571428571,
+          "query_any_support_conditional": 0.9010989010989011,
+          "support_recall": 0.8761904761904762
+        }
+      },
+      "query_level_f1_calibrated": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.5007700517764577,
+          "held_out_evidence_f1_std": 0.042401960082058224,
+          "held_out_mean_chunks_mean": 1.0869999999999997
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.507532956685499,
+          "mean_chunks": 1.063,
+          "precision": 0.5070555032925682,
+          "query_all_support_conditional": 0.4952178533475027,
+          "query_any_support_conditional": 0.5717321997874601,
+          "support_recall": 0.5080113100848256
+        },
+        "definition": "Query-level cosine, calibration-selected evidence F1 (alpha-free at test)",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.4694835680751174,
+          "mean_chunks": 1.08,
+          "precision": 0.46296296296296297,
+          "query_all_support_conditional": 0.46153846153846156,
+          "query_any_support_conditional": 0.5494505494505495,
+          "support_recall": 0.47619047619047616
+        },
+        "threshold": 2.7423888702684347
+      }
+    },
+    "test_queries": 100,
+    "top_l": 30
+  },
+  "webqa": {
+    "calibration_queries": 1000,
+    "dataset": "webqa",
+    "methods": {
+      "query_level_budget10_all_support": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.21228775793962304,
+          "held_out_evidence_f1_std": 0.10128199715330032,
+          "held_out_mean_chunks_mean": 9.958
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.212691466083151,
+          "mean_chunks": 9.99,
+          "precision": 0.12162162162162163,
+          "query_all_support_conditional": 0.7659817351598174,
+          "query_any_support_conditional": 0.8710045662100456,
+          "support_recall": 0.8466898954703833
+        },
+        "definition": "Query-level cosine, calibration-selected all-support under 10-chunk budget",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.11060743427017225,
+          "mean_chunks": 10.18,
+          "precision": 0.05992141453831041,
+          "query_all_support_conditional": 0.6714285714285714,
+          "query_any_support_conditional": 0.7714285714285715,
+          "support_recall": 0.7176470588235294
+        },
+        "threshold": 0.12239534613276805
+      },
+      "query_level_conformal_alpha_0.10_reference": {
+        "calibration": {
+          "finite_sample_order": 790,
+          "retrievable_calibration_queries": 876,
+          "threshold": -0.4762793413219147,
+          "top1_fallback_queries": 0
+        },
+        "definition": "Existing query-level all-support conformal reference; alpha=0.10.",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.08333333333333333,
+          "mean_chunks": 17.63,
+          "precision": 0.04367555303460011,
+          "query_all_support_conditional": 0.8857142857142857,
+          "query_any_support_conditional": 0.9428571428571428,
+          "support_recall": 0.9058823529411765
+        }
+      },
+      "query_level_f1_calibrated": {
+        "calibration_cross_validation": {
+          "folds": 5,
+          "held_out_evidence_f1_mean": 0.3924016423657644,
+          "held_out_evidence_f1_std": 0.2057660267208813,
+          "held_out_mean_chunks_mean": 1.598
+        },
+        "calibration_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.4238628872775214,
+          "mean_chunks": 1.599,
+          "precision": 0.40212632895559725,
+          "query_all_support_conditional": 0.2511415525114155,
+          "query_any_support_conditional": 0.589041095890411,
+          "support_recall": 0.4480836236933798
+        },
+        "definition": "Query-level cosine, calibration-selected evidence F1 (alpha-free at test)",
+        "test_selection": {
+          "empty_rate": 0.0,
+          "evidence_f1": 0.14754098360655737,
+          "mean_chunks": 1.59,
+          "precision": 0.11320754716981132,
+          "query_all_support_conditional": 0.2,
+          "query_any_support_conditional": 0.2571428571428571,
+          "support_recall": 0.21176470588235294
+        },
+        "threshold": 2.106393785057944
+      }
+    },
+    "test_queries": 100,
+    "top_l": 30
+  }
+}
