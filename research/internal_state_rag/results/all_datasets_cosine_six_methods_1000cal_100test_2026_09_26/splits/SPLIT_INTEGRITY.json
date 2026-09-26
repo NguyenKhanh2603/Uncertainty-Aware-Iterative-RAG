@@ -1,0 +1,45 @@
+{
+  "protocol": "inverse_1000_calibration_100_heldout_test_2026_09_26",
+  "top_l": 30,
+  "datasets": {
+    "hotpotqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap_count": 0,
+      "source_role_counts": {
+        "calibration": 1000,
+        "test": 1000
+      }
+    },
+    "mmqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap_count": 0,
+      "source_role_counts": {
+        "calibration": 496,
+        "development": 504,
+        "test": 1000
+      }
+    },
+    "tatqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap_count": 0,
+      "source_role_counts": {
+        "development": 516,
+        "calibration": 484,
+        "test": 1000
+      }
+    },
+    "webqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap_count": 0,
+      "source_role_counts": {
+        "calibration": 535,
+        "development": 465,
+        "test": 250
+      }
+    }
+  }
+}

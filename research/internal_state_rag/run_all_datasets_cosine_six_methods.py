@@ -1,7 +1,9 @@
 """Evaluate cosine conformal context selectors on all four QA datasets.
 
 Every selector for a dataset receives its frozen Top-30 cosine log and the
-same disjoint 100-query calibration plan.  The six selector families are CCE,
+same disjoint calibration plan.  ``--plan-root`` may replace the historical
+100-calibration/full-test manifests with an explicitly materialized protocol.
+The six selector families are CCE,
 CONFLARE, TRAQ retrieval, candidate-level BY, query-level cosine conformal,
 and candidate-level BH.  BH's rank cap is explicitly experimental.
 
@@ -176,7 +178,7 @@ def metric_summary(records: Sequence[dict[str, Any]], methods: Sequence[str]) ->
 def make_report(output: Path, results: dict[str, dict[str, Any]], meta: dict[str, Any]) -> None:
     lines = [
         "# Cosine conformal selector comparison", "",
-        "Every row within a dataset uses the same frozen Top-30 cosine candidates and its disjoint 100-query calibration plan. Query-level cosine is the pure per-query z-scored cosine threshold with a deterministic Top-1 empty-context fallback. BH context caps are experimental rank-ordered policies and have no claimed capped-procedure FDR guarantee.",
+        "Every row within a dataset uses the same frozen Top-30 cosine candidates and its disjoint calibration plan. Query-level cosine is the pure per-query z-scored cosine threshold with a deterministic Top-1 empty-context fallback. BH context caps are experimental rank-ordered policies and have no claimed capped-procedure FDR guarantee.",
         "",
     ]
     for dataset, result in results.items():
@@ -191,20 +193,67 @@ def make_report(output: Path, results: dict[str, dict[str, Any]], meta: dict[str
     output.write_text("\n".join(lines), encoding="utf-8")
 
 
-def load_dataset(config: DatasetConfig) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
+def load_dataset(
+    config: DatasetConfig,
+    *,
+    calibration_plan: Path | None = None,
+    test_plan: Path | None = None,
+) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
     retrieval = grouped(iter_retrieval(config.retrieval))
-    calibration_qids = read_plan(config.calibration_plan)
-    test_qids = read_plan(config.test_plan) if config.test_plan else sorted(retrieval["test"])
-    calibration = [retrieval["calibration"][qid] for qid in calibration_qids]
-    test = [retrieval["test"][qid] for qid in test_qids]
+    all_queries: dict[str, list[dict[str, Any]]] = {}
+    for by_role in retrieval.values():
+        for qid, rows in by_role.items():
+            if qid in all_queries:
+                raise ValueError(f"{config.name}: qid {qid} appears in more than one retrieval role")
+            all_queries[qid] = rows
+    calibration_qids = read_plan(calibration_plan or config.calibration_plan)
+    selected_test_plan = test_plan or config.test_plan
+    test_qids = read_plan(selected_test_plan) if selected_test_plan else sorted(retrieval["test"])
+    overlap = set(calibration_qids).intersection(test_qids)
+    if overlap:
+        raise ValueError(f"{config.name}: calibration/test qids overlap: {sorted(overlap)[:3]}")
+    missing = [qid for qid in calibration_qids + test_qids if qid not in all_queries]
+    if missing:
+        raise ValueError(f"{config.name}: retrieval is missing planned qids: {missing[:3]}")
+    calibration = [all_queries[qid] for qid in calibration_qids]
+    test = [all_queries[qid] for qid in test_qids]
     if any(len(rows) != 30 for rows in calibration + test):
         raise ValueError(f"{config.name}: expected exactly 30 candidates per planned query")
     return calibration_qids, calibration, test_qids, test
 
 
+def validate_downstream_inputs(
+    config: DatasetConfig,
+    test_qids: Sequence[str],
+    test: Sequence[Sequence[dict[str, Any]]],
+) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
+    """Fail before Qwen loads if an inverse-plan qid, chunk, or image is absent."""
+
+    questions, corpus = keyed(config.questions, "qid"), keyed(config.corpus, "id")
+    missing_questions = [qid for qid in test_qids if qid not in questions]
+    if missing_questions:
+        raise ValueError(f"{config.name}: question bundle is missing {missing_questions[:3]}")
+    missing_chunks = sorted(
+        {str(row["chunk_id"]) for rows in test for row in rows}.difference(corpus)
+    )
+    if missing_chunks:
+        raise ValueError(f"{config.name}: corpus is missing {missing_chunks[:3]}")
+    for rows in test:
+        chunks(rows, np.ones(len(rows), dtype=bool), corpus, config.bundle_root)
+    return questions, corpus
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument(
+        "--plan-root",
+        type=Path,
+        help=(
+            "Optional root containing {dataset}/calibration_manifest.json and "
+            "{dataset}/test_manifest.json. Both plans are validated as disjoint."
+        ),
+    )
     parser.add_argument("--datasets", default="hotpotqa,mmqa,tatqa,webqa")
     parser.add_argument(
         "--methods",
@@ -256,7 +305,16 @@ def main() -> None:
     pending: list[tuple[DatasetConfig, list[str], list[list[dict[str, Any]]], dict[str, list[np.ndarray]]]] = []
     for name in names:
         config = CONFIGS[name]
-        calibration_qids, calibration, test_qids, test = load_dataset(config)
+        calibration_plan = None
+        test_plan = None
+        if args.plan_root is not None:
+            calibration_plan = args.plan_root / name / "calibration_manifest.json"
+            test_plan = args.plan_root / name / "test_manifest.json"
+            if not calibration_plan.is_file() or not test_plan.is_file():
+                raise FileNotFoundError(f"Missing plan files for {name} under {args.plan_root}")
+        calibration_qids, calibration, test_qids, test = load_dataset(
+            config, calibration_plan=calibration_plan, test_plan=test_plan
+        )
         masks, thresholds = all_masks(calibration, test)
         if args.internal_fusion_predictions is not None:
             if not args.internal_fusion_predictions.is_file():
@@ -302,14 +360,25 @@ def main() -> None:
             "thresholds": thresholds, "selection": selection_summary(test, masks),
         }
         pending.append((config, test_qids, test, masks))
-    meta = {"selector_families": ["CCE", "CONFLARE", "TRAQ retrieval", "BY cosine", "query-level cosine", "BH cosine"], "top_l": 30, "calibration_queries_per_dataset": 100, "BH_note": "BH normally needs independence or suitable positive dependence; its rank cap is experimental."}
+    meta = {
+        "selector_families": ["CCE", "CONFLARE", "TRAQ retrieval", "BY cosine", "query-level cosine", "BH cosine"],
+        "top_l": 30,
+        "calibration_queries_per_dataset": {name: state[name]["calibration_queries"] for name in names},
+        "test_queries_per_dataset": {name: state[name]["test_queries"] for name in names},
+        "plan_root": str(args.plan_root) if args.plan_root else None,
+        "BH_note": "BH normally needs independence or suitable positive dependence; its rank cap is experimental.",
+    }
     make_report(args.output_dir / "REPORT.md", state, meta)
     (args.output_dir / "selection_summary.json").write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
     if args.selection_only:
         return
+    resolved_inputs = {
+        config.name: validate_downstream_inputs(config, test_qids, test)
+        for config, test_qids, test, _masks in pending
+    }
     generator = QwenDirectAnswerGenerator(args.model, min_pixels=args.min_pixels, max_pixels=args.max_pixels)
     for config, test_qids, test, masks in pending:
-        questions, corpus = keyed(config.questions, "qid"), keyed(config.corpus, "id")
+        questions, corpus = resolved_inputs[config.name]
         prediction_path = args.output_dir / f"{config.name}_downstream_predictions.jsonl"
         done = {str(row["qid"]): row for row in iter_jsonl(prediction_path)} if prediction_path.exists() else {}
         methods = list(masks)
