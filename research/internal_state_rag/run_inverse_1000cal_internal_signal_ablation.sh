@@ -38,7 +38,13 @@ for dataset in hotpotqa mmqa tatqa webqa; do
       ;;
   esac
 
-  for role in probe_train conformal_calibration; do
+  roles=(probe_train conformal_calibration)
+  # HotpotQA is freshly extracted because its historical cache had no manifest;
+  # MMQA/TAT-QA/WebQA test artifacts were validated and materialized by prepare.
+  if [[ ! -f "$base/features/$dataset/test/features.npz" ]]; then
+    roles+=(test)
+  fi
+  for role in "${roles[@]}"; do
     features="$base/features/$dataset/$role/features.npz"
     if [[ ! -f "$features" ]]; then
       PYTHONPATH=src:. "$python_bin" research/internal_state_rag/run_qwen2vl_pairwise_features.py \

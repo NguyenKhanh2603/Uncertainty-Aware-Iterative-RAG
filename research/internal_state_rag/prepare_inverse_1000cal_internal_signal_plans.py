@@ -28,9 +28,10 @@ import numpy as np
 
 DATASETS = ("hotpotqa", "mmqa", "tatqa", "webqa")
 TEST_FEATURE_SOURCES = {
-    "hotpotqa": Path(
-        "research/internal_state_rag/results/official_seed42_hotpot_features/test"
-    ),
+    # This legacy HotpotQA cache lacks its feature manifest, so re-extract the
+    # 100 held-out rows from the pinned Qwen-7B model rather than assuming its
+    # provenance. The other three sources have complete manifests to validate.
+    "hotpotqa": None,
     "mmqa": Path(
         "research/internal_state_rag/results/qwen2vl_7b_jina4/"
         "full_test_internal_fusion_2026_09_25_v2/features/mmqa"
@@ -136,11 +137,24 @@ def plan_payload(
 def validate_existing_test_features(
     *,
     dataset: str,
-    source_dir: Path,
+    source_dir: Path | None,
     test_qids: list[str],
     expected_chunk_ids: list[list[str]],
     target: Path,
 ) -> dict[str, Any]:
+    if source_dir is None:
+        if target.is_file():
+            with np.load(target) as existing:
+                if existing["qids"].astype(str).tolist() != test_qids:
+                    raise RuntimeError(f"{dataset}: fresh test feature qids differ")
+                if existing["chunk_ids"].astype(str).tolist() != expected_chunk_ids:
+                    raise RuntimeError(f"{dataset}: fresh test feature candidates differ")
+        return {
+            "method": "fresh_qwen2vl_7b_extraction_required",
+            "reason": "legacy cached feature file has no model manifest",
+            "n_queries": len(test_qids),
+            "qids": test_qids,
+        }
     source_npz = source_dir / "features.npz"
     source_manifest = source_dir / "manifest.json"
     if not source_npz.is_file() or not source_manifest.is_file():
@@ -312,7 +326,11 @@ def main() -> None:
                 "conformal_calibration__heldout_test": len(set(conformal_qids) & set(test_qids)),
             },
             "source_role_counts": dict(Counter((probe_role,) * len(probe_qids) + (conformal_role,) * len(conformal_qids))),
-            "test_feature_source": str(TEST_FEATURE_SOURCES[dataset]),
+            "test_feature_source": (
+                str(TEST_FEATURE_SOURCES[dataset])
+                if TEST_FEATURE_SOURCES[dataset] is not None
+                else "fresh_qwen2vl_7b_extraction"
+            ),
         }
         print(
             f"{dataset}: probe={len(probe_qids)} calibration={len(conformal_qids)} test={len(test_qids)}",
