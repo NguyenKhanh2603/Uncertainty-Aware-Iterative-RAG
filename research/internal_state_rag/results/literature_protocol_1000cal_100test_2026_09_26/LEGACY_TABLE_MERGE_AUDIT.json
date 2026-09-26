@@ -1,0 +1,24 @@
+{
+  "datasets": {
+    "hotpotqa": {
+      "calibration_qids": 1000,
+      "test_qids": 100,
+      "downstream_complete": false
+    },
+    "mmqa": {
+      "calibration_qids": 1000,
+      "test_qids": 100,
+      "downstream_complete": false
+    },
+    "tatqa": {
+      "calibration_qids": 1000,
+      "test_qids": 100,
+      "downstream_complete": false
+    },
+    "webqa": {
+      "calibration_qids": 1000,
+      "test_qids": 100,
+      "downstream_complete": false
+    }
+  }
+}
