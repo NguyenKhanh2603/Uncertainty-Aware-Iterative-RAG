@@ -1,0 +1,37 @@
+{
+  "status": "complete",
+  "datasets": {
+    "hotpotqa": {
+      "probe_train_queries": 500,
+      "conformal_calibration_queries": 500,
+      "heldout_test_queries": 100,
+      "downstream_records": 100,
+      "selected_layer": 19,
+      "selected_c": 0.03
+    },
+    "mmqa": {
+      "probe_train_queries": 504,
+      "conformal_calibration_queries": 496,
+      "heldout_test_queries": 100,
+      "downstream_records": 100,
+      "selected_layer": 19,
+      "selected_c": 0.003
+    },
+    "tatqa": {
+      "probe_train_queries": 516,
+      "conformal_calibration_queries": 484,
+      "heldout_test_queries": 100,
+      "downstream_records": 100,
+      "selected_layer": 19,
+      "selected_c": 0.01
+    },
+    "webqa": {
+      "probe_train_queries": 465,
+      "conformal_calibration_queries": 535,
+      "heldout_test_queries": 100,
+      "downstream_records": 100,
+      "selected_layer": 19,
+      "selected_c": 0.03
+    }
+  }
+}

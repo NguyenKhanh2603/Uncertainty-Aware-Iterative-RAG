@@ -1,0 +1,78 @@
+{
+  "protocol": "inverse_1000_calibration_100_test_internal_signal_2026_09_26",
+  "partition_policy": {
+    "hotpotqa": "SHA256(seed=20260926,qid) balanced 500/500 within calibration role",
+    "mmqa": "development role (504) probe train; calibration role (496) conformal calibration",
+    "tatqa": "development role (516) probe train; calibration role (484) conformal calibration",
+    "webqa": "development role (465) probe train; calibration role (535) conformal calibration"
+  },
+  "datasets": {
+    "hotpotqa": {
+      "parent_calibration_queries": 1000,
+      "probe_train_queries": 500,
+      "conformal_calibration_queries": 500,
+      "heldout_test_queries": 100,
+      "top_l": 30,
+      "overlaps": {
+        "probe_train__conformal_calibration": 0,
+        "probe_train__heldout_test": 0,
+        "conformal_calibration__heldout_test": 0
+      },
+      "source_role_counts": {
+        "calibration": 1000
+      },
+      "test_feature_source": "fresh_qwen2vl_7b_extraction"
+    },
+    "mmqa": {
+      "parent_calibration_queries": 1000,
+      "probe_train_queries": 504,
+      "conformal_calibration_queries": 496,
+      "heldout_test_queries": 100,
+      "top_l": 30,
+      "overlaps": {
+        "probe_train__conformal_calibration": 0,
+        "probe_train__heldout_test": 0,
+        "conformal_calibration__heldout_test": 0
+      },
+      "source_role_counts": {
+        "development": 504,
+        "calibration": 496
+      },
+      "test_feature_source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/features/mmqa"
+    },
+    "tatqa": {
+      "parent_calibration_queries": 1000,
+      "probe_train_queries": 516,
+      "conformal_calibration_queries": 484,
+      "heldout_test_queries": 100,
+      "top_l": 30,
+      "overlaps": {
+        "probe_train__conformal_calibration": 0,
+        "probe_train__heldout_test": 0,
+        "conformal_calibration__heldout_test": 0
+      },
+      "source_role_counts": {
+        "development": 516,
+        "calibration": 484
+      },
+      "test_feature_source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/features/tatqa"
+    },
+    "webqa": {
+      "parent_calibration_queries": 1000,
+      "probe_train_queries": 465,
+      "conformal_calibration_queries": 535,
+      "heldout_test_queries": 100,
+      "top_l": 30,
+      "overlaps": {
+        "probe_train__conformal_calibration": 0,
+        "probe_train__heldout_test": 0,
+        "conformal_calibration__heldout_test": 0
+      },
+      "source_role_counts": {
+        "development": 465,
+        "calibration": 535
+      },
+      "test_feature_source": "research/internal_state_rag/results/qwen2vl_7b_jina4/full_test_internal_fusion_2026_09_25_v2/features/webqa"
+    }
+  }
+}
