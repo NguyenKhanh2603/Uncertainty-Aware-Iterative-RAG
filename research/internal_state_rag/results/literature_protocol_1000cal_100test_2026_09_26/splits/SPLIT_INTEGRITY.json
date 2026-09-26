@@ -1,0 +1,29 @@
+{
+  "protocol": "literature_retrieval_constructions_on_inverse_1000cal_100test",
+  "datasets": {
+    "hotpotqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "frozen_top_l": 30
+    },
+    "mmqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "frozen_top_l": 30
+    },
+    "tatqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "frozen_top_l": 30
+    },
+    "webqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "frozen_top_l": 30
+    }
+  }
+}
