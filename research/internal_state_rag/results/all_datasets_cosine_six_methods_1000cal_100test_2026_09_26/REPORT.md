@@ -2,6 +2,22 @@
 
 Every row within a dataset uses the same frozen Top-30 cosine candidates and its disjoint calibration plan. Query-level cosine is the pure per-query z-scored cosine threshold with a deterministic Top-1 empty-context fallback. BH context caps are experimental rank-ordered policies and have no claimed capped-procedure FDR guarantee.
 
+## Exact 1,000-calibration / 100-test splits
+
+The qid lists used for every row are versioned here. Each calibration manifest
+has exactly 1,000 qids and each test manifest has exactly 100 distinct held-out
+qids:
+
+| Dataset | Calibration qids | Held-out test qids |
+|---|---|---|
+| HotpotQA | [calibration manifest](splits/hotpotqa/calibration_manifest.json) | [test manifest](splits/hotpotqa/test_manifest.json) |
+| MMQA | [calibration manifest](splits/mmqa/calibration_manifest.json) | [test manifest](splits/mmqa/test_manifest.json) |
+| TAT-QA | [calibration manifest](splits/tatqa/calibration_manifest.json) | [test manifest](splits/tatqa/test_manifest.json) |
+| WebQA | [calibration manifest](splits/webqa/calibration_manifest.json) | [test manifest](splits/webqa/test_manifest.json) |
+
+The shared split-level provenance and no-overlap audit is in
+[SPLIT_INTEGRITY.json](splits/SPLIT_INTEGRITY.json).
+
 ## hotpotqa (complete; n=100)
 
 | Method | Chunks | Precision | Recall | Empty | Any support | All support | EM | F1 | Numeric |
