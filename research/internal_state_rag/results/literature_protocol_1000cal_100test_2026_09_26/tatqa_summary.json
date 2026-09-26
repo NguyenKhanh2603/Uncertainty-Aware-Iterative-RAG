@@ -1,0 +1,131 @@
+{
+  "status": "complete",
+  "calibration_queries": 1000,
+  "test_queries": 100,
+  "thresholds": {
+    "cce_conformal_embedding_jina_alpha_0.10": {
+      "positive_pairs": 1061,
+      "nonconformity_threshold": 0.3985612988471985,
+      "similarity_threshold": 0.6014387011528015,
+      "calibration_unit": "labelled_relevant_question_chunk_pair"
+    },
+    "conflare_source_question_jina_alpha_0.10": {
+      "calibration_records": 941,
+      "distance_threshold": 0.39303016662597656,
+      "similarity_threshold": 0.6069698333740234,
+      "calibration_unit": "one_first_known_relevant_chunk_per_question",
+      "question_source": "benchmark_human_question_with_labelled_support"
+    },
+    "traq_retrieval_bonferroni_jina_alpha_0.10": {
+      "retrievable_calibration_queries": 941,
+      "similarity_threshold": 0.5787214040756226,
+      "total_alpha": 0.1,
+      "alpha_retrieval": 0.05,
+      "alpha_answer": 0.05,
+      "calibration_unit": "one_best_true_retrieval_score_per_question",
+      "scope": "retrieval_component_only; no_answer_prediction_set"
+    },
+    "query_level_all_support_cosine_alpha_0.10": {
+      "threshold": -0.03361823925974544,
+      "finite_sample_order": 848,
+      "retrievable_calibration_queries": 941,
+      "top1_fallback_queries": 0
+    },
+    "calibration_queries": 1000,
+    "calibration_retrievable_queries": 941
+  },
+  "selection": {
+    "fixed_top10": {
+      "mean_chunks": 10.0,
+      "precision": 0.089,
+      "support_recall": 0.8476190476190476,
+      "empty_rate": 0.0,
+      "retrievable_queries": 91,
+      "retrieval_query_coverage_ceiling": 0.91,
+      "query_any_support_conditional": 0.8791208791208791,
+      "query_all_support_conditional": 0.8241758241758241,
+      "selected_chunks": 1000,
+      "selected_supports": 89,
+      "reserve_supports": 105
+    },
+    "cce_conformal_embedding_jina_alpha_0.10": {
+      "mean_chunks": 17.8,
+      "precision": 0.051685393258426963,
+      "support_recall": 0.8761904761904762,
+      "empty_rate": 0.06,
+      "retrievable_queries": 91,
+      "retrieval_query_coverage_ceiling": 0.91,
+      "query_any_support_conditional": 0.8901098901098901,
+      "query_all_support_conditional": 0.8681318681318682,
+      "selected_chunks": 1780,
+      "selected_supports": 92,
+      "reserve_supports": 105
+    },
+    "conflare_source_question_jina_alpha_0.10": {
+      "mean_chunks": 16.52,
+      "precision": 0.05569007263922518,
+      "support_recall": 0.8761904761904762,
+      "empty_rate": 0.07,
+      "retrievable_queries": 91,
+      "retrieval_query_coverage_ceiling": 0.91,
+      "query_any_support_conditional": 0.8901098901098901,
+      "query_all_support_conditional": 0.8681318681318682,
+      "selected_chunks": 1652,
+      "selected_supports": 92,
+      "reserve_supports": 105
+    },
+    "traq_retrieval_bonferroni_jina_alpha_0.10": {
+      "mean_chunks": 21.57,
+      "precision": 0.0449698655540102,
+      "support_recall": 0.9238095238095239,
+      "empty_rate": 0.04,
+      "retrievable_queries": 91,
+      "retrieval_query_coverage_ceiling": 0.91,
+      "query_any_support_conditional": 0.9340659340659341,
+      "query_all_support_conditional": 0.9120879120879121,
+      "selected_chunks": 2157,
+      "selected_supports": 97,
+      "reserve_supports": 105
+    },
+    "query_level_all_support_cosine_alpha_0.10": {
+      "mean_chunks": 11.3,
+      "precision": 0.08141592920353982,
+      "support_recall": 0.8761904761904762,
+      "empty_rate": 0.0,
+      "retrievable_queries": 91,
+      "retrieval_query_coverage_ceiling": 0.91,
+      "query_any_support_conditional": 0.9010989010989011,
+      "query_all_support_conditional": 0.8571428571428571,
+      "selected_chunks": 1130,
+      "selected_supports": 92,
+      "reserve_supports": 105
+    }
+  },
+  "downstream": {
+    "fixed_top10": {
+      "em": 0.19,
+      "f1": 0.2924888585119205,
+      "numerical_accuracy": 0.27
+    },
+    "cce_conformal_embedding_jina_alpha_0.10": {
+      "em": 0.15,
+      "f1": 0.25271434558523365,
+      "numerical_accuracy": 0.23
+    },
+    "conflare_source_question_jina_alpha_0.10": {
+      "em": 0.15,
+      "f1": 0.2484026894836886,
+      "numerical_accuracy": 0.22
+    },
+    "traq_retrieval_bonferroni_jina_alpha_0.10": {
+      "em": 0.13,
+      "f1": 0.23374473391268957,
+      "numerical_accuracy": 0.21
+    },
+    "query_level_all_support_cosine_alpha_0.10": {
+      "em": 0.18,
+      "f1": 0.2917745727976348,
+      "numerical_accuracy": 0.26
+    }
+  }
+}

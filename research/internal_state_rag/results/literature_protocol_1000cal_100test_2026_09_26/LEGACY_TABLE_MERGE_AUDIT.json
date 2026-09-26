@@ -3,22 +3,22 @@
     "hotpotqa": {
       "calibration_qids": 1000,
       "test_qids": 100,
-      "downstream_complete": false
+      "downstream_complete": true
     },
     "mmqa": {
       "calibration_qids": 1000,
       "test_qids": 100,
-      "downstream_complete": false
+      "downstream_complete": true
     },
     "tatqa": {
       "calibration_qids": 1000,
       "test_qids": 100,
-      "downstream_complete": false
+      "downstream_complete": true
     },
     "webqa": {
       "calibration_qids": 1000,
       "test_qids": 100,
-      "downstream_complete": false
+      "downstream_complete": true
     }
   }
 }
