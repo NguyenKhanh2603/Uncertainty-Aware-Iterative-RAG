@@ -2,9 +2,23 @@
 
 This is the inverse-scale companion to `all_datasets_cosine_six_methods_2026_09_24`: it calibrates every cosine-only selector on 1,000 disjoint queries per dataset and evaluates it on 100 held-out queries per dataset.
 
+**Status: complete.** The full selection and Qwen downstream results are in [REPORT.md](REPORT.md); the generated per-query answers and selected contexts are in the four `*_downstream_predictions.jsonl` files.
+
 `SPLIT_INTEGRITY.json` and the per-dataset manifests record every qid and confirm zero calibration/test overlap. HotpotQA uses its official-seed calibration role. MMQA, TATQA, and WebQA each use the union of their frozen `calibration` and `development` roles, which contains exactly 1,000 queries; all four datasets use the first 100 lexicographically sorted qids from their frozen `test` role for evaluation.
 
 The result table contains Fixed Top-K, CCE, CONFLARE, TRAQ-retrieval, query-level cosine, BY cosine, and BH cosine. It deliberately excludes the internal-fusion row: that method selects a hidden-state probe and fusion weights on an additional, disjoint probe-training set. Reusing its old 100-query calibration artifact would violate this inverse calibration protocol.
+
+## Reproducibility and split audit
+
+| Item | Location |
+|---|---|
+| Exact calibration/test qids and zero-overlap audit | [SPLIT_INTEGRITY.json](splits/SPLIT_INTEGRITY.json) |
+| HotpotQA plans | [calibration](splits/hotpotqa/calibration_manifest.json), [test](splits/hotpotqa/test_manifest.json) |
+| MMQA plans | [calibration](splits/mmqa/calibration_manifest.json), [test](splits/mmqa/test_manifest.json) |
+| TAT-QA plans | [calibration](splits/tatqa/calibration_manifest.json), [test](splits/tatqa/test_manifest.json) |
+| WebQA plans | [calibration](splits/webqa/calibration_manifest.json), [test](splits/webqa/test_manifest.json) |
+| Plan preparation code | [prepare_inverse_calibration_1000_test_100_plans.py](../../prepare_inverse_calibration_1000_test_100_plans.py) |
+| Selection and downstream runner | [run_all_datasets_cosine_six_methods.py](../../run_all_datasets_cosine_six_methods.py) |
 
 Run:
 

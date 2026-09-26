@@ -1,6 +1,6 @@
 {
   "hotpotqa": {
-    "status": "selection_complete",
+    "status": "running",
     "calibration_queries": 1000,
     "test_queries": 100,
     "thresholds": {
@@ -215,7 +215,7 @@
     }
   },
   "mmqa": {
-    "status": "selection_complete",
+    "status": "running",
     "calibration_queries": 1000,
     "test_queries": 100,
     "thresholds": {
@@ -430,7 +430,7 @@
     }
   },
   "tatqa": {
-    "status": "selection_complete",
+    "status": "running",
     "calibration_queries": 1000,
     "test_queries": 100,
     "thresholds": {
@@ -645,7 +645,7 @@
     }
   },
   "webqa": {
-    "status": "selection_complete",
+    "status": "running",
     "calibration_queries": 1000,
     "test_queries": 100,
     "thresholds": {

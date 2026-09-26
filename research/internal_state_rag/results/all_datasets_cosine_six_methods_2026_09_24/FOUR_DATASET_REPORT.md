@@ -8,6 +8,12 @@ The HotpotQA query-level result was rerun on 25 September 2026 over all 1,000 te
 
 All selectors use the same frozen Top-30 cosine candidates within each dataset. CCE, CONFLARE, TRAQ, BY, and BH are cosine-only. BY accommodates arbitrary p-value dependence; BH ordinarily needs independence or suitable positive dependence. The rank cap after BH is experimental; this report makes no capped-procedure FDR guarantee.
 
+## Inverse calibration allocation: 1,000 calibration / 100 held-out test
+
+The matched inverse-scale cosine-only rerun is available in [its complete report](../all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/REPORT.md). It keeps the same frozen Top-30 candidates, calibrates each selector on 1,000 disjoint qids per dataset, and evaluates the Qwen downstream task on 100 held-out qids per dataset. Its [split audit](../all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/splits/SPLIT_INTEGRITY.json) records the exact qids and zero overlap.
+
+That inverse run reports the cosine-only selectors only. The internal-fusion row below is not reused there because selecting its hidden-state probe and fusion weights needs a separate disjoint probe-training split; reusing the current 100-query calibration artifact would not be a valid 1,000-calibration comparison.
+
 ## Calibration and test qid files
 
 | Dataset | Calibration qids | Test qids |
