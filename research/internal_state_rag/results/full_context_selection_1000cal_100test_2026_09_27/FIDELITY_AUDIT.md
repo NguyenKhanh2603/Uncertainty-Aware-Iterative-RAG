@@ -29,8 +29,9 @@ number would be arbitrary. The auditable numbers are instead:
 | Full answer-set method retained | Not applicable to this retrieval table | No | No: semantic answer prediction set is omitted |
 
 Thus the accurate wording is **"higher construction fidelity than the legacy
-cosine proxy"**, never "high-fidelity reproduction." The percentage of
-end-to-end released pipeline execution is zero for all three rows.
+cosine proxy"** only for the CONFLARE and TRAQ adaptations, never
+"high-fidelity reproduction." The percentage of end-to-end released pipeline
+execution is zero for all three rows.
 
 ## Why use an adaptation at all?
 
@@ -53,7 +54,7 @@ The consolidated report contains both, so no old result is hidden:
 | Row family | What it does | Fidelity position |
 |---|---|---|
 | `CCE-style`, `CONFLARE-style`, `TRAQ-style` legacy cosine proxy | One global threshold from pooled positive Jina cosine scores | Lowest; historical shared-score ablation only |
-| CCE Conformal-Embedding Jina adaptation | Positive **question–chunk** calibration records with the CCE nonconformity construction | Higher construction fidelity than the old CCE proxy |
+| CCE Conformal-Embedding Jina adaptation | Positive **question–chunk** calibration records with the CCE nonconformity construction | **Numerically identical** to the old CCE proxy here: both pool all positive Jina scores and use the same finite lower-alpha quantile |
 | CONFLARE source-question Jina adaptation | One best labelled support per question, strict distance filtering | Higher construction fidelity than the old CONFLARE proxy |
 | TRAQ retrieval Bonferroni Jina adaptation | One best true-retrieval score per question, `alpha_R=.05` | Higher construction fidelity than the old TRAQ proxy, still retrieval-only |
 
@@ -75,6 +76,15 @@ these four datasets. The adapter uses Jina-v4 cosine values and benchmark
 labelled support pairs, whereas the reported CCE setup uses its own embedding
 model, snippet construction, and dataset protocol. Its result is therefore a
 **Conformal-Embedding construction adapted to Jina candidates**.
+
+For the frozen data in this repository, the earlier `CCE-style global
+positive-cosine proxy (alpha=.10)` performs this same calculation. Writing
+the score as `A=1-cosine`, taking the CCE `1-alpha` upper nonconformity
+quantile, and retaining `A <= tau` is algebraically the same as taking the
+finite lower-alpha Jina cosine quantile and retaining `cosine >= threshold`.
+The two thresholds, masks, retrieval metrics, and Qwen answers are exactly
+equal on all four datasets. The later row is retained only to expose its CCE
+provenance, not as an independent improvement.
 
 ### CONFLARE
 
