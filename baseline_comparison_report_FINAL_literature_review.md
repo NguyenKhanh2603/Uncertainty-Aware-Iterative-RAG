@@ -63,7 +63,7 @@ Phương pháp Two-Stage cũng làm việc trên candidate đã retrieval, nhưn
 
 ## 3. Tổng hợp kết quả selection
 
-Các bảng sau giữ nguyên kết quả thực nghiệm hiện có. Các cấu hình được trình bày để quan sát sự thay đổi giữa số chunk giữ lại, precision và support recall khi thay đổi $\alpha_1$ hoặc $\alpha_2$.
+Các bảng sau lưu lại sweep Two-Stage từ báo cáo nguồn trước đó. Ba hàng literature được tách ra trong [matched comparison trên `splits_khanh_27_09`](research/internal_state_rag/results/full_context_selection_splits_khanh_27_09_2026_09_27/REPORT.md), với 1.000 calibration qids và 100 held-out test qids cho mỗi dataset.
 
 ### HotpotQA
 
@@ -71,9 +71,9 @@ Các bảng sau giữ nguyên kết quả thực nghiệm hiện có. Các cấu
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 9.85 | 20.3% | 100.0% | 33.7% |
 | Fixed Top-5 | 4.95 | 33.7% | 83.5% | 48.1% |
-| ECIR CCE | 6.17 | 29.1% | 90.0% | 44.0% |
-| CONFLARE | 6.17 | 29.2% | 90.0% | 44.1% |
-| TRAQ retrieval | 7.45 | 25.0% | 93.0% | 39.4% |
+| CCE-style positive-cosine proxy (historical sweep) | 6.17 | 29.1% | 90.0% | 44.0% |
+| CONFLARE-style positive-cosine proxy (historical sweep) | 6.17 | 29.2% | 90.0% | 44.1% |
+| TRAQ-style positive-cosine proxy (historical sweep) | 7.45 | 25.0% | 93.0% | 39.4% |
 | Proposed Stage 1 ($\alpha_1=0.1$) | 0.89 | 55.1% | 24.5% | 33.9% |
 | Proposed Stage 1 ($\alpha_1=0.9$) | 8.11 | 22.3% | 90.5% | 35.8% |
 | Proposed Stage 1 ($\alpha_1=0.99$) | 9.59 | 20.5% | 98.5% | 33.9% |
@@ -98,9 +98,9 @@ Các bảng sau giữ nguyên kết quả thực nghiệm hiện có. Các cấu
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 10.00 | 14.1% | 91.0% | 24.4% |
 | Fixed Top-5 | 5.00 | 24.0% | 77.4% | 36.6% |
-| ECIR CCE | 11.58 | 12.4% | 92.9% | 21.9% |
-| CONFLARE | 11.58 | 12.3% | 92.3% | 21.7% |
-| TRAQ retrieval | 13.79 | 10.9% | 97.4% | 19.6% |
+| CCE-style positive-cosine proxy (historical sweep) | 11.58 | 12.4% | 92.9% | 21.9% |
+| CONFLARE-style positive-cosine proxy (historical sweep) | 11.58 | 12.3% | 92.3% | 21.7% |
+| TRAQ-style positive-cosine proxy (historical sweep) | 13.79 | 10.9% | 97.4% | 19.6% |
 | Proposed Stage 1 ($\alpha_1=0.1$) | 0.59 | 38.6% | 14.8% | 21.4% |
 | Proposed Stage 1 ($\alpha_1=0.9$) | 6.85 | 16.7% | 74.2% | 27.3% |
 | Proposed Stage 1 ($\alpha_1=0.99$) | 9.43 | 14.1% | 85.8% | 24.2% |
@@ -125,9 +125,9 @@ MMQA cho thấy trade-off mạnh hơn: các cấu hình pruning sâu tăng preci
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 5.63 | 23.8% | 100.0% | 38.4% |
 | Fixed Top-5 | 4.37 | 29.7% | 97.0% | 45.5% |
-| ECIR CCE | 3.92 | 29.0% | 85.1% | 43.3% |
-| CONFLARE | 3.92 | 28.8% | 84.3% | 42.9% |
-| TRAQ retrieval | 4.64 | 25.9% | 89.6% | 40.2% |
+| CCE-style positive-cosine proxy (historical sweep) | 3.92 | 29.0% | 85.1% | 43.3% |
+| CONFLARE-style positive-cosine proxy (historical sweep) | 3.92 | 28.8% | 84.3% | 42.9% |
+| TRAQ-style positive-cosine proxy (historical sweep) | 4.64 | 25.9% | 89.6% | 40.2% |
 | Proposed Stage 1 ($\alpha_1=0.1$) | 0.33 | 69.7% | 17.2% | 27.6% |
 | Proposed Stage 1 ($\alpha_1=0.9$) | 4.53 | 25.6% | 86.6% | 39.5% |
 | Proposed Stage 1 ($\alpha_1=0.99$) | 5.43 | 24.1% | 97.8% | 38.7% |
@@ -152,9 +152,9 @@ Trên TAT-QA, Top-10 + Stage 2 với $\alpha_2=0.50$ có F1 46.9% và giữ trun
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 9.98 | 14.1% | 80.6% | 24.0% |
 | Fixed Top-5 | 5.00 | 23.0% | 65.7% | 34.1% |
-| ECIR CCE | 11.87 | 12.0% | 81.7% | 20.9% |
-| CONFLARE | 11.87 | 12.0% | 81.7% | 20.9% |
-| TRAQ retrieval | 14.64 | 10.7% | 89.7% | 19.1% |
+| CCE-style positive-cosine proxy (historical sweep) | 11.87 | 12.0% | 81.7% | 20.9% |
+| CONFLARE-style positive-cosine proxy (historical sweep) | 11.87 | 12.0% | 81.7% | 20.9% |
+| TRAQ-style positive-cosine proxy (historical sweep) | 14.64 | 10.7% | 89.7% | 19.1% |
 | Proposed Stage 1 ($\alpha_1=0.1$) | 0.58 | 34.5% | 11.4% | 17.1% |
 | Proposed Stage 1 ($\alpha_1=0.9$) | 6.43 | 16.3% | 60.0% | 25.6% |
 | Proposed Stage 1 ($\alpha_1=0.99$) | 8.33 | 14.5% | 69.1% | 24.0% |
