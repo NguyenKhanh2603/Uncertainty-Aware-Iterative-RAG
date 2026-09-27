@@ -2,6 +2,8 @@
 
 Every row evaluates the same frozen Jina Top-30 candidates on the same 100 held-out test qids per dataset. This consolidates completed artifacts; it does not rerun, average, or overwrite any experiment.
 
+> **Fidelity status:** CCE, CONFLARE, and TRAQ rows are **original-formula / calibration-unit adaptations**, not end-to-end executions of their released pipelines. The exact boundary is documented in [FIDELITY_AUDIT.md](FIDELITY_AUDIT.md). Do not claim these values reproduce or outperform the published systems.
+
 ## Protocol distinctions that must remain visible
 
 - **Original cosine / CCE / CONFLARE / TRAQ / alpha-free:** 1,000 calibration qids and 100 held-out test qids. CCE, CONFLARE, and TRAQ are Jina adaptations with their distinct retrieval calibration units. TRAQ is its retrieval component only, not the full semantic answer prediction-set procedure.
@@ -127,3 +129,4 @@ Chunks is mean retained chunks/query; Precision and Recall are micro support met
 - [CCE / CONFLARE / TRAQ adapted protocol](../literature_protocol_1000cal_100test_2026_09_26/REPORT.md)
 - [Qwen-7B internal-signal ablation](../all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/internal_signal_ablation_7b/REPORT.md)
 - [Alpha-free query-level operating points](../alpha_free_query_level_1000cal_100test_2026_09_26/DOWNSTREAM_REPORT.md)
+- [Fidelity audit for CCE / CONFLARE / TRAQ](FIDELITY_AUDIT.md)
