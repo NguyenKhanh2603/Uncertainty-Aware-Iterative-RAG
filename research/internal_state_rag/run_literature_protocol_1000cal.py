@@ -212,17 +212,21 @@ def selection_metrics(
     return result
 
 
-def metrics(records: Sequence[dict[str, Any]]) -> dict[str, dict[str, float]]:
+def metrics(
+    records: Sequence[dict[str, Any]], methods: Sequence[str]
+) -> dict[str, dict[str, float]]:
     return {
         method: {
             name: float(np.mean([record["metrics"][method][name] for record in records]))
             for name in ("em", "f1", "numerical_accuracy")
         }
-        for method in METHODS
+        for method in methods
     }
 
 
-def write_report(output: Path, state: dict[str, dict[str, Any]]) -> None:
+def write_report(
+    output: Path, state: dict[str, dict[str, Any]], methods: Sequence[str]
+) -> None:
     lines = [
         "# Literature-protocol comparison: 1,000 calibration / 100 test",
         "",
@@ -238,7 +242,7 @@ def write_report(output: Path, state: dict[str, dict[str, Any]]) -> None:
                 "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
-        for method in METHODS:
+        for method in methods:
             selected = result["selection"][method]
             qa = result.get("downstream", {}).get(method)
             values = (
@@ -290,6 +294,15 @@ def main() -> None:
         ),
     )
     parser.add_argument("--datasets", default=",".join(CONFIGS))
+    parser.add_argument(
+        "--methods",
+        default=",".join(METHODS),
+        help=(
+            "Comma-separated selector subset. The requested methods alone are "
+            "evaluated downstream; selection masks for other methods are not "
+            "written to the result summary."
+        ),
+    )
     parser.add_argument("--alpha", type=float, default=0.10)
     parser.add_argument("--selection-only", action="store_true")
     parser.add_argument("--model", type=Path)
@@ -304,6 +317,14 @@ def main() -> None:
         raise ValueError(f"--datasets must be a non-empty subset of {tuple(CONFIGS)}")
     if not args.selection_only and args.model is None:
         raise ValueError("--model is required unless --selection-only is set")
+    methods = [method.strip() for method in args.methods.split(",") if method.strip()]
+    if not methods:
+        raise ValueError("--methods must name at least one selector")
+    unknown_methods = [method for method in methods if method not in METHODS]
+    if unknown_methods:
+        raise ValueError(f"Unknown selector(s): {unknown_methods}; choices are {METHODS}")
+    if len(set(methods)) != len(methods):
+        raise ValueError("--methods must not repeat a selector")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     split_root = args.output_dir / "splits"
@@ -329,7 +350,17 @@ def main() -> None:
                 raise RuntimeError(f"{name}: existing copied manifest differs: {target}")
             if not target.exists():
                 target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-        masks, thresholds = build_masks(calibration, test, args.alpha)
+        all_method_masks, all_thresholds = build_masks(calibration, test, args.alpha)
+        masks = {method: all_method_masks[method] for method in methods}
+        thresholds = {
+            method: all_thresholds[method]
+            for method in methods
+            if method in all_thresholds
+        }
+        thresholds["calibration_queries"] = all_thresholds["calibration_queries"]
+        thresholds["calibration_retrievable_queries"] = all_thresholds[
+            "calibration_retrievable_queries"
+        ]
         state[name] = {
             "status": "selection_complete" if args.selection_only else "running",
             "calibration_queries": len(calibration_qids),
@@ -348,7 +379,7 @@ def main() -> None:
     (split_root / "SPLIT_INTEGRITY.json").write_text(
         json.dumps(split_audit, indent=2) + "\n", encoding="utf-8"
     )
-    write_report(args.output_dir / "REPORT.md", state)
+    write_report(args.output_dir / "REPORT.md", state, methods)
     (args.output_dir / "selection_summary.json").write_text(
         json.dumps(state, indent=2) + "\n", encoding="utf-8"
     )
@@ -375,7 +406,7 @@ def main() -> None:
             cache: dict[tuple[str, ...], str] = {}
             predictions: dict[str, str] = {}
             contexts: dict[str, dict[str, Any]] = {}
-            for method in METHODS:
+            for method in methods:
                 selected = chunks(rows, masks[method][index - 1], corpus, config.bundle_root)
                 key = tuple(chunk.id for chunk in selected)
                 answer = cache.get(key)
@@ -403,11 +434,11 @@ def main() -> None:
             print(f"[{config.name} {index}/{len(test_qids)}] {qid}", flush=True)
         records = [completed[qid] for qid in test_qids]
         state[config.name]["status"] = "complete"
-        state[config.name]["downstream"] = metrics(records)
+        state[config.name]["downstream"] = metrics(records, methods)
         (args.output_dir / f"{config.name}_summary.json").write_text(
             json.dumps(state[config.name], indent=2) + "\n", encoding="utf-8"
         )
-        write_report(args.output_dir / "REPORT.md", state)
+        write_report(args.output_dir / "REPORT.md", state, methods)
         (args.output_dir / "summary.json").write_text(
             json.dumps({"status": "running", "datasets": state}, indent=2) + "\n",
             encoding="utf-8",
