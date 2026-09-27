@@ -83,6 +83,12 @@ def write_report(
     archive: Path,
     split_datasets: dict[str, Any],
 ) -> None:
+    pool_summary = "; ".join(
+        f"{dataset}: {results['datasets'][dataset]['candidate_pool']['test_min']}–"
+        f"{results['datasets'][dataset]['candidate_pool']['test_max']} candidates/query "
+        f"(mean {results['datasets'][dataset]['candidate_pool']['test_mean']:.2f})"
+        for dataset in DATASETS
+    )
     lines = [
         "# Full context-selection comparison — `splits_khanh_27_09`",
         "",
@@ -90,8 +96,9 @@ def write_report(
         "`splits_khanh_27_09.zip` (SHA-256 "
         f"`{sha256(archive)}`): 1,000 calibration qids and 100 held-out test "
         "qids per dataset, with zero qid overlap. Every evaluated selector "
-        "receives the frozen Jina-v4 Top-30 candidate list and is scored by "
-        "the shared greedy Qwen2-VL-7B direct-answer diagnostic.",
+        "receives the frozen Jina-v4 dataset-provided candidate pool, capped at "
+        f"Top-L=30, and is scored by the shared greedy Qwen2-VL-7B direct-answer "
+        f"diagnostic. Test-pool sizes are ragged: {pool_summary}.",
         "",
         "Only the three literature retrieval adaptations below were run on this "
         "split: CCE Conformal-Embedding, CONFLARE source-question, and TRAQ "
@@ -101,7 +108,7 @@ def write_report(
         "## Metrics",
         "",
         "Chunks is mean retained chunks/query. Precision and Recall are micro "
-        "support metrics in the frozen Top-30. Empty is the fraction of queries "
+        "support metrics in each frozen candidate pool. Empty is the fraction of queries "
         "that retained no chunk. Any/All are conditional support-retention rates "
         "among queries with at least one labelled support in Top-30. EM, token F1, "
         "and Numeric are Qwen direct-answer measurements on the 100 held-out "

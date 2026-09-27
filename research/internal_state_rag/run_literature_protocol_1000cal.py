@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -34,8 +35,6 @@ from eval.metrics import exact_match, numerical_accuracy, token_f1
 from research.internal_state_rag.run_all_datasets_cosine_six_methods import (
     CONFIGS,
     DatasetConfig,
-    load_dataset,
-    query_level_cosine_mask,
     validate_downstream_inputs,
 )
 from research.internal_state_rag.run_downstream_qa_conformal_baselines import (
@@ -43,6 +42,11 @@ from research.internal_state_rag.run_downstream_qa_conformal_baselines import (
     append_jsonl,
     chunks,
     iter_jsonl,
+)
+from research.internal_state_rag.run_hotpotqa_cosine_six_methods import (
+    grouped,
+    iter_retrieval,
+    read_plan,
 )
 
 
@@ -60,6 +64,120 @@ DISPLAY = {
     "traq_retrieval_bonferroni_jina_alpha_0.10": "TRAQ retrieval, Bonferroni (Jina adaptation)",
     "query_level_all_support_cosine_alpha_0.10": "Query-level all-support cosine",
 }
+
+
+ZIP_20_09_ROOT = Path("research/internal_state_rag/results/zip_calibration_split_20_09")
+ZIP_20_09_BUNDLE = Path("data/zip_calibration_split_20_09")
+ZIP_20_09_WEB_BUNDLE = Path("/dev/shm/uncertainty_rag_webqa_stage_20260922")
+ZIP_20_09_CONFIGS = {
+    "hotpotqa": DatasetConfig(
+        "hotpotqa",
+        ZIP_20_09_ROOT / "retrieval/hotpotqa_jina_v4_candidates.jsonl.gz",
+        Path(),
+        None,
+        ZIP_20_09_BUNDLE / "hotpotqa/questions.jsonl",
+        ZIP_20_09_BUNDLE / "hotpotqa/corpus.jsonl",
+        ZIP_20_09_BUNDLE,
+    ),
+    "mmqa": DatasetConfig(
+        "mmqa",
+        ZIP_20_09_ROOT / "retrieval/mmqa_jina_v4_candidates.jsonl.gz",
+        Path(),
+        None,
+        ZIP_20_09_BUNDLE / "mmqa/questions.jsonl",
+        ZIP_20_09_BUNDLE / "mmqa/corpus.jsonl",
+        ZIP_20_09_BUNDLE,
+    ),
+    "tatqa": DatasetConfig(
+        "tatqa",
+        ZIP_20_09_ROOT / "retrieval/tatqa_jina_v4_candidates.jsonl.gz",
+        Path(),
+        None,
+        ZIP_20_09_BUNDLE / "tatqa/questions.jsonl",
+        ZIP_20_09_BUNDLE / "tatqa/corpus.jsonl",
+        ZIP_20_09_BUNDLE,
+    ),
+    "webqa": DatasetConfig(
+        "webqa",
+        ZIP_20_09_ROOT / "retrieval/webqa_jina_v4_candidates.jsonl.gz",
+        Path(),
+        None,
+        ZIP_20_09_WEB_BUNDLE / "webqa/questions.jsonl",
+        ZIP_20_09_WEB_BUNDLE / "webqa/corpus.jsonl",
+        ZIP_20_09_WEB_BUNDLE,
+    ),
+}
+
+
+def load_dataset(
+    config: DatasetConfig,
+    *,
+    calibration_plan: Path,
+    test_plan: Path,
+    allow_ragged_candidates: bool,
+) -> tuple[list[str], list[list[dict[str, Any]]], list[str], list[list[dict[str, Any]]]]:
+    """Load exactly the requested qids, allowing ZIP-supplied ragged pools."""
+
+    retrieval = grouped(iter_retrieval(config.retrieval))
+    all_queries: dict[str, list[dict[str, Any]]] = {}
+    for by_role in retrieval.values():
+        for qid, rows in by_role.items():
+            if qid in all_queries:
+                raise ValueError(f"{config.name}: qid appears in multiple retrieval roles: {qid}")
+            all_queries[qid] = rows
+    calibration_qids = read_plan(calibration_plan)
+    test_qids = read_plan(test_plan)
+    overlap = set(calibration_qids).intersection(test_qids)
+    if overlap:
+        raise ValueError(f"{config.name}: calibration/test overlap: {sorted(overlap)[:3]}")
+    missing = [qid for qid in calibration_qids + test_qids if qid not in all_queries]
+    if missing:
+        raise ValueError(f"{config.name}: retrieval is missing planned qids: {missing[:3]}")
+    calibration = [all_queries[qid] for qid in calibration_qids]
+    test = [all_queries[qid] for qid in test_qids]
+    for qid, rows in zip(calibration_qids + test_qids, calibration + test, strict=True):
+        ranks = [int(row["rank"]) for row in rows]
+        if not rows or ranks != list(range(1, len(rows) + 1)):
+            raise ValueError(f"{config.name}/{qid}: candidates must have contiguous ranks from one")
+        if len(rows) > 30:
+            raise ValueError(f"{config.name}/{qid}: candidate pool exceeds Top-L=30")
+        if not allow_ragged_candidates and len(rows) != 30:
+            raise ValueError(f"{config.name}/{qid}: expected exactly 30 candidates")
+    return calibration_qids, calibration, test_qids, test
+
+
+def query_level_cosine_mask(
+    calibration: list[list[dict[str, Any]]], test: list[list[dict[str, Any]]], alpha: float
+) -> tuple[list[np.ndarray], dict[str, float | int]]:
+    """Query-level cosine selector for rectangular Top-30 or ragged ZIP pools."""
+
+    critical: list[float] = []
+    for rows in calibration:
+        scores = np.asarray([float(row["cosine_score"]) for row in rows], dtype=float)
+        labels = np.asarray([row["support_label"] == "support" for row in rows], dtype=bool)
+        if labels.any():
+            z_scores = (scores - scores.mean()) / (scores.std() + 1e-8)
+            critical.append(float(z_scores[labels].min()))
+    if not critical:
+        raise ValueError("Query-level calibration has no retrievable queries")
+    ordered = min(len(critical), math.ceil((len(critical) + 1) * (1 - alpha)))
+    threshold = float(np.sort(-np.asarray(critical))[ordered - 1] * -1)
+    masks: list[np.ndarray] = []
+    fallback = 0
+    for rows in test:
+        scores = np.asarray([float(row["cosine_score"]) for row in rows], dtype=float)
+        z_scores = (scores - scores.mean()) / (scores.std() + 1e-8)
+        mask = z_scores >= threshold
+        if not mask.any():
+            mask[int(np.argmax(z_scores))] = True
+            fallback += 1
+        masks.append(mask)
+    return masks, {
+        "threshold": threshold,
+        "finite_sample_order": ordered,
+        "retrievable_calibration_queries": len(critical),
+        "top1_fallback_queries": fallback,
+    }
 
 
 def support_scores_by_query(rows: Sequence[Sequence[dict[str, Any]]]) -> list[np.ndarray]:
@@ -286,6 +404,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
+        "--input-profile",
+        choices=("current_top30", "zip_20_09"),
+        default="current_top30",
+        help=(
+            "Select the historical fixed-Top-30 data mapping or the original "
+            "ZIP-20-09 Jina logs and source bundles. ZIP pools may contain fewer "
+            "than 30 candidates because they preserve dataset-provided pools."
+        ),
+    )
+    parser.add_argument(
         "--plan-root",
         type=Path,
         default=Path(
@@ -293,7 +421,7 @@ def main() -> None:
             "all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/splits"
         ),
     )
-    parser.add_argument("--datasets", default=",".join(CONFIGS))
+    parser.add_argument("--datasets")
     parser.add_argument(
         "--methods",
         default=",".join(METHODS),
@@ -312,9 +440,11 @@ def main() -> None:
     args = parser.parse_args()
     if not 0 < args.alpha < 1:
         raise ValueError("--alpha must be in (0, 1)")
-    names = [name.strip() for name in args.datasets.split(",") if name.strip()]
-    if not names or any(name not in CONFIGS for name in names):
-        raise ValueError(f"--datasets must be a non-empty subset of {tuple(CONFIGS)}")
+    configs = ZIP_20_09_CONFIGS if args.input_profile == "zip_20_09" else CONFIGS
+    dataset_argument = args.datasets or ",".join(configs)
+    names = [name.strip() for name in dataset_argument.split(",") if name.strip()]
+    if not names or any(name not in configs for name in names):
+        raise ValueError(f"--datasets must be a non-empty subset of {tuple(configs)}")
     if not args.selection_only and args.model is None:
         raise ValueError("--model is required unless --selection-only is set")
     methods = [method.strip() for method in args.methods.split(",") if method.strip()]
@@ -331,14 +461,21 @@ def main() -> None:
     split_root.mkdir(exist_ok=True)
     state: dict[str, dict[str, Any]] = {}
     pending: list[tuple[DatasetConfig, list[str], list[list[dict[str, Any]]], dict[str, list[np.ndarray]]]] = []
-    split_audit: dict[str, Any] = {"protocol": "literature_retrieval_constructions_on_inverse_1000cal_100test", "datasets": {}}
+    split_audit: dict[str, Any] = {
+        "protocol": "literature_retrieval_constructions_on_inverse_1000cal_100test",
+        "input_profile": args.input_profile,
+        "datasets": {},
+    }
 
     for name in names:
-        config = CONFIGS[name]
+        config = configs[name]
         calibration_plan = args.plan_root / name / "calibration_manifest.json"
         test_plan = args.plan_root / name / "test_manifest.json"
         calibration_qids, calibration, test_qids, test = load_dataset(
-            config, calibration_plan=calibration_plan, test_plan=test_plan
+            config,
+            calibration_plan=calibration_plan,
+            test_plan=test_plan,
+            allow_ragged_candidates=args.input_profile == "zip_20_09",
         )
         if len(calibration_qids) != 1000 or len(test_qids) != 100:
             raise ValueError(f"{name}: require exactly 1,000 calibration and 100 test qids")
@@ -365,6 +502,12 @@ def main() -> None:
             "status": "selection_complete" if args.selection_only else "running",
             "calibration_queries": len(calibration_qids),
             "test_queries": len(test_qids),
+            "candidate_pool": {
+                "top_l_cap": 30,
+                "test_min": min(len(rows) for rows in test),
+                "test_max": max(len(rows) for rows in test),
+                "test_mean": float(np.mean([len(rows) for rows in test])),
+            },
             "thresholds": thresholds,
             "selection": selection_metrics(test, masks),
         }
@@ -373,6 +516,9 @@ def main() -> None:
             "test_queries": len(test_qids),
             "overlap": 0,
             "frozen_top_l": 30,
+            "candidate_pool_min": min(len(rows) for rows in test),
+            "candidate_pool_max": max(len(rows) for rows in test),
+            "candidate_pool_mean": float(np.mean([len(rows) for rows in test])),
         }
         pending.append((config, test_qids, test, masks))
 
