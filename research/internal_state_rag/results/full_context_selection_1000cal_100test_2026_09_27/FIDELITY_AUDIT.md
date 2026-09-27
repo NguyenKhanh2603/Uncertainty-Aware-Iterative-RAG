@@ -14,6 +14,49 @@ receive exactly the same frozen Jina-v4 Top-30 candidates, the same 1,000
 calibration qids, and the same 100 held-out qids. They must not be described
 as published-baseline reproduction results.
 
+## What “fidelity” means here
+
+There is no defensible single fidelity percentage: weighing a retrieval model,
+chunking, corpus, calibration data, answer generation, and evaluation into one
+number would be arbitrary. The auditable numbers are instead:
+
+| Dimension | CCE adaptation | CONFLARE adaptation | TRAQ adaptation |
+|---|---|---|---|
+| Original repository code executed end-to-end | **0%** | **0%** | **0%** |
+| Mathematical threshold/filtering kernel retained | Conformal-Embedding `1 - cosine` positive-pair quantile | Strict distance-percentile filter | Lower retrieval-score quantile with `alpha_R = alpha / 2` |
+| Original calibration-record construction retained | No | No: generated questions replaced with benchmark question/support pairs | No: original calibration split and answer stage omitted |
+| Original retriever, scorer, corpus, chunking retained | No: frozen Jina-v4 Top-30 is substituted | No: frozen Jina-v4 Top-30 replaces Chroma pipeline | No: frozen Jina-v4 Top-30 replaces released retriever artifacts |
+| Full answer-set method retained | Not applicable to this retrieval table | No | No: semantic answer prediction set is omitted |
+
+Thus the accurate wording is **"higher construction fidelity than the legacy
+cosine proxy"**, never "high-fidelity reproduction." The percentage of
+end-to-end released pipeline execution is zero for all three rows.
+
+## Why use an adaptation at all?
+
+The adaptation makes the *selection decision* comparable: every method sees
+the same candidate chunks, labels, calibration qids, test qids, embedding
+score, and downstream Qwen prompt. A direct execution of CONFLARE or TRAQ
+would change question generation, corpus, retriever, chunking, score scale,
+and sometimes the desired output itself. Any gain could then come from those
+changed inputs rather than from the pruning/calibration rule.
+
+This is a **matched comparison of retrieval rules**, not a head-to-head
+published-system benchmark. A published-system benchmark requires running each
+repository's full data, retrieval, generation, and evaluation protocol and
+reporting its native metric separately.
+
+## Legacy proxy rows versus later adaptation rows
+
+The consolidated report contains both, so no old result is hidden:
+
+| Row family | What it does | Fidelity position |
+|---|---|---|
+| `CCE-style`, `CONFLARE-style`, `TRAQ-style` legacy cosine proxy | One global threshold from pooled positive Jina cosine scores | Lowest; historical shared-score ablation only |
+| CCE Conformal-Embedding Jina adaptation | Positive **question–chunk** calibration records with the CCE nonconformity construction | Higher construction fidelity than the old CCE proxy |
+| CONFLARE source-question Jina adaptation | One best labelled support per question, strict distance filtering | Higher construction fidelity than the old CONFLARE proxy |
+| TRAQ retrieval Bonferroni Jina adaptation | One best true-retrieval score per question, `alpha_R=.05` | Higher construction fidelity than the old TRAQ proxy, still retrieval-only |
+
 ## Checked-out source revisions
 
 | Method | Local source revision | What was retained |

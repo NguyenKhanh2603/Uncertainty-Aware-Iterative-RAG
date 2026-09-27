@@ -2,7 +2,7 @@
 
 Every row evaluates the same frozen Jina Top-30 candidates on the same 100 held-out test qids per dataset. This consolidates completed artifacts; it does not rerun, average, or overwrite any experiment.
 
-> **Fidelity status:** CCE, CONFLARE, and TRAQ rows are **original-formula / calibration-unit adaptations**, not end-to-end executions of their released pipelines. The exact boundary is documented in [FIDELITY_AUDIT.md](FIDELITY_AUDIT.md). Do not claim these values reproduce or outperform the published systems.
+> **Fidelity status:** CCE, CONFLARE, and TRAQ rows are **original-formula / calibration-unit adaptations**, not end-to-end executions of their released pipelines. The table intentionally includes both the earlier *legacy cosine proxies* and the later, more construction-faithful Jina adaptations. See [FIDELITY_AUDIT.md](FIDELITY_AUDIT.md); do not claim these values reproduce or outperform the published systems.
 
 ## Protocol distinctions that must remain visible
 
@@ -10,6 +10,7 @@ Every row evaluates the same frozen Jina Top-30 candidates on the same 100 held-
 - **Internal Qwen-7B rows:** the same 1,000 parent calibration qids are split into disjoint probe-train and conformal-calibration roles (about 500 / 500, exact counts shown in the internal report), followed by the same 100 test qids. Their use of 500 calibration qids means they are an ablation, not a strictly matched 1,000-calibration head-to-head result.
 - **Alpha-free rows:** threshold is chosen only on the 1,000 calibration qids for the stated empirical utility. It is frozen for test inference, but it has no conformal risk guarantee.
 - **BY/BH:** `alpha` is the multiple-testing level. BH rows use the reported experimental context cap; no capped-procedure FDR guarantee is claimed.
+- **Legacy cosine proxy vs Jina adaptation:** neither is a full published-pipeline reproduction. The adaptation rows preserve more of each method's reported calibration construction; the proxy rows apply simple global positive-score thresholds and are retained for historical comparability.
 
 ## Metrics
 
@@ -21,6 +22,9 @@ Chunks is mean retained chunks/query; Precision and Recall are micro support met
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Fixed | Fixed Top-10 | 10.00 | 16.0% | 93.0% | 0.0% | 99.0% | 88.0% | 0.430 | 0.538 | 0.450 |
 | Fixed | Fixed Top-20 | 20.00 | 8.4% | 97.7% | 0.0% | 100.0% | 96.0% | 0.390 | 0.504 | 0.410 |
+| Legacy cosine proxy | CCE-style global positive-cosine proxy (α=.10) | 8.75 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
+| Legacy cosine proxy | CONFLARE-style global positive-cosine proxy (α=.10) | 8.74 | 17.8% | 90.7% | 0.0% | 97.0% | 86.0% | 0.460 | 0.559 | 0.480 |
+| Legacy cosine proxy | TRAQ-style loose positive-cosine proxy (α=.10) | 14.53 | 11.2% | 94.8% | 0.0% | 98.0% | 92.0% | 0.430 | 0.539 | 0.450 |
 | Literature | CCE Conformal-Embedding, Jina adaptation (α=.10) | 8.75 | 17.8% | 90.7% | 0.0% | 96.9% | 85.7% | 0.460 | 0.559 | 0.480 |
 | Literature | CONFLARE source-question, Jina adaptation (α=.10) | 2.14 | 57.0% | 70.9% | 8.0% | 88.8% | 55.1% | 0.430 | 0.527 | 0.440 |
 | Literature | TRAQ retrieval Bonferroni, Jina adaptation (α=.10; α_R=.05) | 3.39 | 41.3% | 81.4% | 3.0% | 92.9% | 71.4% | 0.440 | 0.553 | 0.450 |
@@ -48,6 +52,9 @@ Chunks is mean retained chunks/query; Precision and Recall are micro support met
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Fixed | Fixed Top-10 | 10.00 | 10.9% | 96.5% | 0.0% | 100.0% | 96.0% | 0.470 | 0.512 | 0.490 |
 | Fixed | Fixed Top-20 | 20.00 | 5.5% | 97.3% | 0.0% | 100.0% | 97.0% | 0.460 | 0.497 | 0.480 |
+| Legacy cosine proxy | CCE-style global positive-cosine proxy (α=.10) | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
+| Legacy cosine proxy | CONFLARE-style global positive-cosine proxy (α=.10) | 10.00 | 10.0% | 88.5% | 5.0% | 96.0% | 88.0% | 0.480 | 0.519 | 0.500 |
+| Legacy cosine proxy | TRAQ-style loose positive-cosine proxy (α=.10) | 18.34 | 5.9% | 95.6% | 2.0% | 98.0% | 95.0% | 0.480 | 0.521 | 0.500 |
 | Literature | CCE Conformal-Embedding, Jina adaptation (α=.10) | 10.00 | 10.0% | 88.5% | 5.0% | 95.7% | 87.1% | 0.480 | 0.519 | 0.500 |
 | Literature | CONFLARE source-question, Jina adaptation (α=.10) | 5.70 | 16.0% | 80.5% | 8.0% | 89.2% | 78.5% | 0.480 | 0.520 | 0.500 |
 | Literature | TRAQ retrieval Bonferroni, Jina adaptation (α=.10; α_R=.05) | 9.97 | 10.0% | 88.5% | 5.0% | 95.7% | 87.1% | 0.480 | 0.519 | 0.500 |
@@ -75,6 +82,9 @@ Chunks is mean retained chunks/query; Precision and Recall are micro support met
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Fixed | Fixed Top-10 | 10.00 | 8.9% | 84.8% | 0.0% | 89.0% | 84.0% | 0.190 | 0.292 | 0.270 |
 | Fixed | Fixed Top-20 | 20.00 | 5.1% | 96.2% | 0.0% | 97.0% | 96.0% | 0.150 | 0.253 | 0.230 |
+| Legacy cosine proxy | CCE-style global positive-cosine proxy (α=.10) | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
+| Legacy cosine proxy | CONFLARE-style global positive-cosine proxy (α=.10) | 17.80 | 5.2% | 87.6% | 6.0% | 90.0% | 88.0% | 0.150 | 0.253 | 0.230 |
+| Legacy cosine proxy | TRAQ-style loose positive-cosine proxy (α=.10) | 23.00 | 4.3% | 95.2% | 4.0% | 95.0% | 95.0% | 0.140 | 0.243 | 0.220 |
 | Literature | CCE Conformal-Embedding, Jina adaptation (α=.10) | 17.80 | 5.2% | 87.6% | 6.0% | 89.0% | 86.8% | 0.150 | 0.253 | 0.230 |
 | Literature | CONFLARE source-question, Jina adaptation (α=.10) | 16.52 | 5.6% | 87.6% | 7.0% | 89.0% | 86.8% | 0.150 | 0.248 | 0.220 |
 | Literature | TRAQ retrieval Bonferroni, Jina adaptation (α=.10; α_R=.05) | 21.57 | 4.5% | 92.4% | 4.0% | 93.4% | 91.2% | 0.130 | 0.234 | 0.210 |
@@ -102,6 +112,9 @@ Chunks is mean retained chunks/query; Precision and Recall are micro support met
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | Fixed | Fixed Top-10 | 10.00 | 5.8% | 68.2% | 0.0% | 81.0% | 74.0% | 0.000 | 0.125 | 0.050 |
 | Fixed | Fixed Top-20 | 20.00 | 4.0% | 92.9% | 0.0% | 97.0% | 94.0% | 0.000 | 0.128 | 0.050 |
+| Legacy cosine proxy | CCE-style global positive-cosine proxy (α=.10) | 19.82 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
+| Legacy cosine proxy | CONFLARE-style global positive-cosine proxy (α=.10) | 19.80 | 3.6% | 83.5% | 9.0% | 90.0% | 86.0% | 0.000 | 0.179 | 0.060 |
+| Legacy cosine proxy | TRAQ-style loose positive-cosine proxy (α=.10) | 23.72 | 3.4% | 94.1% | 5.0% | 96.0% | 95.0% | 0.000 | 0.154 | 0.060 |
 | Literature | CCE Conformal-Embedding, Jina adaptation (α=.10) | 19.82 | 3.6% | 83.5% | 9.0% | 85.7% | 80.0% | 0.000 | 0.179 | 0.060 |
 | Literature | CONFLARE source-question, Jina adaptation (α=.10) | 18.27 | 3.8% | 82.4% | 10.0% | 84.3% | 78.6% | 0.000 | 0.189 | 0.060 |
 | Literature | TRAQ retrieval Bonferroni, Jina adaptation (α=.10; α_R=.05) | 22.17 | 3.5% | 91.8% | 8.0% | 92.9% | 90.0% | 0.000 | 0.174 | 0.050 |
