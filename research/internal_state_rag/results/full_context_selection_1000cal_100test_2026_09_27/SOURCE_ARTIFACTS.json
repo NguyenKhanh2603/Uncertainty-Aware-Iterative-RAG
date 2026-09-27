@@ -1,0 +1,16 @@
+{
+  "sources": {
+    "original": "research/internal_state_rag/results/all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/summary.json",
+    "literature": "research/internal_state_rag/results/literature_protocol_1000cal_100test_2026_09_26/summary.json",
+    "internal": "research/internal_state_rag/results/all_datasets_cosine_six_methods_1000cal_100test_2026_09_26/internal_signal_ablation_7b/summary.json",
+    "alpha_free": "research/internal_state_rag/results/alpha_free_query_level_1000cal_100test_2026_09_26/downstream_summary.json"
+  },
+  "rows_per_dataset": 22,
+  "datasets": [
+    "hotpotqa",
+    "mmqa",
+    "tatqa",
+    "webqa"
+  ],
+  "test_queries_per_dataset": 100
+}
