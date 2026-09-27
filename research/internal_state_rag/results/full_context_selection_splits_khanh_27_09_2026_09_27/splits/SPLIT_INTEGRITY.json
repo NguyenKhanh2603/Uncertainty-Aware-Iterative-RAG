@@ -1,0 +1,34 @@
+{
+  "source_archive": "splits_khanh_27_09.zip",
+  "source_archive_sha256": "c9d4ea29fea7ddee5b8eabe7ddbf8d019ff990c371710d660fb088e178f34580",
+  "datasets": {
+    "hotpotqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/hotpotqa/calibration_manifest.json",
+      "test_manifest": "splits/hotpotqa/test_manifest.json"
+    },
+    "mmqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/mmqa/calibration_manifest.json",
+      "test_manifest": "splits/mmqa/test_manifest.json"
+    },
+    "tatqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/tatqa/calibration_manifest.json",
+      "test_manifest": "splits/tatqa/test_manifest.json"
+    },
+    "webqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/webqa/calibration_manifest.json",
+      "test_manifest": "splits/webqa/test_manifest.json"
+    }
+  }
+}

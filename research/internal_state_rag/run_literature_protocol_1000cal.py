@@ -180,6 +180,12 @@ def query_level_cosine_mask(
     }
 
 
+def canonical_manifest(path: Path) -> str:
+    """Normalize a qid manifest without changing its parsed plan."""
+
+    return json.dumps(json.loads(path.read_text(encoding="utf-8")), indent=2) + "\n"
+
+
 def support_scores_by_query(rows: Sequence[Sequence[dict[str, Any]]]) -> list[np.ndarray]:
     """Return positive candidate scores separately for every query."""
 
@@ -483,10 +489,11 @@ def main() -> None:
             raise ValueError(f"{name}: calibration/test overlap")
         for source, target in ((calibration_plan, split_root / name / "calibration_manifest.json"), (test_plan, split_root / name / "test_manifest.json")):
             target.parent.mkdir(parents=True, exist_ok=True)
-            if target.exists() and target.read_text(encoding="utf-8") != source.read_text(encoding="utf-8"):
+            source_content = canonical_manifest(source)
+            if target.exists() and canonical_manifest(target) != source_content:
                 raise RuntimeError(f"{name}: existing copied manifest differs: {target}")
             if not target.exists():
-                target.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+                target.write_text(source_content, encoding="utf-8")
         all_method_masks, all_thresholds = build_masks(calibration, test, args.alpha)
         masks = {method: all_method_masks[method] for method in methods}
         thresholds = {

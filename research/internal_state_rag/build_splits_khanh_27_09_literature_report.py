@@ -147,7 +147,7 @@ def write_report(
             "## Split and code provenance",
             "",
             "- Archive supplied for this rerun: `splits_khanh_27_09.zip`; its SHA-256 is recorded above.",
-            "- Materialized, exact manifests: [splits](splits), including one calibration and one test manifest per dataset.",
+            "- Materialized qid manifests, canonically formatted from the archive: [splits](splits), including one calibration and one test manifest per dataset.",
             "- Split audit: [SPLIT_INTEGRITY.json](splits/SPLIT_INTEGRITY.json).",
             "- Literature selector/downstream runner: [run_literature_protocol_1000cal.py](../../run_literature_protocol_1000cal.py).",
             "- Full-table renderer: [build_splits_khanh_27_09_literature_report.py](../../build_splits_khanh_27_09_literature_report.py).",

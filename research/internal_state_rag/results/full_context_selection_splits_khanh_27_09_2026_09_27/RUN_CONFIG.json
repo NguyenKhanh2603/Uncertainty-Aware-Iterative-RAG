@@ -1,0 +1,58 @@
+{
+  "archive": {
+    "path": "splits_khanh_27_09.zip",
+    "sha256": "c9d4ea29fea7ddee5b8eabe7ddbf8d019ff990c371710d660fb088e178f34580"
+  },
+  "input_profile": "zip_20_09",
+  "runner": "research/internal_state_rag/run_literature_protocol_1000cal.py",
+  "report_renderer": "research/internal_state_rag/build_splits_khanh_27_09_literature_report.py",
+  "methods": [
+    "cce_conformal_embedding_jina_alpha_0.10",
+    "conflare_source_question_jina_alpha_0.10",
+    "traq_retrieval_bonferroni_jina_alpha_0.10"
+  ],
+  "alpha": 0.1,
+  "retrieval": {
+    "scorer": "jinaai/jina-embeddings-v4",
+    "candidate_pool": "dataset-provided; variable size; Top-L cap=30",
+    "source_root": "research/internal_state_rag/results/zip_calibration_split_20_09/retrieval"
+  },
+  "downstream": {
+    "model": "Qwen/Qwen2-VL-7B-Instruct",
+    "revision": "eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+    "decoding": "greedy",
+    "max_new_tokens": 24,
+    "min_pixels": 3136,
+    "max_pixels": 200704
+  },
+  "splits": {
+    "hotpotqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/hotpotqa/calibration_manifest.json",
+      "test_manifest": "splits/hotpotqa/test_manifest.json"
+    },
+    "mmqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/mmqa/calibration_manifest.json",
+      "test_manifest": "splits/mmqa/test_manifest.json"
+    },
+    "tatqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/tatqa/calibration_manifest.json",
+      "test_manifest": "splits/tatqa/test_manifest.json"
+    },
+    "webqa": {
+      "calibration_queries": 1000,
+      "test_queries": 100,
+      "overlap": 0,
+      "calibration_manifest": "splits/webqa/calibration_manifest.json",
+      "test_manifest": "splits/webqa/test_manifest.json"
+    }
+  }
+}
