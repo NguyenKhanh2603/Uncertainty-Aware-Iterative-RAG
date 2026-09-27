@@ -5,14 +5,14 @@ from collections import defaultdict
 
 def main():
     manifests = {
-        ("tatqa", "test"): r"E:\Downloads\test_manifest_tatqa.json",
-        ("mmqa", "test"): r"E:\Downloads\test_manifest_mmqa.json",
-        ("hotpotqa", "test"): r"E:\Downloads\test_manifest_hotpot.json",
-        ("webqa", "test"): r"E:\Downloads\test_manifest_webqa.json",
-        ("tatqa", "calibration"): r"E:\Downloads\calibration_manifest_tatqa.json",
-        ("webqa", "calibration"): r"E:\Downloads\calibration_manifest_webqa.json",
-        ("mmqa", "calibration"): r"E:\Downloads\calibration_manifest_mmqa.json",
-        ("hotpotqa", "calibration"): r"E:\Downloads\calibration_manifest_hotpot.json"
+        ("tatqa", "test"): r"E:\splits\tatqa\test_manifest.json",
+        ("mmqa", "test"): r"E:\splits\mmqa\test_manifest.json",
+        ("hotpotqa", "test"): r"E:\splits\hotpotqa\test_manifest.json",
+        ("webqa", "test"): r"E:\splits\webqa\test_manifest.json",
+        ("tatqa", "calibration"): r"E:\splits\tatqa\calibration_manifest.json",
+        ("webqa", "calibration"): r"E:\splits\webqa\calibration_manifest.json",
+        ("mmqa", "calibration"): r"E:\splits\mmqa\calibration_manifest.json",
+        ("hotpotqa", "calibration"): r"E:\splits\hotpotqa\calibration_manifest.json"
     }
     
     # Map (dataset, split) -> set of QueryIDs
@@ -24,14 +24,14 @@ def main():
                 target_qids[(ds, split)].add(qid)
             print(f"Loaded {len(data.get('plan', []))} queries for {ds} {split}")
             
-    input_dir = r"E:\Downloads\bacao\Uncertainty-Aware-Iterative-RAG-results-qwen2vl-jina4-four-datasets-2026-09-14\research\internal_state_rag\results\qwen2vl_jina4"
-    output_dir = r"E:\Downloads\filtered_manifest_conformal_data"
+    input_dir = r"E:\Downloads\conformal_backfill_2_3_results"
+    output_dir = r"E:\Downloads\filtered_splits_conformal_data"
     os.makedirs(output_dir, exist_ok=True)
     
     datasets = ["hotpotqa", "mmqa", "tatqa", "webqa"]
     
     for ds in datasets:
-        in_file = os.path.join(input_dir, f"{ds}_jina_v4_top30.jsonl.gz")
+        in_file = os.path.join(input_dir, f"{ds}_top30_retrieval.jsonl.gz")
         out_file = os.path.join(output_dir, f"{ds}_filtered_top30.jsonl.gz")
         
         calib_ids = target_qids[(ds, "calibration")]

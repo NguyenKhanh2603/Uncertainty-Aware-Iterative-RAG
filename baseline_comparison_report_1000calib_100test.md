@@ -1,4 +1,8 @@
-### Dataset: hotpotqa
+# Báo cáo Đánh giá Phương pháp Conformal BH (1000 Calibration, 100 Test)
+
+Dưới đây là bảng số liệu khi chạy pipeline với **1000 câu Calibration** và **100 câu Test** (được lấy từ file manifest trong thư mục `E:\splits`).
+
+### 1. Dataset: HotpotQA
 | Method | Kept Chunks | Precision | Recall | Empty Rate |
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 9.85 | 20.3% | 100.0% | 0.0% |
@@ -9,7 +13,7 @@
 | Conformal BH (modality_aware, α=0.9) | 8.11 | 22.3% | 90.5% | 3.0% |
 | Conformal BH (modality_aware, α=0.99) | 9.59 | 20.5% | 98.5% | 0.0% |
 
-### Dataset: mmqa
+### 2. Dataset: MMQA
 | Method | Kept Chunks | Precision | Recall | Empty Rate |
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 10.00 | 14.1% | 91.0% | 0.0% |
@@ -20,7 +24,7 @@
 | Conformal BH (modality_aware, α=0.9) | 6.62 | 11.0% | 47.1% | 18.0% |
 | Conformal BH (modality_aware, α=0.99) | 8.36 | 9.6% | 51.6% | 7.0% |
 
-### Dataset: tatqa
+### 3. Dataset: TAT-QA
 | Method | Kept Chunks | Precision | Recall | Empty Rate |
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 5.63 | 23.8% | 100.0% | 0.0% |
@@ -31,7 +35,7 @@
 | Conformal BH (modality_aware, α=0.9) | 2.74 | 13.1% | 26.9% | 31.0% |
 | Conformal BH (modality_aware, α=0.99) | 3.22 | 11.5% | 27.6% | 26.0% |
 
-### Dataset: webqa
+### 4. Dataset: WebQA
 | Method | Kept Chunks | Precision | Recall | Empty Rate |
 | :--- | :--- | :--- | :--- | :--- |
 | Fixed Top-10 | 9.98 | 14.1% | 80.6% | 0.0% |
@@ -41,4 +45,3 @@
 | Conformal BH (modality_aware, α=0.1) | 0.58 | 34.5% | 11.4% | 81.0% |
 | Conformal BH (modality_aware, α=0.9) | 6.43 | 16.3% | 60.0% | 25.0% |
 | Conformal BH (modality_aware, α=0.99) | 8.33 | 14.5% | 69.1% | 13.0% |
-

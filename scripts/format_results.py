@@ -5,7 +5,7 @@ def format_percentage(val):
     return f"{val * 100:.1f}%"
 
 def main():
-    summary_path = r"E:\Downloads\filtered_manifest_conformal_data\benchmark_with_pooled\backfill_benchmark_summary.json"
+    summary_path = r"E:\Downloads\filtered_splits_conformal_data\benchmark_modality_aware\backfill_benchmark_summary.json"
     with open(summary_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     
