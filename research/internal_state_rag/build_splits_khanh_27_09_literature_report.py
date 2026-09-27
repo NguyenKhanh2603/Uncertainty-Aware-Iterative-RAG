@@ -110,7 +110,7 @@ def write_report(
         "Chunks is mean retained chunks/query. Precision and Recall are micro "
         "support metrics in each frozen candidate pool. Empty is the fraction of queries "
         "that retained no chunk. Any/All are conditional support-retention rates "
-        "among queries with at least one labelled support in Top-30. EM, token F1, "
+        "among queries with at least one labelled support in the candidate pool. EM, token F1, "
         "and Numeric are Qwen direct-answer measurements on the 100 held-out "
         "queries; they are not conformal guarantees.",
         "",
@@ -152,6 +152,7 @@ def write_report(
             "- Literature selector/downstream runner: [run_literature_protocol_1000cal.py](../../run_literature_protocol_1000cal.py).",
             "- Full-table renderer: [build_splits_khanh_27_09_literature_report.py](../../build_splits_khanh_27_09_literature_report.py).",
             "- Shared frozen-candidate configuration and data mapping: [run_all_datasets_cosine_six_methods.py](../../run_all_datasets_cosine_six_methods.py).",
+            "- Exact model, decoding, archive, and input-profile configuration: [RUN_CONFIG.json](RUN_CONFIG.json).",
             "- Raw completed selection and QA summary: [summary.json](summary.json).",
             "",
             "The three literature rows are matched Jina adaptations, not full end-to-end replications of the original CCE, CONFLARE, or TRAQ systems. TRAQ reports its retrieval component only; it does not report TRAQ's semantic answer-set coverage procedure.",
@@ -159,6 +160,38 @@ def write_report(
         ]
     )
     output.write_text("\n".join(lines), encoding="utf-8")
+
+
+def write_run_config(
+    output_dir: Path, *, archive: Path, split_datasets: dict[str, Any]
+) -> None:
+    """Persist all non-secret knobs needed to audit or repeat this artifact."""
+
+    config = {
+        "archive": {"path": str(archive), "sha256": sha256(archive)},
+        "input_profile": "zip_20_09",
+        "runner": "research/internal_state_rag/run_literature_protocol_1000cal.py",
+        "report_renderer": "research/internal_state_rag/build_splits_khanh_27_09_literature_report.py",
+        "methods": sorted(EVALUATED_METHODS),
+        "alpha": 0.10,
+        "retrieval": {
+            "scorer": "jinaai/jina-embeddings-v4",
+            "candidate_pool": "dataset-provided; variable size; Top-L cap=30",
+            "source_root": "research/internal_state_rag/results/zip_calibration_split_20_09/retrieval",
+        },
+        "downstream": {
+            "model": "Qwen/Qwen2-VL-7B-Instruct",
+            "revision": "eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+            "decoding": "greedy",
+            "max_new_tokens": 24,
+            "min_pixels": 3136,
+            "max_pixels": 200704,
+        },
+        "splits": split_datasets,
+    }
+    (output_dir / "RUN_CONFIG.json").write_text(
+        json.dumps(config, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def main() -> None:
@@ -189,6 +222,7 @@ def main() -> None:
         + "\n",
         encoding="utf-8",
     )
+    write_run_config(args.output_dir, archive=args.archive, split_datasets=split_datasets)
     write_report(
         args.output_dir / "REPORT.md",
         results=result,
