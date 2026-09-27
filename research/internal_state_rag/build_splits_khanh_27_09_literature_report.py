@@ -154,8 +154,9 @@ def write_report(
             "- Shared frozen-candidate configuration and data mapping: [run_all_datasets_cosine_six_methods.py](../../run_all_datasets_cosine_six_methods.py).",
             "- Exact model, decoding, archive, and input-profile configuration: [RUN_CONFIG.json](RUN_CONFIG.json).",
             "- Raw completed selection and QA summary: [summary.json](summary.json).",
+            "- Source-code and fidelity re-audit: [SOURCE_CODE_REAUDIT.md](SOURCE_CODE_REAUDIT.md).",
             "",
-            "The three literature rows are matched Jina adaptations, not full end-to-end replications of the original CCE, CONFLARE, or TRAQ systems. TRAQ reports its retrieval component only; it does not report TRAQ's semantic answer-set coverage procedure.",
+            "The three literature rows are matched Jina score-threshold adaptations, not source-code reproductions of CCE, CONFLARE, or TRAQ. The re-audit records the precise differences. TRAQ reports its retrieval component only; it does not report TRAQ's semantic answer-set coverage procedure.",
             "",
         ]
     )
