@@ -72,7 +72,7 @@ def validate(sources: dict[str, dict[str, Any]]) -> None:
     for dataset in DATASETS:
         state = sources["internal"]["datasets"][dataset]
         split = state.get("split", {})
-        if state.get("status") != "complete" or split.get("test_queries") != 100:
+        if state.get("status") != "complete" or split.get("heldout_test_queries") != 100:
             raise RuntimeError(f"internal/{dataset}: incomplete or wrong test split")
         if split.get("probe_train_queries", 0) + split.get("conformal_calibration_queries", 0) != 1000:
             raise RuntimeError(f"internal/{dataset}: expected 1,000 parent calibration qids")
