@@ -59,8 +59,6 @@ CCE nhìn việc lọc context như bài toán giữ coverage của relevant sni
 
 Phương pháp Two-Stage cũng làm việc trên candidate đã retrieval, nhưng dùng hai reference banks có vai trò đối xứng: Stage 1 tìm evidence khác biệt với false bank, sau đó Stage 2 loại evidence yếu so với support bank. Thủ tục được chạy theo query và có thể conditioning theo modality. Cấu trúc này tạo hai nút điều chỉnh riêng cho evidence retention và pruning; đây là hướng có tiềm năng để khảo sát trade-off precision–recall thay vì chỉ thay đổi một global similarity cutoff. Các bước hoàn thiện tiếp theo gồm đánh giá độ ổn định khi thay đổi calibration size, ablation theo modality, và kiểm tra các điều kiện bảo đảm của thủ tục hai stage có context cap.
 
-**Tài liệu tham khảo.** CCE: [ECIR record](https://dblp.org/rec/conf/ecir/ChakrabortyYKLD26) và [paper](https://arxiv.org/abs/2511.17908); CONFLARE: [paper](https://arxiv.org/abs/2404.04287) và [code](https://github.com/Mayo-Radiology-Informatics-Lab/conflare); TRAQ: [NAACL Anthology](https://aclanthology.org/2024.naacl-long.210/) và [code](https://github.com/shuoli90/TRAQ). Venue ranks follow the [CORE/ICORE conference ranking](https://portal.core.edu.au/); ECIR and NAACL are rank A.
-
 ---
 
 ## 3. Tổng hợp kết quả selection
