@@ -29,6 +29,9 @@ class RowSpec:
 ROWS = (
     RowSpec("Fixed", "Fixed Top-10", "original", "fixed_top10"),
     RowSpec("Fixed", "Fixed Top-20", "original", "fixed_top20"),
+    RowSpec("Legacy cosine proxy", "CCE-style global positive-cosine proxy (α=.10)", "original", "cce_alpha_0.10"),
+    RowSpec("Legacy cosine proxy", "CONFLARE-style global positive-cosine proxy (α=.10)", "original", "conflare_alpha_0.10"),
+    RowSpec("Legacy cosine proxy", "TRAQ-style loose positive-cosine proxy (α=.10)", "original", "traq_alpha_0.10"),
     RowSpec("Literature", "CCE Conformal-Embedding, Jina adaptation (α=.10)", "literature", "cce_conformal_embedding_jina_alpha_0.10"),
     RowSpec("Literature", "CONFLARE source-question, Jina adaptation (α=.10)", "literature", "conflare_source_question_jina_alpha_0.10"),
     RowSpec("Literature", "TRAQ retrieval Bonferroni, Jina adaptation (α=.10; α_R=.05)", "literature", "traq_retrieval_bonferroni_jina_alpha_0.10"),
@@ -98,12 +101,15 @@ def write_report(output: Path, sources: dict[str, dict[str, Any]], source_paths:
         "",
         "Every row evaluates the same frozen Jina Top-30 candidates on the same 100 held-out test qids per dataset. This consolidates completed artifacts; it does not rerun, average, or overwrite any experiment.",
         "",
+        "> **Fidelity status:** CCE, CONFLARE, and TRAQ rows are **original-formula / calibration-unit adaptations**, not end-to-end executions of their released pipelines. The table intentionally includes both the earlier *legacy cosine proxies* and the later, more construction-faithful Jina adaptations. See [FIDELITY_AUDIT.md](FIDELITY_AUDIT.md); do not claim these values reproduce or outperform the published systems.",
+        "",
         "## Protocol distinctions that must remain visible",
         "",
         "- **Original cosine / CCE / CONFLARE / TRAQ / alpha-free:** 1,000 calibration qids and 100 held-out test qids. CCE, CONFLARE, and TRAQ are Jina adaptations with their distinct retrieval calibration units. TRAQ is its retrieval component only, not the full semantic answer prediction-set procedure.",
         "- **Internal Qwen-7B rows:** the same 1,000 parent calibration qids are split into disjoint probe-train and conformal-calibration roles (about 500 / 500, exact counts shown in the internal report), followed by the same 100 test qids. Their use of 500 calibration qids means they are an ablation, not a strictly matched 1,000-calibration head-to-head result.",
         "- **Alpha-free rows:** threshold is chosen only on the 1,000 calibration qids for the stated empirical utility. It is frozen for test inference, but it has no conformal risk guarantee.",
         "- **BY/BH:** `alpha` is the multiple-testing level. BH rows use the reported experimental context cap; no capped-procedure FDR guarantee is claimed.",
+        "- **Legacy cosine proxy vs Jina adaptation:** neither is a full published-pipeline reproduction. The adaptation rows preserve more of each method's reported calibration construction; the proxy rows apply simple global positive-score thresholds and are retained for historical comparability.",
         "",
         "## Metrics",
         "",
@@ -130,6 +136,7 @@ def write_report(output: Path, sources: dict[str, dict[str, Any]], source_paths:
             f"- [CCE / CONFLARE / TRAQ adapted protocol]({source_paths['literature'].as_posix()})",
             f"- [Qwen-7B internal-signal ablation]({source_paths['internal'].as_posix()})",
             f"- [Alpha-free query-level operating points]({source_paths['alpha_free'].as_posix()})",
+            "- [Fidelity audit for CCE / CONFLARE / TRAQ](FIDELITY_AUDIT.md)",
             "",
         ]
     )
