@@ -1,0 +1,21 @@
+{
+  "name": "khanh_27_09_qwen2vl_direct_answer_v1",
+  "calibration_queries_per_dataset": 1000,
+  "held_out_test_queries_per_dataset": 100,
+  "split_archive": "splits_khanh_27_09.zip",
+  "retrieval": {
+    "scorer": "jinaai/jina-embeddings-v4",
+    "candidate_pool": "dataset-provided ragged pool, capped at Top-L=30",
+    "context_order": "ascending frozen Jina retrieval rank"
+  },
+  "generator": {
+    "model": "Qwen/Qwen2-VL-7B-Instruct",
+    "revision": "eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+    "decoding": "greedy (do_sample=false)",
+    "max_new_tokens": 24,
+    "min_pixels": 3136,
+    "max_pixels": 200704
+  },
+  "prompt": "Answer using only the supplied context. Return only the short answer.\\nQuestion: {question}",
+  "metrics": ["exact_match", "token_f1", "numerical_accuracy"]
+}

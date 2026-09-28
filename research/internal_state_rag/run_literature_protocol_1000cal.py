@@ -440,6 +440,7 @@ def main() -> None:
     parser.add_argument("--alpha", type=float, default=0.10)
     parser.add_argument("--selection-only", action="store_true")
     parser.add_argument("--model", type=Path)
+    parser.add_argument("--model-revision", default=None)
     parser.add_argument("--max-new-tokens", type=int, default=24)
     parser.add_argument("--min-pixels", type=int, default=3136)
     parser.add_argument("--max-pixels", type=int, default=200704)
@@ -544,7 +545,10 @@ def main() -> None:
         for config, test_qids, test, _masks in pending
     }
     generator = QwenDirectAnswerGenerator(
-        args.model, min_pixels=args.min_pixels, max_pixels=args.max_pixels
+        args.model,
+        min_pixels=args.min_pixels,
+        max_pixels=args.max_pixels,
+        revision=args.model_revision,
     )
     for config, test_qids, test, masks in pending:
         questions, corpus = resolved[config.name]

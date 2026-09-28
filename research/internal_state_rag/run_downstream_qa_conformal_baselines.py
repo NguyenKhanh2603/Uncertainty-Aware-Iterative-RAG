@@ -147,9 +147,17 @@ class QwenDirectAnswerGenerator:
     during ordinary answer generation with the current transformers release.
     """
 
-    def __init__(self, model_path: Path, *, min_pixels: int, max_pixels: int):
+    def __init__(
+        self,
+        model_path: Path,
+        *,
+        min_pixels: int,
+        max_pixels: int,
+        revision: str | None = None,
+    ):
+        revision_kwargs = {"revision": revision} if revision is not None else {}
         self.processor = AutoProcessor.from_pretrained(
-            str(model_path), min_pixels=min_pixels, max_pixels=max_pixels
+            str(model_path), min_pixels=min_pixels, max_pixels=max_pixels, **revision_kwargs
         )
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
             str(model_path),
@@ -158,6 +166,7 @@ class QwenDirectAnswerGenerator:
             torch_dtype=torch.bfloat16,
             low_cpu_mem_usage=True,
             attn_implementation="sdpa",
+            **revision_kwargs,
         ).eval().to("cuda")
 
     @torch.inference_mode()
