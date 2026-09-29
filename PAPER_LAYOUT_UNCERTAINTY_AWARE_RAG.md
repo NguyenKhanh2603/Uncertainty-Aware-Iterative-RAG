@@ -169,7 +169,7 @@
   - chunk cùng document hoặc cùng modality;
   - score chịu chung query representation.
 
-### 3.4. Sau retrieval, từng baseline làm gì và gap nằm ở đâu
+### 3.4. Research Gap
 
 #### 3.4.1. CCE
 
