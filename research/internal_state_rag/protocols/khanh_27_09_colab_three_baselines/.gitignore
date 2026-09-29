@@ -1,0 +1,4 @@
+colab_results/
+data_bundle/
+*.zip
+*.tar.gz

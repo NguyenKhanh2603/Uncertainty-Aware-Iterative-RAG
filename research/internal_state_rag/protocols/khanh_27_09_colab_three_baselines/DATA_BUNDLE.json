@@ -1,0 +1,16 @@
+{
+  "repo_id": "danny2507/khanh-27-09-three-baselines-colab",
+  "repo_type": "dataset",
+  "revision": "main",
+  "filename": "khanh_27_09_test_bundle_v1.tar.gz",
+  "bytes": 139941207,
+  "sha256": "46797d0ed4453176c95e69995dbec698e1c0ecee4f53ff9dbcfb1fed33b1080f",
+  "archive_root": "data_bundle",
+  "queries_per_dataset": 100,
+  "datasets": [
+    "hotpotqa",
+    "mmqa",
+    "tatqa",
+    "webqa"
+  ]
+}
