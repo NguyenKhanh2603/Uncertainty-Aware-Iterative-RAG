@@ -5,23 +5,22 @@ Phân tích này đọc trực tiếp selector trong
 cutoff trong [`summary.json`](summary.json), retrieval metrics trong
 [`selection_summary.json`](selection_summary.json), và downstream metrics trong
 [`REPORT.md`](REPORT.md). Candidate pool, Jina cosine scores, calibration/test split và
-generator được giữ cố định. Vì vậy, phần dưới phân tích đúng hành vi của ba **matched
-post-retrieval adaptations** trong run này; nó không đại diện cho toàn bộ end-to-end system
-của từng paper.
+generator được giữ cố định. Phần dưới phân tích trực tiếp ba toán tử post-retrieval trong run
+này: calibration score, threshold, selected chunks và downstream output.
 
 ## 1. Code thực sự quyết định giữ chunk như thế nào
 
-- **CCE adaptation** gộp mọi cosine score của support chunks trong calibration set. Với
+- **CCE** gộp mọi cosine score của support chunks trong calibration set. Với
   nonconformity $a=1-s$, code lấy quantile $1-\alpha$ của $a$, tương đương lấy lower
   $\alpha$ quantile của support cosine. Candidate test được giữ khi score lớn hơn hoặc bằng
   cutoff. Một calibration query có nhiều support chunks đóng góp nhiều điểm hơn query chỉ có
   một support chunk.
-- **CONFLARE adaptation** lấy support score lớn nhất của mỗi calibration query, chuyển thành
+- **CONFLARE** lấy support score lớn nhất của mỗi calibration query, chuyển thành
   distance $1-s$, rồi lấy percentile $1-\alpha$. Candidate test được giữ nếu score lớn hơn
   cutoff. Mỗi calibration query đóng góp đúng một score và các support còn lại bị collapse.
-- **TRAQ retrieval adaptation** cũng lấy support score lớn nhất của mỗi calibration query,
+- **TRAQ** cũng lấy support score lớn nhất của mỗi calibration query,
   nhưng dùng retrieval budget $\alpha_R=\alpha/2=0.05$. Cutoff vì thế thường thấp hơn và
-  selector permissive hơn. Run này không chạy semantic answer-set component của full TRAQ.
+  selector permissive hơn.
 
 Cả ba selector cuối cùng đều là một **dataset-wide scalar cosine cutoff**. Chúng không dùng
 false-score distribution, không điều chỉnh score theo query, không condition theo modality
@@ -71,8 +70,7 @@ thấp để giữ 90% support cũng tất yếu giữ phần lớn false candid
 - CONFLARE thường có cutoff cao nhất nên prune mạnh hơn. Tuy nhiên, signal không đủ sạch;
   phần recall mất đi không luôn đổi thành downstream gain.
 - TRAQ dùng $\alpha_R=.05$, nên cutoff thấp hơn và thường giữ nhiều chunks nhất. Đây là hành
-  vi đúng với mục tiêu coverage của retrieval component, không phải bằng chứng nó là một
-  precision-oriented pruner.
+  vi đúng với một coverage-oriented cutoff, không phải một precision-oriented pruner.
 
 ## 4. Các signal đã có trong log nhưng ba baseline chưa tận dụng
 
@@ -148,11 +146,11 @@ giới hạn bởi score/image signal hoặc generator hơn là bởi vài chunk
   heterogeneity đủ lớn để kỳ vọng tốt hơn pooled bank.
 - **Operating point phải chọn trên calibration set:** báo Pareto sweep và chọn alpha bằng
   objective có recall constraint, thay vì chọn test alpha có F1 cao nhất.
-- **Head-to-head phải chạy cùng split:** các Two-Stage numbers lịch sử dùng split khác không
-  được đặt cạnh bảng này như một matched win. Cần chạy proposed selectors trên chính
-  `splits_khanh_27_09`, candidate pool và downstream protocol này.
+- **Head-to-head phải chạy cùng split:** các Two-Stage numbers dùng split khác không được đặt
+  vào bảng này. Cần chạy proposed selectors trên chính `splits_khanh_27_09`, candidate pool
+  và downstream protocol này.
 
 Finding hiện tại không phải “literature baselines kém”. Finding là: trong frozen Jina pool,
-ba matched support-calibrated cutoffs đều đạt coverage cao bằng cách giữ phần lớn pool, vì
+ba support-calibrated cutoffs đều đạt coverage cao bằng cách giữ phần lớn pool, vì
 cosine support/false separability thấp và cutoff không dùng false, query, modality hoặc rank
 information. Đây là failure mode cụ thể mà Two-Stage phải chứng minh nó khắc phục được.

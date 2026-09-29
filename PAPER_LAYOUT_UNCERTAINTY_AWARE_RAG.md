@@ -39,7 +39,8 @@
   - context-selection quality;
   - downstream answer quality;
   - context/generation cost.
-- Thực hiện matched comparison trên bốn text/multimodal datasets với cùng split, candidate pool, retriever và generator.
+- So sánh các toán tử post-retrieval trên bốn text/multimodal datasets với cùng split,
+  candidate pool, cosine scores và generator.
 - Phân tích calibration size, modality conditioning, $\alpha$ sweep, BH/BY và các ablation của từng stage.
 
 ---
@@ -92,7 +93,9 @@
 
 - Fixed Top-$k$ không có calibration và không thích ứng theo uncertainty.
 - Global similarity threshold thích ứng số chunk nhưng vẫn dùng một cutoff chung.
-- Một số conformal methods tập trung vào relevant-snippet coverage hoặc end-to-end answer-set coverage, nhưng chưa tách false-null screening và support-null pruning thành hai bước theo query.
+- Các post-retrieval conformal selectors hiện tại dùng support-side calibration để bảo toàn
+  relevant-snippet coverage, nhưng chưa tách false-null screening và support-null pruning
+  thành hai quyết định theo query.
 - Cosine score có thể có distribution khác nhau giữa dataset, modality, rank bin và query type.
 
 ### 2.3. Ý tưởng chính
@@ -144,15 +147,15 @@
 ### 3.2. Conformal prediction cho retrieval và RAG
 
 - Giới thiệu exchangeability, calibration set và finite-sample marginal validity ở mức cần thiết.
-- Trình bày ngắn ba baseline:
-  - **CCE / Conformal Context Engineering:** nonconformity hoặc relevance-score calibration để chọn context;
-  - **CONFLARE:** calibration threshold trên source-question/relevant-document distance;
-  - **TRAQ:** phân bổ error budget giữa retrieval coverage và semantic answer-set coverage.
-- Nêu rõ phần nào được so sánh:
-  - cùng frozen post-retrieval candidate pool;
-  - retrieval component của TRAQ;
-  - Jina score adaptations nếu chưa chạy nguyên source implementation.
-- Không dùng từ “reproduction” cho các hàng chỉ là matched Jina adaptation.
+- Trình bày ba post-retrieval rules đúng theo code đang chạy:
+  - **CCE:** hiệu chuẩn nonconformity $1-s$ từ mọi labelled support pair, rồi giữ candidate
+    nếu $s$ vượt support-derived cutoff;
+  - **CONFLARE:** lấy best support score của từng calibration query, hiệu chuẩn một
+    source-question cutoff, rồi giữ candidate vượt cutoff;
+  - **TRAQ:** lấy best support score của từng calibration query, dành mức
+    $\alpha_R=\alpha/2$ cho retrieval threshold, rồi giữ candidate vượt cutoff.
+- Cả ba bắt đầu từ cùng candidate pool sau retrieval. Vì vậy phần so sánh tập trung hoàn toàn
+  vào calibration object, threshold và tập chunk được chuyển cho generator.
 
 ### 3.3. Multiple hypothesis testing trong context selection
 
@@ -166,41 +169,63 @@
   - chunk cùng document hoặc cùng modality;
   - score chịu chung query representation.
 
-### 3.4. Cơ chế post-retrieval chính xác của các baseline
+### 3.4. Sau retrieval, từng baseline làm gì và gap nằm ở đâu
 
-- **CCE Conformal-Embedding adaptation** xây phân bố calibration từ nonconformity score
-  $1-\cos(e_q,e_c)$ của các relevant/support snippets. Quantile $(1-\alpha)$ của phân bố
-  này tạo một cutoff; ở test, mỗi candidate được giữ nếu nonconformity của nó không vượt
-  cutoff. Đây là một quyết định threshold độc lập cho từng candidate, dùng support-side
-  calibration scores.
-- **CONFLARE source-question adaptation** ghi cosine distance giữa calibration question và
-  source chunk chứa evidence. Percentile $(1-\alpha)$ của các relevant-source distances tạo
-  một cutoff toàn cục; ở test, tất cả retrieved chunks có distance nhỏ hơn cutoff được giữ.
-  Khác biệt chính với CCE trong matched implementation nằm ở cách tạo calibration pairs và
-  tập source-question scores dùng để ước lượng cutoff.
-- **TRAQ retrieval adaptation** hiệu chuẩn một retrieval-score threshold với retrieval error
-  budget $\alpha_R$. Trong TRAQ đầy đủ, $\alpha_R$ được phân bổ cùng error budget của bước
-  semantic answer-set generation, chẳng hạn bằng Bonferroni. Matched comparison hiện tại chỉ
-  đánh giá retrieval component: passages vượt calibrated retrieval threshold được giữ, còn
-  semantic answer-set stage không được chạy.
-- **Two-Stage Conformal Selection** không dùng một cutoff duy nhất. Stage 1 so từng candidate
-  với false-evidence bank để tạo false-null p-value; Stage 2 so các candidate sống sót với
-  support-evidence bank để tạo support-null p-value. BH hoặc BY được chạy trên family p-values
-  của từng query, vì vậy quyết định cuối phụ thuộc đồng thời vào score của candidate và các
-  candidates khác trong cùng query.
-- Trong matched Jina implementation, CCE và CONFLARE có thể cho kết quả rất gần hoặc trùng
-  nhau nếu cả hai cuối cùng dùng cùng question–support pairs, cùng cosine-distance definition
-  và cùng quantile convention. Paper phải báo chính xác nguồn calibration pairs và threshold
-  của từng hàng; không nên trình bày hai tên baseline như hai thuật toán thực nghiệm khác nhau
-  nếu implementation thực tế đã rút gọn về cùng selector.
-- Trong exact code của matched run:
-  - CCE gộp **mọi support score**, nên query có nhiều support chunks có trọng số lớn hơn;
-  - CONFLARE lấy **maximum support score của mỗi query**, nên mỗi query đóng góp một điểm;
-  - TRAQ cũng lấy maximum support score nhưng dùng $\alpha_R=\alpha/2=.05$, nên cutoff thường
-    permissive hơn;
-  - cả ba cuối cùng đều áp dụng **một scalar cosine cutoff cho toàn dataset**.
+#### 3.4.1. CCE
 
-### 3.5. Matched run thực sự cho thấy điều gì
+- **Input:** toàn bộ candidate chunks và Jina cosine score $s(q,c)$ sau retrieval.
+- **Calibration:** gom score của **mọi labelled support chunk** trên calibration set và đặt
+  nonconformity $a(q,c)=1-s(q,c)$. Code lấy quantile $(1-\alpha)$ của $a$.
+- **Selection:** giữ từng test chunk nếu $1-s(q,c)\le \hat q_{1-\alpha}$, tương đương
+  $s(q,c)\ge 1-\hat q_{1-\alpha}$.
+- **Làm được:** bảo toàn support recall cao: 90.5% HotpotQA, 91.0% MMQA, 91.8% TAT-QA và
+  86.3% WebQA.
+- **Chưa ổn:** gộp mọi support pair làm query có nhiều labelled supports đóng góp nhiều điểm;
+  threshold không quan sát false distribution và không thay đổi theo query. Kết quả là giữ
+  81.7%–87.4% pool, với precision chỉ 6.5% trên WebQA và 7.7% trên MMQA.
+
+#### 3.4.2. CONFLARE
+
+- **Input:** cùng candidate pool và cùng cosine score sau retrieval.
+- **Calibration:** với mỗi calibration query, code lấy **maximum cosine của các support
+  chunks**, chuyển thành distance $d=1-s$, rồi lấy percentile $(1-\alpha)$ của các distances.
+- **Selection:** giữ test chunk nếu distance của nó nhỏ hơn calibrated cutoff.
+- **Làm được:** cutoff thường chặt hơn CCE/TRAQ, nên giữ ít chunk nhất trong ba methods:
+  7.05 trên HotpotQA, 18.05 trên MMQA, 4.64 trên TAT-QA và 21.60 trên WebQA. Trên MMQA,
+  downstream F1 .462 là tốt nhất trong ba baseline.
+- **Chưa ổn:** maximum operation chỉ đại diện support dễ nhất của mỗi query; nó không hiệu
+  chuẩn khả năng giữ đủ multi-support evidence. HotpotQA recall giảm xuống 74.0% và F1 giảm
+  từ .653 của CCE xuống .623; TAT-QA recall giảm xuống 86.6% và F1 còn .432.
+
+#### 3.4.3. TRAQ
+
+- **Input:** cùng candidate pool và cùng cosine score sau retrieval.
+- **Calibration:** lấy maximum support score của mỗi calibration query. Với $\alpha=.10$,
+  code dùng $\alpha_R=\alpha/2=.05$ và lấy lower $.05$ quantile làm similarity cutoff.
+- **Selection:** giữ test chunk nếu score lớn hơn hoặc bằng cutoff.
+- **Làm được:** threshold permissive giúp đạt recall cao nhất trên MMQA (94.2%), TAT-QA
+  (93.3%) và WebQA (88.6%). Trên TAT-QA, nó đạt downstream F1 .500, cao nhất trong ba methods.
+- **Chưa ổn:** recall cao đạt được bằng cách giữ 82.9%–89.2% pool. TRAQ còn trung bình 19.50
+  chunks/query trên MMQA và 24.68 trên WebQA; precision tương ứng chỉ 7.5% và 6.3%.
+
+#### 3.4.4. Gap chung và cách phương pháp đề xuất xử lý
+
+- CCE, CONFLARE và TRAQ khác nhau ở calibration sample và quantile, nhưng quyết định test cuối
+  cùng đều có dạng **một scalar cosine cutoff cho toàn dataset**.
+- Chúng làm tốt mục tiêu support coverage, nhưng score threshold không dùng:
+  - false-score distribution;
+  - vị trí và độ phân tán score trong từng query;
+  - modality và retrieval rank;
+  - family-wise quan hệ giữa các candidates của cùng query.
+- **Stage 1** bổ sung false-evidence bank để kiểm tra candidate có thực sự khác false evidence
+  hay chỉ vượt một support-derived cutoff thấp.
+- **Stage 2** dùng support-evidence bank để prune các candidate không tương thích với support
+  sau khi Stage 1 đã tạo high-recall set.
+- **BH/BY theo query** biến quyết định từ các threshold độc lập thành selection trên toàn family
+  candidates của query. Modality- và rank-conditioned banks khai thác heterogeneity mà pooled
+  threshold đang bỏ qua.
+
+### 3.5. Kết quả post-retrieval hiện tại cho thấy điều gì
 
 Phân tích đầy đủ và số liệu truy vết nằm tại
 [`BASELINE_SIGNAL_DIAGNOSIS.md`](research/internal_state_rag/results/full_context_selection_splits_khanh_27_09_2026_09_27/BASELINE_SIGNAL_DIAGNOSIS.md).
@@ -250,17 +275,17 @@ Phân tích đầy đủ và số liệu truy vết nằm tại
 - Không có quy luật đơn điệu “ít chunk hơn tốt hơn”. Khoảng trống cần kiểm chứng là liệu dùng
   false bank, query-level multiple testing, modality và rank conditioning có đẩy được Pareto
   frontier ra ngoài các global support cutoffs trên cùng split hay không.
-- Two-Stage phải được đánh giá trên chính candidate pool và split này. Các con số từ split cũ
-  chỉ dùng để hình thành hypothesis, không dùng làm matched head-to-head evidence.
+- Two-Stage phải được đánh giá trên chính candidate pool và split này. Các con số từ split
+  khác không được gộp vào cùng bảng so sánh.
 
 ### 3.8. Bảng so sánh related work dự kiến
 
 | Method | Calibration object | Decision granularity | Output | Multiple testing | Comparison role |
 |---|---|---|---|---|---|
 | Fixed Top-$k$ | None | global budget | first $k$ chunks | No | non-calibrated baseline |
-| CCE adaptation | $1-\cos(e_q,e_c)$ của relevant/support snippets | candidate-wise test against one calibrated quantile | chunks below nonconformity cutoff | No | support-score cutoff baseline |
-| CONFLARE adaptation | question-to-relevant-source cosine distances | candidate-wise test against one calibrated percentile | chunks below distance cutoff | No | source-question cutoff baseline |
-| TRAQ retrieval adaptation | retrieval scores và retrieval error budget $\alpha_R$ | candidate-wise test against calibrated retrieval threshold | passages passed to generation | Bonferroni allocates end-to-end error budget | retrieval component only |
+| CCE | mọi support-pair nonconformity $1-\cos(e_q,e_c)$ | independent global threshold | chunks below nonconformity cutoff | No | high-recall support cutoff |
+| CONFLARE | best-support distance của mỗi calibration query | independent global threshold | chunks below distance cutoff | No | stricter support cutoff |
+| TRAQ | best-support score của mỗi calibration query, $\alpha_R=\alpha/2$ | independent global threshold | chunks above similarity cutoff | No | permissive coverage cutoff |
 | Stage 1 only | false-score bank | per query | admitted set | BH or BY | ablation |
 | Two-Stage | false + support banks | per query | screened then pruned set | BH/BY per stage | proposed method |
 | Top-$k$ + Stage 2 | support bank | per query after fixed budget | pruned Top-$k$ | BH/BY | stage-isolation ablation |
@@ -315,7 +340,7 @@ $$
 
 - Trình bày full pipeline:
   - frozen candidate retrieval;
-  - matched reference-bank lookup;
+  - condition-specific reference-bank lookup;
   - Stage 1 false-null screening;
   - Stage 2 support-null pruning;
   - optional rank-preserving context cap;
@@ -416,7 +441,7 @@ $$
   - hoặc verified backfill từ ranks $K+1\ldots L$.
 - Tách rõ:
   - uncapped multiple-testing procedure;
-  - capped procedure dùng trong end-to-end experiments.
+  - capped procedure dùng trong downstream experiments.
 - Không chuyển guarantee của uncapped procedure sang capped procedure nếu chưa có proof.
 
 ### 5.7. Method variants
@@ -464,7 +489,7 @@ $$
 
 ### 6.2. Data split
 
-- Main matched split: `splits_khanh_27_09`.
+- Main split: `splits_khanh_27_09`.
 - 1,000 calibration và 100 held-out test queries mỗi dataset.
 - Zero qid overlap.
 - Hyperparameters phải chọn từ calibration hoặc một validation subset, không chọn bằng test F1.
@@ -489,14 +514,11 @@ $$
 ### 6.5. Baselines
 
 - Fixed Top-5, Fixed Top-10 và Fixed Top-20 khi candidate pool đủ lớn.
-- CCE Conformal-Embedding adaptation.
-- CONFLARE source-question adaptation.
-- TRAQ retrieval Bonferroni adaptation.
-- Nếu không dùng nguyên source code, label nhất quán là **matched adaptation**.
-- Báo baseline fidelity table:
-  - thành phần giống paper gốc;
-  - thành phần thay đổi để dùng chung retriever/candidate pool;
-  - phần end-to-end không được đánh giá.
+- CCE support-pair nonconformity cutoff.
+- CONFLARE per-query best-support distance cutoff.
+- TRAQ per-query best-support retrieval cutoff với $\alpha_R=\alpha/2$.
+- Với mỗi method, báo exact calibration sample count, quantile convention, numerical cutoff,
+  comparison operator (`<`, `<=`, `>=`) và candidate pool trước/sau selection.
 
 ### 6.6. Proposed configurations
 
@@ -561,7 +583,7 @@ $$
 - **Table 1:** Kept chunks, precision, recall và Selection F1 trên bốn datasets.
 - Sắp xếp rows theo nhóm:
   - Fixed Top-$k$;
-  - literature matched adaptations;
+  - literature post-retrieval selectors;
   - Stage 1 only;
   - Two-Stage;
   - Top-10 + Stage 2.
@@ -579,12 +601,13 @@ $$
   - context-selection F1 cao hơn có luôn cải thiện QA F1 không;
   - dataset nào hưởng lợi từ context ngắn;
   - dataset nào cần giữ recall cao.
-- Phân tích preliminary cần viết trung thực:
-  - HotpotQA: Two-Stage $(.99,.15)$ có F1 76.96 trong bảng hiện tại, cao hơn CCE 73.02 và TRAQ 73.52;
-  - MMQA: CCE F1 54.08 cao hơn các Two-Stage rows đã liệt kê, nên không claim universal downstream win;
-  - TAT-QA: Two-Stage $(.99,.15)$ có EM 37 so với 28 của CCE/TRAQ trong bảng hiện tại;
-  - WebQA: Top-10 + Stage 2 $(.15)$ có F1 30.02 so với CCE 28.89 và TRAQ 29.29.
-- Chỉ giữ các số này nếu xác nhận chúng dùng cùng split và cùng generator protocol.
+- Phân tích ba post-retrieval baselines trên `splits_khanh_27_09`:
+  - HotpotQA: CCE/CONFLARE/TRAQ đạt F1 .653/.623/.642;
+  - MMQA: .436/.462/.435;
+  - TAT-QA: .490/.432/.500;
+  - WebQA: .260/.255/.246.
+- Điền Two-Stage và Top-$k$ + Stage 2 vào cùng bảng sau khi chạy đúng candidate pool, split
+  và generator protocol này.
 
 ### 7.3. Quality–cost trade-off
 
@@ -602,14 +625,14 @@ $$
 
 - So sánh ở ba chế độ công bằng:
   - cùng $\alpha$ nominal;
-  - matched mean context budget;
+  - cùng mean context budget;
   - Pareto frontier không ép cùng threshold.
 - Với mỗi baseline, trả lời ngắn:
   - calibration object khác gì;
   - output context size khác gì;
   - selection F1 khác gì;
   - downstream/cost khác gì.
-- Không gọi literature adaptations là original implementation nếu chỉ giữ post-retrieval scoring logic.
+- Phân tích chỉ dựa trên calibration rule, selected chunks và downstream output sau retrieval.
 
 ### 7.5. Head-to-head comparison với Fixed Top-$k$
 
@@ -725,11 +748,12 @@ $$
 - Context cap/backfill có thể làm guarantee của uncapped procedure không còn áp dụng.
 - Tách formal theorem cho procedure nào đã chứng minh và empirical method cho phần còn lại.
 
-### 10.2. Baseline fidelity
+### 10.2. Kiểm soát post-retrieval comparison
 
-- Matched adaptations dùng cùng Jina scores giúp kiểm soát retriever, nhưng không thay thế full source-code reproduction.
-- TRAQ comparison mới đánh giá retrieval component nếu chưa chạy semantic answer-set stage.
-- Trình bày fidelity table trong main paper hoặc Appendix.
+- Mọi method nhận cùng qids, candidate chunk IDs, Jina scores và support labels.
+- Chỉ calibration rule và chunk-selection decision được thay đổi giữa các methods.
+- Lưu exact threshold, selected chunk IDs và context đưa vào generator để kết quả có thể
+  kiểm tra ở từng query.
 
 ### 10.3. Dataset and label limitations
 
@@ -761,7 +785,7 @@ $$
   - kết quả phụ thuộc dataset và calibration quality.
 - Nêu hướng tiếp theo:
   - theorem cho selective two-stage procedure và capped context;
-  - larger matched evaluations;
+  - larger post-retrieval evaluations;
   - adaptive selection of operating point without test leakage.
 
 ---
@@ -780,7 +804,7 @@ $$
 ### 12.2. Main tables
 
 - **Table 1:** dataset, split và candidate-pool statistics.
-- **Table 2:** method comparison và baseline fidelity.
+- **Table 2:** calibration object và exact post-retrieval decision rule của từng method.
 - **Table 3:** context-selection metrics.
 - **Table 4:** downstream EM/F1/Numeric.
 - **Table 5:** context size, tokens, latency và approximate TFLOPs.
@@ -817,9 +841,9 @@ $$
 ### 14.1. Những câu có thể dùng sau khi số liệu được xác nhận
 
 - “The proposed support-null pruning stage exposes a controllable precision–recall trade-off.”
-- “Several operating points lie on a better downstream-quality/compute frontier than the matched baselines.”
+- “Several operating points lie on a better downstream-quality/compute frontier than the post-retrieval baselines.”
 - “The benefit is dataset dependent, with the clearest downstream gains on HotpotQA and TAT-QA in the current evaluation.”
-- “Matched post-retrieval evaluation controls the candidate pool, retriever scores, split and generator across methods.”
+- “The evaluation controls the candidate pool, retriever scores, split and generator across post-retrieval methods.”
 
 ### 14.2. Những câu chưa nên dùng
 
@@ -828,7 +852,6 @@ $$
 - “Stage 2 strictly controls the false positive rate of retained chunks.”
 - “Our method consistently outperforms all baselines on all datasets.”
 - “TFLOPs are hardware-measured,” nếu vẫn dùng công thức proxy hiện tại.
-- “CCE/CONFLARE/TRAQ source-code reproduction,” nếu hàng kết quả vẫn là Jina matched adaptations.
 
 ### 14.3. Các việc phải khóa trước khi viết Results cuối
 
@@ -844,8 +867,8 @@ $$
 ## 15. Writing Order đề xuất
 
 1. Khóa Problem Formulation, notation và exact procedure.
-2. Hoàn thành Experimental Setup và baseline fidelity table.
-3. Chạy đủ matched experiments và khóa main tables.
+2. Hoàn thành Experimental Setup và bảng exact post-retrieval decision rules.
+3. Chạy đủ experiments trên cùng candidate pool và khóa main tables.
 4. Viết Results từ evidence đã khóa, không viết claim trước số liệu.
 5. Viết Introduction và Abstract sau khi biết contribution nào thực sự đứng vững.
 6. Viết Limitations và formal scope song song với Methodology.
