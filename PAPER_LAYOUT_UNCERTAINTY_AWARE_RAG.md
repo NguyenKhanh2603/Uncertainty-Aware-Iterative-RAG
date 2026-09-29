@@ -168,8 +168,34 @@
 
 ### 3.4. Khoảng trống và vị trí của phương pháp
 
-- CCE/CONFLARE/TRAQ chủ yếu dùng một calibration object hoặc một retrieval cutoff trong matched comparison.
-- Proposed method dùng hai distributions có vai trò khác nhau và quyết định theo query.
+- **CCE Conformal-Embedding adaptation** xây phân bố calibration từ nonconformity score
+  $1-\cos(e_q,e_c)$ của các relevant/support snippets. Quantile $(1-\alpha)$ của phân bố
+  này tạo một cutoff; ở test, mỗi candidate được giữ nếu nonconformity của nó không vượt
+  cutoff. Đây là một quyết định threshold độc lập cho từng candidate, dùng support-side
+  calibration scores.
+- **CONFLARE source-question adaptation** ghi cosine distance giữa calibration question và
+  source chunk chứa evidence. Percentile $(1-\alpha)$ của các relevant-source distances tạo
+  một cutoff toàn cục; ở test, tất cả retrieved chunks có distance nhỏ hơn cutoff được giữ.
+  Khác biệt chính với CCE trong matched implementation nằm ở cách tạo calibration pairs và
+  tập source-question scores dùng để ước lượng cutoff.
+- **TRAQ retrieval adaptation** hiệu chuẩn một retrieval-score threshold với retrieval error
+  budget $\alpha_R$. Trong TRAQ đầy đủ, $\alpha_R$ được phân bổ cùng error budget của bước
+  semantic answer-set generation, chẳng hạn bằng Bonferroni. Matched comparison hiện tại chỉ
+  đánh giá retrieval component: passages vượt calibrated retrieval threshold được giữ, còn
+  semantic answer-set stage không được chạy.
+- **Two-Stage Conformal Selection** không dùng một cutoff duy nhất. Stage 1 so từng candidate
+  với false-evidence bank để tạo false-null p-value; Stage 2 so các candidate sống sót với
+  support-evidence bank để tạo support-null p-value. BH hoặc BY được chạy trên family p-values
+  của từng query, vì vậy quyết định cuối phụ thuộc đồng thời vào score của candidate và các
+  candidates khác trong cùng query.
+- Trong matched Jina implementation, CCE và CONFLARE có thể cho kết quả rất gần hoặc trùng
+  nhau nếu cả hai cuối cùng dùng cùng question–support pairs, cùng cosine-distance definition
+  và cùng quantile convention. Paper phải báo chính xác nguồn calibration pairs và threshold
+  của từng hàng; không nên trình bày hai tên baseline như hai thuật toán thực nghiệm khác nhau
+  nếu implementation thực tế đã rút gọn về cùng selector.
+- Khoảng trống cần kiểm chứng là liệu hai quyết định theo query này có tạo quality–cost Pareto
+  frontier tốt hơn các single-cutoff procedures khi tất cả methods nhận cùng candidate pool,
+  retriever scores, calibration/test split và generator.
 - Điểm cần kiểm chứng bằng thí nghiệm:
   - hai-stage có tạo Pareto frontier tốt hơn không;
   - improvement đến từ Stage 1, Stage 2 hay chỉ từ context budget;
@@ -180,9 +206,9 @@
 | Method | Calibration object | Decision granularity | Output | Multiple testing | Comparison role |
 |---|---|---|---|---|---|
 | Fixed Top-$k$ | None | global budget | first $k$ chunks | No | non-calibrated baseline |
-| CCE adaptation | relevant/support scores | global threshold | thresholded set | No | single-bank baseline |
-| CONFLARE adaptation | source-question distances | global threshold | thresholded set | No | single-bank baseline |
-| TRAQ retrieval adaptation | retrieval scores | global threshold/error budget | retrieval set | Bonferroni allocation | retrieval component baseline |
+| CCE adaptation | $1-\cos(e_q,e_c)$ của relevant/support snippets | candidate-wise test against one calibrated quantile | chunks below nonconformity cutoff | No | support-score cutoff baseline |
+| CONFLARE adaptation | question-to-relevant-source cosine distances | candidate-wise test against one calibrated percentile | chunks below distance cutoff | No | source-question cutoff baseline |
+| TRAQ retrieval adaptation | retrieval scores và retrieval error budget $\alpha_R$ | candidate-wise test against calibrated retrieval threshold | passages passed to generation | Bonferroni allocates end-to-end error budget | retrieval component only |
 | Stage 1 only | false-score bank | per query | admitted set | BH or BY | ablation |
 | Two-Stage | false + support banks | per query | screened then pruned set | BH/BY per stage | proposed method |
 | Top-$k$ + Stage 2 | support bank | per query after fixed budget | pruned Top-$k$ | BH/BY | stage-isolation ablation |
