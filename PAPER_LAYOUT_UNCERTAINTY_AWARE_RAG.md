@@ -166,14 +166,7 @@
   - chunk cùng document hoặc cùng modality;
   - score chịu chung query representation.
 
-### 3.4. Internal model uncertainty signals
-
-- Chỉ đưa mục này vào main paper nếu ablation internal-state đã có kết quả ổn định trên cùng split.
-- Tóm tắt attention, hidden-state probes, LM-head/direct-logit attribution và self-probing.
-- Định vị đây là extension signal cho score fusion, không phải contribution chính của cosine two-stage paper hiện tại.
-- Nếu kết quả chưa đủ mạnh, chuyển toàn bộ sang Appendix hoặc Future Work.
-
-### 3.5. Khoảng trống và vị trí của phương pháp
+### 3.4. Khoảng trống và vị trí của phương pháp
 
 - CCE/CONFLARE/TRAQ chủ yếu dùng một calibration object hoặc một retrieval cutoff trong matched comparison.
 - Proposed method dùng hai distributions có vai trò khác nhau và quyết định theo query.
@@ -182,7 +175,7 @@
   - improvement đến từ Stage 1, Stage 2 hay chỉ từ context budget;
   - modality-aware banks có đáng kể hơn pooled banks không.
 
-### 3.6. Bảng so sánh related work dự kiến
+### 3.5. Bảng so sánh related work dự kiến
 
 | Method | Calibration object | Decision granularity | Output | Multiple testing | Comparison role |
 |---|---|---|---|---|---|
@@ -356,7 +349,6 @@ $$
 - **Pooled banks:** không conditioning theo modality.
 - **Modality-aware banks:** conditioning theo text/table/image.
 - **BH vs BY:** cùng p-values, khác multiple-testing correction.
-- **Internal-signal fusion:** chỉ để exploratory extension nếu có matched results.
 
 ### 5.8. Statistical scope và assumptions
 
@@ -607,17 +599,6 @@ $$
 - So sánh uncapped selection, capped selection và verified backfill.
 - Không kết luận tăng $L$ vô ích nếu candidate pool cũ chưa thật sự được retrieve từ full corpus.
 
-### 8.7. Score signal
-
-- Cosine only là main setting.
-- Reranker only, internal only và fusion là optional ablations.
-- Với internal signals, tách riêng:
-  - hidden-state probe;
-  - LM-head/logit score;
-  - attention-based score;
-  - learned fusion.
-- Chỉ đưa vào main paper nếu cải thiện ổn định trên nhiều datasets và cùng split.
-
 ---
 
 ## 9. Discussion
@@ -702,7 +683,6 @@ $$
   - kết quả phụ thuộc dataset và calibration quality.
 - Nêu hướng tiếp theo:
   - theorem cho selective two-stage procedure và capped context;
-  - learned/internal-model signals;
   - larger matched evaluations;
   - adaptive selection of operating point without test leakage.
 
