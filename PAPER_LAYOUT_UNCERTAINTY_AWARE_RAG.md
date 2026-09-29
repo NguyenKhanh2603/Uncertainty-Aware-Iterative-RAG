@@ -210,20 +210,46 @@
 
 #### 3.4.4. Gap chung và cách phương pháp đề xuất xử lý
 
-- CCE, CONFLARE và TRAQ khác nhau ở calibration sample và quantile, nhưng quyết định test cuối
-  cùng đều có dạng **một scalar cosine cutoff cho toàn dataset**.
-- Chúng làm tốt mục tiêu support coverage, nhưng score threshold không dùng:
-  - false-score distribution;
-  - vị trí và độ phân tán score trong từng query;
-  - modality và retrieval rank;
-  - family-wise quan hệ giữa các candidates của cùng query.
-- **Stage 1** bổ sung false-evidence bank để kiểm tra candidate có thực sự khác false evidence
-  hay chỉ vượt một support-derived cutoff thấp.
-- **Stage 2** dùng support-evidence bank để prune các candidate không tương thích với support
-  sau khi Stage 1 đã tạo high-recall set.
-- **BH/BY theo query** biến quyết định từ các threshold độc lập thành selection trên toàn family
-  candidates của query. Modality- và rank-conditioned banks khai thác heterogeneity mà pooled
-  threshold đang bỏ qua.
+- **Support-derived cutoff dẫn đến keep-too-many khi hai lớp overlap.** CCE đặt cutoff theo
+  lower tail của support scores; CONFLARE và TRAQ đặt cutoff theo best-support score của mỗi
+  calibration query. Để bảo toàn support coverage, cutoff phải đủ thấp cho các support khó.
+  Tuy nhiên, false scores nằm gần support scores: cosine AUC chỉ .543 trên HotpotQA và khoảng
+  .61–.62 trên ba datasets còn lại. Vì vậy, một cutoff đủ thấp để giữ support cũng cho phần lớn
+  false chunks đi qua. Điều này thể hiện ở việc ba methods giữ 71.6%–89.2% pool, trong khi
+  precision gần bằng support prevalence ban đầu: HotpotQA tăng từ 20.3% lên 21.0%–21.4%,
+  WebQA chỉ tăng từ 6.2% lên 6.3%–6.8%.
+
+- **Quyết định độc lập trên từng candidate làm context size tăng theo candidate pool.** Một
+  chunk chỉ cần vượt global cutoff; việc query đã có bao nhiêu chunks được giữ không ảnh hưởng
+  quyết định của chunk tiếp theo. Do đó các query có pool lớn dễ chuyển một context dài sang
+  generator. MMQA có 21.87 candidates/query và còn 18.05–19.50; WebQA có 28.11 và còn
+  21.60–24.68. Đây là nguyên nhân trực tiếp khiến recall cao nhưng chi phí context và số false
+  chunks vẫn lớn.
+
+- **Best-support calibration không đại diện cho việc giữ đủ evidence.** CONFLARE và TRAQ rút
+  mỗi calibration query về support score lớn nhất. Ngưỡng vì thế được quyết định bởi support
+  dễ nhất, trong khi multi-hop query có thể còn các support yếu hơn. Trên HotpotQA, CONFLARE
+  đạt any-support coverage 88% nhưng all-support coverage chỉ 60%; support recall giảm còn
+  74.0% và downstream F1 giảm từ .653 của CCE xuống .623. TRAQ dùng cutoff permissive hơn nên
+  all-support coverage tăng lên 79%, đổi lại giữ 8.17/9.85 chunks mỗi query.
+
+- **Một pooled cutoff tạo cùng quyết định cho các modality có độ tách lớp rất khác nhau.**
+  Trên TAT-QA, table cosine có AUC .832 nhưng text chỉ .620. Trên WebQA, text đạt .683 còn
+  image chỉ .555, gần random. Khi các score regimes này dùng chung một cutoff, selector không
+  thể đồng thời chặt với nhóm có nhiều false scores và mềm với nhóm chứa evidence khó. Pattern
+  này phù hợp với WebQA: 21.60–24.68 chunks/query nhưng precision chỉ 6.3%–6.8%.
+
+- Các failure mechanisms trên dẫn trực tiếp tới thiết kế đề xuất:
+  - **Stage 1 false-bank screening** so candidate với false distribution, nhắm trực tiếp vào
+    hiện tượng cutoff support-side giữ quá nhiều false chunks;
+  - **BH/BY theo query** đặt quyết định trong toàn candidate family, để số lượng và p-values
+    của các chunks cùng query ảnh hưởng đến tập được giữ;
+  - **modality- và rank-conditioned banks** so candidate với calibration regime gần nó hơn,
+    thay vì trộn các nhóm có score separability khác nhau;
+  - **Stage 2 support-bank pruning** loại support-incompatible candidates sau khi Stage 1 đã
+    bảo toàn candidate set rộng;
+  - operating point được chọn với recall/all-support constraint để pruning không lặp lại lỗi
+    mất secondary evidence của best-support calibration.
 
 ### 3.5. Kết quả post-retrieval hiện tại cho thấy điều gì
 
@@ -248,19 +274,20 @@ Phân tích đầy đủ và số liệu truy vết nằm tại
 - TRAQ thường giữ nhiều nhất vì $\alpha_R=.05$ tạo cutoff thấp hơn. CONFLARE thường prune
   nhiều hơn, nhưng phần recall mất đi không luôn đổi thành downstream gain.
 
-### 3.6. Những signal chưa được các baseline tận dụng
+### 3.6. Các giả thuyết thực nghiệm rút ra từ Research Gap
 
-- **False-score distribution:** ba cutoff chỉ biết lower tail của support distribution; chúng
-  không kiểm tra candidate có khác hàng nghìn false scores hay không.
-- **Query-relative distribution:** cùng score .85 có thể nổi bật trong một query nhưng bình
-  thường trong query khác. Global cutoff bỏ qua location, spread và pool size của từng query.
-- **Modality:** MMQA table có support prevalence 49.0% và cosine AUC .734, còn image chỉ 3.2%
-  và .598. TAT-QA table có prevalence 78.0% và AUC .832, còn text là 10.9% và .620. WebQA
-  image AUC chỉ .555 so với text .683. Pooled threshold đang trộn các score regimes rất khác.
-- **Rank:** Top-1 precision đạt 42% trên HotpotQA và 45% trên TAT-QA, cao hơn global-cutoff
-  output, dù rank một mình vẫn yếu trên MMQA/WebQA.
-- **Multi-support structure:** CCE overweight query nhiều supports; CONFLARE/TRAQ collapse về
-  support dễ nhất. Không method nào trực tiếp hiệu chuẩn khả năng giữ đủ evidence set.
+- **H1 — False-bank enrichment:** tại cùng support recall, Stage 1 phải giảm false
+  chunks/query và tăng precision so với support-derived global cutoffs. Hiệu quả kỳ vọng rõ
+  nhất trên MMQA và WebQA, nơi false prevalence lần lượt là 92.9% và 93.8%.
+- **H2 — Query-family selection:** BH/BY theo query phải làm retained context ít phụ thuộc vào
+  raw pool size hơn independent thresholding, đồng thời giảm empty rate so với một cutoff quá
+  chặt.
+- **H3 — Conditional calibration:** modality-aware banks phải cải thiện Selection F1 so với
+  pooled banks trên MMQA, TAT-QA và WebQA. Ablation cần báo riêng text/table/image để xác định
+  improvement đến từ nhóm nào.
+- **H4 — Multi-support preservation:** Two-Stage phải tăng precision mà không làm all-support
+  coverage sụp như CONFLARE trên HotpotQA. Vì vậy operating point được chọn bằng calibration
+  objective có recall hoặc all-support constraint, không chỉ tối đa hóa precision.
 
 ### 3.7. Downstream diagnosis và research gap
 

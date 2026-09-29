@@ -72,23 +72,23 @@ thấp để giữ 90% support cũng tất yếu giữ phần lớn false candid
 - TRAQ dùng $\alpha_R=.05$, nên cutoff thấp hơn và thường giữ nhiều chunks nhất. Đây là hành
   vi đúng với một coverage-oriented cutoff, không phải một precision-oriented pruner.
 
-## 4. Các signal đã có trong log nhưng ba baseline chưa tận dụng
+## 4. Cơ chế tạo ra failure pattern trong bảng kết quả
 
 ### 4.1. False-score distribution
 
-Ba methods chỉ hỏi candidate có giống **phần thấp của support distribution** hay không. Chúng
-không hỏi score đó có phân biệt được với hàng nghìn false candidates hay không. Đây là signal
-thiếu lớn nhất, vì false prevalence là 79.7% trên HotpotQA, 92.9% trên MMQA, 78.1% trên TAT-QA
-và 93.8% trên WebQA. False-bank p-value ở Stage 1 được thiết kế để dùng đúng phần thông tin
-này.
+Vì threshold được suy ra từ support distribution, nó phải đủ thấp để giữ các support khó.
+Khi false scores overlap với support scores, chính cutoff thấp này cho nhiều false chunks đi
+qua. Hậu quả được thấy trực tiếp ở MMQA và WebQA: false prevalence là 92.9% và 93.8%, còn
+output precision chỉ 7.5%–7.8% và 6.3%–6.8%. False-bank p-value ở Stage 1 được đưa vào để
+đánh giá candidate theo mức độ nó khác false distribution, nhắm trực tiếp vào failure này.
 
 ### 4.2. Query-relative score distribution
 
-Một cutoff toàn dataset giả định score .85 có cùng ý nghĩa cho mọi query. Thực tế, mỗi query
-có location, spread và candidate count khác nhau. Score percentile, normalized margin so với
-top candidate, hoặc conformal p-values trong từng query có thể phân biệt một score nổi bật
-trong query khó với một score tầm thường trong query dễ. Code hiện có một query-level selector,
-nhưng run ba-baseline này không xuất row đó; cần đánh giá lại trên đúng split trước khi kết luận.
+Vì từng candidate được so độc lập với một cutoff, số chunks đã được giữ và kích thước pool
+không ảnh hưởng tới quyết định tiếp theo. Hậu quả là context size tăng gần theo pool size:
+MMQA bắt đầu với 21.87 candidates/query và còn 18.05–19.50; WebQA bắt đầu với 28.11 và còn
+21.60–24.68. Query-level BH/BY đưa toàn bộ candidate family vào cùng một quyết định để kiểm
+soát hiện tượng này.
 
 ### 4.3. Modality
 
@@ -102,10 +102,11 @@ nhưng run ba-baseline này không xuất row đó; cần đánh giá lại trê
 | WebQA image | 1,275 | 6.0% | 0.555 |
 | WebQA text | 1,536 | 6.4% | 0.683 |
 
-Một cutoff pooled bỏ qua khác biệt rất lớn này. TAT-QA table chunks vừa có prior support cao
-vừa có cosine separability tốt, trong khi WebQA image cosine gần random. Modality-conditioned
-banks hoặc modality-specific calibration là thử nghiệm tiếp theo có cơ sở trực tiếp từ data.
-Nó cần kèm minimum bank size và fallback để không overfit các nhóm nhỏ.
+Vì pooled cutoff trộn các score regimes này, cùng một ngưỡng không thể đồng thời chặt cho
+WebQA image gần random và mềm cho TAT-QA table có evidence rõ. Hậu quả phù hợp với WebQA:
+selector giữ 76.8%–87.8% pool nhưng precision chỉ 6.3%–6.8%. Modality-conditioned banks kiểm
+tra candidate trong đúng score regime của nó; ablation pooled versus modality-aware sẽ xác
+định mức cải thiện thực tế.
 
 ### 4.4. Retrieval rank
 
@@ -116,10 +117,11 @@ vì quay lại một hard Top-$k$ cutoff.
 
 ### 4.5. Multi-support structure
 
-CCE pooled calibration để query nhiều supports có trọng số lớn hơn. CONFLARE và TRAQ collapse
-mỗi query thành maximum support score, nên hiệu chuẩn khả năng giữ **một support dễ nhất** hơn
-là giữ đủ evidence set. Điều này đặc biệt quan trọng với multi-hop HotpotQA và các query cần
-table + text. Any-support và all-support coverage phải được báo song song với micro recall.
+CONFLARE và TRAQ collapse mỗi query thành maximum support score, nên cutoff phản ánh support
+dễ nhất thay vì support yếu nhất cần giữ. Trên HotpotQA, CONFLARE vẫn có any-support coverage
+88% nhưng all-support coverage chỉ 60%; TRAQ tăng all-support lên 79% bằng cutoff permissive
+hơn và giữ 8.17/9.85 chunks/query. Vì vậy all-support coverage phải trở thành constraint khi
+chọn operating point, thay vì chỉ tối đa hóa precision.
 
 ## 5. Downstream không nói rằng cứ giữ nhiều hơn hoặc ít hơn là tốt hơn
 
