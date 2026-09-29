@@ -17,7 +17,7 @@ Chọn **A100 GPU** để giữ cùng model dtype/protocol. Mở [`Khanh_27_09_3
 - tải test-only data bundle từ Hugging Face;
 - chạy 1,200 generations với Qwen2-VL-7B;
 - resume từ `progress_log.jsonl` nếu runtime bị ngắt;
-- xuất `final_downstream_results.csv`, `RESOURCE_RESULTS.md`, `summary.json`, `RUN_CONFIG.json`, và per-query log.
+- xuất `final_downstream_results.csv`, `RESOURCE_RESULTS.md`, `REPORT_WITH_RESOURCE_METRICS.md`, `summary.json`, `RUN_CONFIG.json`, và per-query log.
 
 Có thể chạy tương đương bằng shell:
 
@@ -57,9 +57,10 @@ Mỗi query hoàn thành được append và flush ngay vào `progress_log.jsonl
 ## Nội dung folder
 
 - `run_colab.py`: runner độc lập, gồm cả EM/F1 implementation và report writer.
+- `merge_resource_columns.py`: kiểm tra đủ 12 hàng rồi ghép hai cột resource vào full report.
 - `selections/`: exact saved context IDs của ba baseline cho 400 test queries.
 - `splits/`: qid manifests và split-integrity record.
-- `REPORT_TEMPLATE.md`: báo cáo selection/downstream hiện tại; hai cột resource sẽ được cập nhật sau khi Colab trả kết quả.
+- `REPORT_TEMPLATE.md`: báo cáo selection/downstream hiện tại; notebook tạo bản mới có hai cột resource, không overwrite template.
 - `build_portable_bundle.py`: script provenance dùng để tạo test-only bundle từ dữ liệu đầy đủ.
 - `DATA_BUNDLE.json`: URL, SHA-256, kích thước và content counts của bundle đã publish.
 
