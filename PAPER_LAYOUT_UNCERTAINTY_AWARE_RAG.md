@@ -216,7 +216,7 @@
   Tuy nhiên, false scores nằm gần support scores: cosine AUC chỉ .543 trên HotpotQA và khoảng
   .61–.62 trên ba datasets còn lại. Vì vậy, một cutoff đủ thấp để giữ support cũng cho phần lớn
   false chunks đi qua. Điều này thể hiện ở việc ba methods giữ 71.6%–89.2% pool, trong khi
-  precision gần bằng support prevalence ban đầu: HotpotQA tăng từ 20.3% lên 21.0%–21.4%,
+  precision gần bằng tỷ lệ support trước pruning: HotpotQA tăng từ 20.3% lên 21.0%–21.4%,
   WebQA chỉ tăng từ 6.2% lên 6.3%–6.8%.
 
 - **Quyết định độc lập trên từng candidate làm context size tăng theo candidate pool.** Một
@@ -256,7 +256,10 @@
 Phân tích đầy đủ và số liệu truy vết nằm tại
 [`BASELINE_SIGNAL_DIAGNOSIS.md`](research/internal_state_rag/results/full_context_selection_splits_khanh_27_09_2026_09_27/BASELINE_SIGNAL_DIAGNOSIS.md).
 
-| Dataset | Pool support | Cosine AUC | CCE kept / P / R | CONFLARE kept / P / R | TRAQ kept / P / R |
+`Support rate before pruning` là số support chunks chia cho tổng số retrieved candidates
+trước khi bất kỳ selector nào chạy.
+
+| Dataset | Support rate before pruning | Cosine AUC | CCE kept / P / R | CONFLARE kept / P / R | TRAQ kept / P / R |
 |---|---:|---:|---:|---:|---:|
 | HotpotQA | 20.3% | .543 | 87.4% / 21.0% / 90.5% | 71.6% / 21.0% / 74.0% | 82.9% / 21.4% / 87.5% |
 | MMQA | 7.1% | .609 | 84.1% / 7.7% / 91.0% | 82.5% / 7.8% / 90.3% | 89.2% / 7.5% / 94.2% |
@@ -265,7 +268,7 @@ Phân tích đầy đủ và số liệu truy vết nằm tại
 
 - Ba methods giữ **71.6%–89.2% toàn candidate pool**. CCE còn 18.40 chunks/query trên MMQA
   và 23.36 trên WebQA; TRAQ còn 19.50 và 24.68.
-- Precision gần bằng base support prevalence. HotpotQA tăng từ 20.3% lên khoảng 21%; WebQA
+- Precision gần bằng tỷ lệ support trước pruning. HotpotQA tăng từ 20.3% lên khoảng 21%; WebQA
   tăng từ 6.2% lên 6.3%–6.8%. Selector đạt recall cao chủ yếu bằng cách cho gần hết pool đi
   qua, chưa thực sự enrich evidence.
 - Cosine AUC chỉ .543 trên HotpotQA và khoảng .61–.62 trên ba datasets còn lại. Support và
@@ -278,7 +281,7 @@ Phân tích đầy đủ và số liệu truy vết nằm tại
 
 - **H1 — False-bank enrichment:** tại cùng support recall, Stage 1 phải giảm false
   chunks/query và tăng precision so với support-derived global cutoffs. Hiệu quả kỳ vọng rõ
-  nhất trên MMQA và WebQA, nơi false prevalence lần lượt là 92.9% và 93.8%.
+  nhất trên MMQA và WebQA, nơi false-chunk rate trước pruning lần lượt là 92.9% và 93.8%.
 - **H2 — Query-family selection:** BH/BY theo query phải làm retained context ít phụ thuộc vào
   raw pool size hơn independent thresholding, đồng thời giảm empty rate so với một cutoff quá
   chặt.

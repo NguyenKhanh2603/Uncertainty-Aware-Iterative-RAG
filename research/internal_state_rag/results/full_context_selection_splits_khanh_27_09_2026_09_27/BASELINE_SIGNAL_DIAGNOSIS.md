@@ -28,11 +28,12 @@ hoặc rank, và không xử lý family of candidates trong một query bằng m
 
 ## 2. Kết quả cho thấy selector giữ quá nhiều chunk
 
-`Pool/query` là candidate pool trung bình trước pruning. `Pool support` là tỷ lệ support thật
-trong toàn pool. `Kept %` là tỷ lệ tất cả candidates vượt cutoff. AUC đo khả năng một cosine
-score ngẫu nhiên xếp support cao hơn false; 0.5 là gần như random.
+`Pool/query` là số retrieved candidates trung bình trước pruning. `Support rate before
+pruning` là số support chunks chia cho tổng số candidates trước pruning. `Kept %` là tỷ lệ
+tất cả candidates vượt cutoff. AUC đo khả năng một cosine score ngẫu nhiên xếp support cao
+hơn false; 0.5 là gần như random.
 
-| Dataset | Pool/query | Pool support | Cosine AUC | CCE kept % / P / R | CONFLARE kept % / P / R | TRAQ kept % / P / R |
+| Dataset | Pool/query | Support rate before pruning | Cosine AUC | CCE kept % / P / R | CONFLARE kept % / P / R | TRAQ kept % / P / R |
 |---|---:|---:|---:|---:|---:|---:|
 | HotpotQA | 9.85 | 20.3% | 0.543 | 87.4% / 21.0% / 90.5% | 71.6% / 21.0% / 74.0% | 82.9% / 21.4% / 87.5% |
 | MMQA | 21.87 | 7.1% | 0.609 | 84.1% / 7.7% / 91.0% | 82.5% / 7.8% / 90.3% | 89.2% / 7.5% / 94.2% |
@@ -78,7 +79,7 @@ thấp để giữ 90% support cũng tất yếu giữ phần lớn false candid
 
 Vì threshold được suy ra từ support distribution, nó phải đủ thấp để giữ các support khó.
 Khi false scores overlap với support scores, chính cutoff thấp này cho nhiều false chunks đi
-qua. Hậu quả được thấy trực tiếp ở MMQA và WebQA: false prevalence là 92.9% và 93.8%, còn
+qua. Hậu quả được thấy trực tiếp ở MMQA và WebQA: false-chunk rate trước pruning là 92.9% và 93.8%, còn
 output precision chỉ 7.5%–7.8% và 6.3%–6.8%. False-bank p-value ở Stage 1 được đưa vào để
 đánh giá candidate theo mức độ nó khác false distribution, nhắm trực tiếp vào failure này.
 
@@ -92,7 +93,7 @@ soát hiện tượng này.
 
 ### 4.3. Modality
 
-| Dataset / modality | Candidates | Support prevalence | Cosine AUC |
+| Dataset / modality | Candidates | Support rate before pruning | Cosine AUC |
 |---|---:|---:|---:|
 | MMQA image | 1,087 | 3.2% | 0.598 |
 | MMQA table | 100 | 49.0% | 0.734 |
