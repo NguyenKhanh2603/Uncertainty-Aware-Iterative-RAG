@@ -166,7 +166,7 @@
   - chunk cùng document hoặc cùng modality;
   - score chịu chung query representation.
 
-### 3.4. Khoảng trống và vị trí của phương pháp
+### 3.4. Cơ chế post-retrieval chính xác của các baseline
 
 - **CCE Conformal-Embedding adaptation** xây phân bố calibration từ nonconformity score
   $1-\cos(e_q,e_c)$ của các relevant/support snippets. Quantile $(1-\alpha)$ của phân bố
@@ -193,15 +193,67 @@
   và cùng quantile convention. Paper phải báo chính xác nguồn calibration pairs và threshold
   của từng hàng; không nên trình bày hai tên baseline như hai thuật toán thực nghiệm khác nhau
   nếu implementation thực tế đã rút gọn về cùng selector.
-- Khoảng trống cần kiểm chứng là liệu hai quyết định theo query này có tạo quality–cost Pareto
-  frontier tốt hơn các single-cutoff procedures khi tất cả methods nhận cùng candidate pool,
-  retriever scores, calibration/test split và generator.
-- Điểm cần kiểm chứng bằng thí nghiệm:
-  - hai-stage có tạo Pareto frontier tốt hơn không;
-  - improvement đến từ Stage 1, Stage 2 hay chỉ từ context budget;
-  - modality-aware banks có đáng kể hơn pooled banks không.
+- Trong exact code của matched run:
+  - CCE gộp **mọi support score**, nên query có nhiều support chunks có trọng số lớn hơn;
+  - CONFLARE lấy **maximum support score của mỗi query**, nên mỗi query đóng góp một điểm;
+  - TRAQ cũng lấy maximum support score nhưng dùng $\alpha_R=\alpha/2=.05$, nên cutoff thường
+    permissive hơn;
+  - cả ba cuối cùng đều áp dụng **một scalar cosine cutoff cho toàn dataset**.
 
-### 3.5. Bảng so sánh related work dự kiến
+### 3.5. Matched run thực sự cho thấy điều gì
+
+Phân tích đầy đủ và số liệu truy vết nằm tại
+[`BASELINE_SIGNAL_DIAGNOSIS.md`](research/internal_state_rag/results/full_context_selection_splits_khanh_27_09_2026_09_27/BASELINE_SIGNAL_DIAGNOSIS.md).
+
+| Dataset | Pool support | Cosine AUC | CCE kept / P / R | CONFLARE kept / P / R | TRAQ kept / P / R |
+|---|---:|---:|---:|---:|---:|
+| HotpotQA | 20.3% | .543 | 87.4% / 21.0% / 90.5% | 71.6% / 21.0% / 74.0% | 82.9% / 21.4% / 87.5% |
+| MMQA | 7.1% | .609 | 84.1% / 7.7% / 91.0% | 82.5% / 7.8% / 90.3% | 89.2% / 7.5% / 94.2% |
+| TAT-QA | 21.9% | .620 | 81.7% / 24.6% / 91.8% | 75.7% / 25.0% / 86.6% | 83.0% / 24.6% / 93.3% |
+| WebQA | 6.2% | .621 | 83.1% / 6.5% / 86.3% | 76.8% / 6.8% / 83.4% | 87.8% / 6.3% / 88.6% |
+
+- Ba methods giữ **71.6%–89.2% toàn candidate pool**. CCE còn 18.40 chunks/query trên MMQA
+  và 23.36 trên WebQA; TRAQ còn 19.50 và 24.68.
+- Precision gần bằng base support prevalence. HotpotQA tăng từ 20.3% lên khoảng 21%; WebQA
+  tăng từ 6.2% lên 6.3%–6.8%. Selector đạt recall cao chủ yếu bằng cách cho gần hết pool đi
+  qua, chưa thực sự enrich evidence.
+- Cosine AUC chỉ .543 trên HotpotQA và khoảng .61–.62 trên ba datasets còn lại. Support và
+  false score overlap mạnh, nên một cutoff thấp đủ giữ khoảng 90% support cũng giữ phần lớn
+  false chunks.
+- TRAQ thường giữ nhiều nhất vì $\alpha_R=.05$ tạo cutoff thấp hơn. CONFLARE thường prune
+  nhiều hơn, nhưng phần recall mất đi không luôn đổi thành downstream gain.
+
+### 3.6. Những signal chưa được các baseline tận dụng
+
+- **False-score distribution:** ba cutoff chỉ biết lower tail của support distribution; chúng
+  không kiểm tra candidate có khác hàng nghìn false scores hay không.
+- **Query-relative distribution:** cùng score .85 có thể nổi bật trong một query nhưng bình
+  thường trong query khác. Global cutoff bỏ qua location, spread và pool size của từng query.
+- **Modality:** MMQA table có support prevalence 49.0% và cosine AUC .734, còn image chỉ 3.2%
+  và .598. TAT-QA table có prevalence 78.0% và AUC .832, còn text là 10.9% và .620. WebQA
+  image AUC chỉ .555 so với text .683. Pooled threshold đang trộn các score regimes rất khác.
+- **Rank:** Top-1 precision đạt 42% trên HotpotQA và 45% trên TAT-QA, cao hơn global-cutoff
+  output, dù rank một mình vẫn yếu trên MMQA/WebQA.
+- **Multi-support structure:** CCE overweight query nhiều supports; CONFLARE/TRAQ collapse về
+  support dễ nhất. Không method nào trực tiếp hiệu chuẩn khả năng giữ đủ evidence set.
+
+### 3.7. Downstream diagnosis và research gap
+
+- HotpotQA: CCE giữ 8.61 chunks, F1 .653; CONFLARE giảm còn 7.05 chunks nhưng F1 giảm xuống
+  .623 vì recall mất 16.5 điểm.
+- MMQA: CONFLARE có F1 .462, cao hơn CCE .436 và TRAQ .435 dù retrieval metrics gần nhau;
+  đây là dấu hiệu noise reduction có thể giúp.
+- TAT-QA: TRAQ giữ recall cao nhất và đạt F1 .500; CONFLARE prune mạnh hơn và giảm còn .432,
+  cho thấy task cần giữ evidence coverage.
+- WebQA: 21.60–24.68 chunks vẫn cho cùng EM .11 và F1 chỉ .246–.260; thay đổi cutoff hiện tại
+  chưa tác động đáng kể tới generator.
+- Không có quy luật đơn điệu “ít chunk hơn tốt hơn”. Khoảng trống cần kiểm chứng là liệu dùng
+  false bank, query-level multiple testing, modality và rank conditioning có đẩy được Pareto
+  frontier ra ngoài các global support cutoffs trên cùng split hay không.
+- Two-Stage phải được đánh giá trên chính candidate pool và split này. Các con số từ split cũ
+  chỉ dùng để hình thành hypothesis, không dùng làm matched head-to-head evidence.
+
+### 3.8. Bảng so sánh related work dự kiến
 
 | Method | Calibration object | Decision granularity | Output | Multiple testing | Comparison role |
 |---|---|---|---|---|---|
