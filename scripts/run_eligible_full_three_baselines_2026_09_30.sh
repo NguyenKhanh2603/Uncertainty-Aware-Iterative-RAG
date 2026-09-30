@@ -33,6 +33,7 @@ for dataset in $DATASET_ORDER; do
     reuse_cache="data/zip_calibration_split_20_09_webqa/embedding_cache"
   fi
   text_batch_size=8
+  image_batch_size=16
   if [[ "$dataset" == "hotpotqa" ]]; then
     # HotpotQA chunks are short text passages; the A100 safely supports the
     # larger batch and avoids spending most of the run in per-batch overhead.
@@ -43,7 +44,7 @@ for dataset in $DATASET_ORDER; do
     --dataset "$dataset" --bundle-dir "$BUNDLE_ROOT" \
     --cache-dir "$CACHE_ROOT/$dataset" --reuse-cache-dir "$reuse_cache" \
     --device cuda --text-batch-size "$text_batch_size" \
-    --image-batch-size 4 --checkpoint-every 128
+    --image-batch-size "$image_batch_size" --checkpoint-every 128
 
   retrieval="$RETRIEVAL_ROOT/${dataset}_jina_v4_candidates.jsonl.gz"
   if [[ ! -f "${retrieval}.manifest.json" ]]; then
@@ -53,7 +54,8 @@ for dataset in $DATASET_ORDER; do
       --cache-dir "$CACHE_ROOT/$dataset" \
       --model "$JINA_MODEL" --model-revision "$JINA_REVISION" \
       --device cuda --dtype bfloat16 --truncate-dim 512 \
-      --text-batch-size "$text_batch_size" --image-batch-size 4 --checkpoint-every 128 \
+      --text-batch-size "$text_batch_size" --image-batch-size "$image_batch_size" \
+      --checkpoint-every 128 \
       --max-text-length 1024 --max-image-pixels 200704 \
       --top-l 30 --candidate-scope official_pool --retrieval-mode global \
       --split-policy bundle_roles --data-grade paper
