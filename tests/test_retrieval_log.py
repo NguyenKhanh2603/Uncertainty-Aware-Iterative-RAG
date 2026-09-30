@@ -159,6 +159,39 @@ def test_normalized_official_bundle_uses_per_query_candidates(tmp_path):
     assert queries[0].support_ids == frozenset({"gold"})
 
 
+def test_normalized_bundle_records_support_outside_frozen_candidate_pool(tmp_path):
+    dataset_dir = tmp_path / "mmqa"
+    dataset_dir.mkdir()
+    (dataset_dir / "corpus.jsonl").write_text(
+        json.dumps({"id": "candidate", "modality": "text", "content": "available"}),
+        encoding="utf-8",
+    )
+    (dataset_dir / "questions.jsonl").write_text(
+        json.dumps(
+            {
+                "qid": "q1",
+                "question": "Question?",
+                "candidate_ids": ["candidate"],
+                "support_ids": ["omitted-support"],
+                "metadata": {
+                    "source_split": "dev",
+                    "split_role": "test",
+                    "support_ids_outside_candidate_set": ["omitted-support"],
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    _, queries = load_bundle_records(
+        dataset_dir / "questions.jsonl", bundle_root=tmp_path, dataset="mmqa"
+    )
+
+    assert queries[0].support_ids == frozenset()
+    assert queries[0].candidate_ids == ("candidate",)
+    assert queries[0].assigned_split_role == "test"
+
+
 def test_retrieval_row_uses_explicit_closed_world_label():
     query = QueryRecord("mmqa", "q1", "Question?", frozenset({"gold"}), "train")
     negative = CorpusRecord("negative", "text", "content", "doc")

@@ -292,8 +292,13 @@ def prepare_mmqa(
 
     image_dir = root / "mmqa" / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
+    # An interrupted parallel extraction can leave an empty destination file.
+    # Treat it exactly like a missing asset so a later resumable preparation
+    # replaces it from the pinned official archive.
     needed = [
-        row for key, row in image_meta.items() if not (image_dir / str(row["path"])).is_file()
+        row
+        for key, row in image_meta.items()
+        if not (asset := image_dir / str(row["path"])).is_file() or asset.stat().st_size == 0
     ]
     if needed:
         print(f"MMQA images: {len(needed)} official referenced assets (local parallel extraction)")
@@ -402,7 +407,19 @@ class _ProgressReader:
         self.progress = progress
 
     def read(self, size=-1):
-        data = self.handle.read(size)
+        # The workspace is backed by NFS.  Very large sequential reads can
+        # occasionally receive a transient EACCES from the file server even
+        # though the archive remains readable (a later read at the same offset
+        # succeeds).  Retrying keeps a multi-hour WebQA extraction resumable
+        # without masking a persistent access problem.
+        for attempt in range(5):
+            try:
+                data = self.handle.read(size)
+                break
+            except PermissionError:
+                if attempt == 4:
+                    raise
+                time.sleep(2**attempt)
         self.progress.update(len(data))
         return data
 
@@ -413,15 +430,17 @@ class _ProgressReader:
 def _existing_webqa_image_paths(
     destination: Path, selected_ids: set[str]
 ) -> dict[str, str]:
-    """Index already-extracted selected images with one directory scan."""
+    """Return a durable extraction index when one is available.
 
-    if not destination.is_dir():
-        return {}
-    found: dict[str, str] = {}
-    for path in destination.iterdir():
-        if path.is_file() and path.stem in selected_ids:
-            found.setdefault(path.stem, f"webqa/images/{path.name}")
-    return found
+    WebQA images live on NFS in this environment.  Listing and stat-ing a
+    partially populated 100k-file directory is slower and less reliable than
+    replaying the compressed archive, whereas overwriting a selected image is
+    safe.  A completed bundle is never re-entered by the runner, so there is
+    no correctness benefit to a best-effort directory scan here.
+    """
+
+    del destination, selected_ids
+    return {}
 
 
 def _extract_webqa_images(

@@ -36,7 +36,7 @@ DEFAULT_MODEL = "jinaai/jina-clip-v2"
 DEFAULT_MODEL_REVISION = "e10d47f5691d0454a0fb5d13f46f2199b74cb436"
 DEFAULT_HF_REPO = "danny2507/attention-uq-800q-colab"
 DEFAULT_HF_REVISION = "26c3b8269d6ec5f17463f714bbc400658dd01313"
-PREPROCESS_VERSION = "conformal-retrieval-log-v2-image-caption-fusion"
+PREPROCESS_VERSION = "conformal-retrieval-log-v4-image-caption-fusion-bounded-text"
 CANDIDATE_SCOPES = ("auto", "official_pool", "global_corpus")
 
 
@@ -87,21 +87,96 @@ def to_normalized_numpy(value: Any) -> np.ndarray:
     return (array / norms).astype(np.float32, copy=False)
 
 
+def _partial_checkpoint_paths(cache_dir: Path, checkpoint_key: str) -> tuple[Path, Path]:
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return (
+        cache_dir / f"{checkpoint_key}.partial.npy",
+        cache_dir / f"{checkpoint_key}.partial.json",
+    )
+
+
+def _write_partial_checkpoint_metadata(path: Path, payload: dict[str, Any]) -> None:
+    temporary = path.with_suffix(".json.tmp")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(path)
+
+
+def clear_partial_checkpoint(cache_dir: Path, checkpoint_key: str) -> None:
+    """Remove only the two resumable files owned by one completed encoding stage."""
+
+    vectors_path, metadata_path = _partial_checkpoint_paths(cache_dir, checkpoint_key)
+    vectors_path.unlink(missing_ok=True)
+    metadata_path.unlink(missing_ok=True)
+
+
 def encode_with_backoff(
     items: Sequence[str],
     *,
     encode_batch: Callable[[Sequence[str]], Any],
     initial_batch_size: int,
     description: str,
+    checkpoint_dir: Path | None = None,
+    checkpoint_key: str | None = None,
+    item_keys: Sequence[str] | None = None,
+    checkpoint_every: int = 256,
 ) -> np.ndarray:
-    """Encode all inputs and halve the batch automatically after CUDA OOM."""
+    """Encode inputs with OOM backoff and resumable block checkpoints.
+
+    A completed cache remains the source of truth.  While it is being built,
+    this function writes an ``.npy`` memmap plus a tiny atomic JSON cursor.
+    After an interrupt, it restarts from that cursor (at most
+    ``checkpoint_every`` inputs are repeated), instead of re-encoding the
+    entire corpus.
+    """
 
     if not items:
         return np.empty((0, 0), dtype=np.float32)
+    if (checkpoint_dir is None) != (checkpoint_key is None):
+        raise ValueError("checkpoint_dir and checkpoint_key must be provided together")
+    if item_keys is not None and len(item_keys) != len(items):
+        raise ValueError("item_keys must align one-to-one with items")
+
     batch_size = max(1, initial_batch_size)
-    vectors: list[np.ndarray] = []
+    checkpoint_every = max(1, checkpoint_every)
+    vectors: np.ndarray | np.memmap | None = None
     index = 0
+    metadata_path: Path | None = None
+    item_identity = stable_json_hash(list(item_keys) if item_keys is not None else list(items))
+
+    if checkpoint_dir is not None and checkpoint_key is not None:
+        vectors_path, metadata_path = _partial_checkpoint_paths(checkpoint_dir, checkpoint_key)
+        if vectors_path.is_file() and metadata_path.is_file():
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            if (
+                metadata.get("item_count") != len(items)
+                or metadata.get("item_identity") != item_identity
+                or not isinstance(metadata.get("completed"), int)
+            ):
+                raise RuntimeError(
+                    f"Partial checkpoint {checkpoint_key} does not match this encoding input"
+                )
+            index = int(metadata["completed"])
+            vectors = np.load(vectors_path, mmap_mode="r+")
+            if vectors.ndim != 2 or vectors.shape[0] != len(items) or not 0 <= index <= len(items):
+                raise RuntimeError(f"Partial checkpoint {checkpoint_key} has an invalid shape or cursor")
+            print(
+                f"Resuming {description} from {index:,}/{len(items):,} "
+                f"({checkpoint_key})",
+                flush=True,
+            )
+        elif vectors_path.exists() or metadata_path.exists():
+            # A kill during first-file creation cannot provide a trustworthy
+            # cursor; discard only this owned, incomplete checkpoint.
+            vectors_path.unlink(missing_ok=True)
+            metadata_path.unlink(missing_ok=True)
+
     progress = tqdm(total=len(items), desc=description)
+    if index:
+        progress.update(index)
+    last_checkpoint = index
     while index < len(items):
         current_size = min(batch_size, len(items) - index)
         batch = items[index : index + current_size]
@@ -121,11 +196,49 @@ def encode_with_backoff(
             raise RuntimeError(
                 f"Encoder returned {len(encoded)} vectors for a batch of {current_size}"
             )
-        vectors.append(encoded)
+        if vectors is None:
+            if checkpoint_dir is not None and checkpoint_key is not None:
+                vectors_path, metadata_path = _partial_checkpoint_paths(checkpoint_dir, checkpoint_key)
+                vectors = np.lib.format.open_memmap(
+                    vectors_path,
+                    mode="w+",
+                    dtype=np.float32,
+                    shape=(len(items), encoded.shape[1]),
+                )
+            else:
+                vectors = np.empty((len(items), encoded.shape[1]), dtype=np.float32)
+        if encoded.shape[1] != vectors.shape[1]:
+            progress.close()
+            raise RuntimeError("Embedding dimension changed within a single encoding stage")
+        vectors[index : index + current_size] = encoded
         index += current_size
         progress.update(current_size)
+        if metadata_path is not None and (
+            index - last_checkpoint >= checkpoint_every or index == len(items)
+        ):
+            assert isinstance(vectors, np.memmap)
+            vectors.flush()
+            _write_partial_checkpoint_metadata(
+                metadata_path,
+                {
+                    "schema_version": 1,
+                    "item_count": len(items),
+                    "item_identity": item_identity,
+                    "completed": index,
+                    "dimension": vectors.shape[1],
+                },
+            )
+            last_checkpoint = index
     progress.close()
-    return np.concatenate(vectors, axis=0)
+    assert vectors is not None
+    # The final cache is written by the caller. Copy out of the mmap and close
+    # it first, otherwise an NFS-backed workspace can retain a hidden .nfs file
+    # and prevent the completed partial checkpoint from being removed.
+    result = np.array(vectors, dtype=np.float32, copy=True)
+    if isinstance(vectors, np.memmap):
+        vectors.flush()
+        vectors._mmap.close()
+    return result
 
 
 def resolve_dtype(device: str, dtype_name: str) -> torch.dtype:
@@ -145,9 +258,10 @@ def resolve_dtype(device: str, dtype_name: str) -> torch.dtype:
 class JinaV4RetrievalAdapter:
     """Expose Jina Embeddings v4 through the legacy retrieval runner API."""
 
-    def __init__(self, model, max_image_pixels: int):
+    def __init__(self, model, max_image_pixels: int, max_text_length: int):
         self.model = model
         self.max_image_pixels = max_image_pixels
+        self.max_text_length = max_text_length
 
     def encode_text(self, texts, *, task=None, truncate_dim=None):
         prompt_name = "query" if task and "query" in task else "passage"
@@ -157,6 +271,7 @@ class JinaV4RetrievalAdapter:
             prompt_name=prompt_name,
             truncate_dim=truncate_dim,
             return_numpy=True,
+            max_length=self.max_text_length,
         )
 
     def encode_image(self, images, *, truncate_dim=None):
@@ -175,6 +290,7 @@ def load_model(
     device: str,
     dtype_name: str,
     max_image_pixels: int = 200704,
+    max_text_length: int = 1024,
 ):
     from transformers import AutoModel
 
@@ -187,7 +303,7 @@ def load_model(
     )
     model = model.eval().to(device)
     if "jina-embeddings-v4" in model_name.lower():
-        model = JinaV4RetrievalAdapter(model, max_image_pixels)
+        model = JinaV4RetrievalAdapter(model, max_image_pixels, max_text_length)
     return model, dtype
 
 
@@ -233,6 +349,19 @@ def save_embedding_cache(
     temporary_metadata.replace(metadata_path)
 
 
+def unavailable_image_asset_indices(corpus: Sequence[CorpusRecord]) -> list[int]:
+    """Locate official image records that cannot be sent to the image encoder."""
+
+    return [
+        index
+        for index, chunk in enumerate(corpus)
+        if chunk.modality == "image"
+        and (
+            not Path(chunk.content).is_file() or Path(chunk.content).stat().st_size == 0
+        )
+    ]
+
+
 def encode_corpus(
     model,
     corpus: Sequence[CorpusRecord],
@@ -241,33 +370,67 @@ def encode_corpus(
     text_batch_size: int,
     image_batch_size: int,
     image_caption_fusion: bool = True,
+    checkpoint_dir: Path | None = None,
+    checkpoint_prefix: str | None = None,
+    checkpoint_every: int = 256,
 ) -> np.ndarray:
     vectors: np.ndarray | None = None
     text_indices = [index for index, chunk in enumerate(corpus) if chunk.modality != "image"]
     image_indices = [index for index, chunk in enumerate(corpus) if chunk.modality == "image"]
+    unavailable_image_indices = unavailable_image_asset_indices(corpus)
+    unavailable_image_index_set = set(unavailable_image_indices)
+    encodable_image_indices = [
+        index for index in image_indices if index not in unavailable_image_index_set
+    ]
+    if unavailable_image_indices:
+        unavailable_ids = [corpus[index].chunk_id for index in unavailable_image_indices]
+        without_captions = [
+            chunk_id
+            for chunk_id, index in zip(unavailable_ids, unavailable_image_indices)
+            if not corpus[index].caption.strip()
+        ]
+        if without_captions:
+            raise RuntimeError(
+                "Official image asset(s) are missing or empty and have no caption fallback: "
+                + ", ".join(without_captions[:10])
+            )
+        print(
+            "Image-caption fallback for "
+            f"{len(unavailable_image_indices)} unavailable official image asset(s): "
+            + ", ".join(unavailable_ids[:10]),
+            flush=True,
+        )
 
     text_vectors = encode_with_backoff(
         [corpus[index].content for index in text_indices],
         encode_batch=lambda batch: model.encode_text(list(batch), truncate_dim=truncate_dim),
         initial_batch_size=text_batch_size,
         description="Encode text/table corpus",
+        checkpoint_dir=checkpoint_dir,
+        checkpoint_key=(f"{checkpoint_prefix}.text" if checkpoint_prefix else None),
+        item_keys=[corpus[index].chunk_id for index in text_indices],
+        checkpoint_every=checkpoint_every,
     )
     if len(text_vectors):
         vectors = np.empty((len(corpus), text_vectors.shape[1]), dtype=np.float32)
         vectors[text_indices] = text_vectors
 
     image_vectors = encode_with_backoff(
-        [corpus[index].content for index in image_indices],
+        [corpus[index].content for index in encodable_image_indices],
         encode_batch=lambda batch: model.encode_image(list(batch), truncate_dim=truncate_dim),
         initial_batch_size=image_batch_size,
         description="Encode image corpus",
+        checkpoint_dir=checkpoint_dir,
+        checkpoint_key=(f"{checkpoint_prefix}.image" if checkpoint_prefix else None),
+        item_keys=[corpus[index].chunk_id for index in encodable_image_indices],
+        checkpoint_every=checkpoint_every,
     )
     if len(image_vectors):
         if vectors is None:
             vectors = np.empty((len(corpus), image_vectors.shape[1]), dtype=np.float32)
         if image_vectors.shape[1] != vectors.shape[1]:
             raise RuntimeError("Text and image encoders returned different dimensions")
-        vectors[image_indices] = image_vectors
+        vectors[encodable_image_indices] = image_vectors
 
     caption_indices = (
         [index for index in image_indices if corpus[index].caption.strip()]
@@ -279,14 +442,29 @@ def encode_corpus(
         encode_batch=lambda batch: model.encode_text(list(batch), truncate_dim=truncate_dim),
         initial_batch_size=text_batch_size,
         description="Encode image captions",
+        checkpoint_dir=checkpoint_dir,
+        checkpoint_key=(f"{checkpoint_prefix}.caption" if checkpoint_prefix else None),
+        item_keys=[corpus[index].chunk_id for index in caption_indices],
+        checkpoint_every=checkpoint_every,
     )
     if len(caption_vectors):
-        assert vectors is not None
-        fused = vectors[caption_indices] + caption_vectors
+        if vectors is None:
+            vectors = np.empty((len(corpus), caption_vectors.shape[1]), dtype=np.float32)
+        caption_vector_by_index = dict(zip(caption_indices, caption_vectors))
+        for index in unavailable_image_indices:
+            vectors[index] = caption_vector_by_index[index]
+        fusion_indices = [
+            index for index in caption_indices if index not in unavailable_image_index_set
+        ]
+        if not fusion_indices:
+            return vectors
+        fused = vectors[fusion_indices] + np.asarray(
+            [caption_vector_by_index[index] for index in fusion_indices], dtype=np.float32
+        )
         fused_norms = np.linalg.norm(fused, axis=1, keepdims=True)
         if np.any(fused_norms == 0):
             raise RuntimeError("Image-caption fusion returned a zero vector")
-        vectors[caption_indices] = fused / fused_norms
+        vectors[fusion_indices] = fused / fused_norms
 
     if vectors is None:
         raise RuntimeError("Corpus contains no encodable chunks")
@@ -626,7 +804,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-per-modality", type=int, default=10)
     parser.add_argument("--text-batch-size", type=int, default=32)
     parser.add_argument("--image-batch-size", type=int, default=8)
+    parser.add_argument(
+        "--checkpoint-every",
+        type=int,
+        default=256,
+        help=(
+            "Persist a resumable embedding cursor after this many items. An interrupted "
+            "encoding stage repeats at most this many inputs."
+        ),
+    )
     parser.add_argument("--max-image-pixels", type=int, default=200704)
+    parser.add_argument(
+        "--max-text-length",
+        type=int,
+        default=1024,
+        help="Maximum Jina-v4 text tokens; protects retrieval from malformed/very long tables.",
+    )
     parser.add_argument(
         "--no-image-caption-fusion",
         action="store_true",
@@ -643,11 +836,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--split-seed", type=int, default=8092026)
     parser.add_argument(
         "--split-policy",
-        choices=("hash_all", "official_holdout"),
+        choices=("hash_all", "official_holdout", "bundle_roles"),
         default="hash_all",
         help=(
             "official_holdout uses train only for development/calibration and "
-            "reserves official dev/validation exclusively for test"
+            "reserves official dev/validation exclusively for test; bundle_roles "
+            "uses metadata.split_role supplied with every query"
         ),
     )
     parser.add_argument("--development-fraction", type=float, default=0.2)
@@ -677,6 +871,9 @@ def main() -> None:
         bundle_root=bundle_root,
         dataset=args.dataset,
     )
+    unavailable_image_ids = [
+        corpus[index].chunk_id for index in unavailable_image_asset_indices(corpus)
+    ]
     has_official_pools = bool(queries) and all(query.candidate_ids for query in queries)
     candidate_scope = resolve_candidate_scope(args.candidate_scope, has_official_pools)
     timings["load_records"] = time.perf_counter() - stage_started
@@ -685,7 +882,10 @@ def main() -> None:
     )
     resolved_dtype = resolve_dtype(args.device, args.dtype)
     dtype_id = str(resolved_dtype).removeprefix("torch.")
-    retriever_id = f"{args.model}@{args.model_revision}#dim={args.truncate_dim}#dtype={dtype_id}"
+    retriever_id = (
+        f"{args.model}@{args.model_revision}#dim={args.truncate_dim}#dtype={dtype_id}"
+        f"#max_text_length={args.max_text_length}"
+    )
     available_modalities = sorted({chunk.modality for chunk in corpus})
     retrieval_policy = {
         "mode": args.retrieval_mode,
@@ -693,6 +893,8 @@ def main() -> None:
         "candidate_scope": candidate_scope,
         "image_caption_fusion": not args.no_image_caption_fusion,
         "max_image_pixels": args.max_image_pixels,
+        "max_text_length": args.max_text_length,
+        "embedding_checkpoint_every": args.checkpoint_every,
         "min_per_modality": (
             args.min_per_modality if args.retrieval_mode == "modality_aware" else None
         ),
@@ -731,6 +933,7 @@ def main() -> None:
             args.device,
             args.dtype,
             args.max_image_pixels,
+            args.max_text_length,
         )
         corpus_vectors = encode_corpus(
             model,
@@ -739,8 +942,13 @@ def main() -> None:
             text_batch_size=args.text_batch_size,
             image_batch_size=args.image_batch_size,
             image_caption_fusion=not args.no_image_caption_fusion,
+            checkpoint_dir=args.cache_dir,
+            checkpoint_prefix=f"corpus-{cache_identity}",
+            checkpoint_every=args.checkpoint_every,
         )
         save_embedding_cache(args.cache_dir, f"corpus-{cache_identity}", corpus_ids, corpus_vectors)
+        for modality in ("text", "image", "caption"):
+            clear_partial_checkpoint(args.cache_dir, f"corpus-{cache_identity}.{modality}")
         timings["encode_corpus"] = time.perf_counter() - stage_started
     else:
         timings["encode_corpus"] = 0.0
@@ -766,6 +974,7 @@ def main() -> None:
                 args.device,
                 args.dtype,
                 args.max_image_pixels,
+                args.max_text_length,
             )
         query_vectors = encode_with_backoff(
             [query.question for query in queries],
@@ -774,6 +983,10 @@ def main() -> None:
             ),
             initial_batch_size=args.text_batch_size,
             description="Encode queries",
+            checkpoint_dir=args.cache_dir,
+            checkpoint_key=f"queries-{query_cache_identity}.query",
+            item_keys=query_ids,
+            checkpoint_every=args.checkpoint_every,
         )
         save_embedding_cache(
             args.cache_dir,
@@ -781,6 +994,7 @@ def main() -> None:
             query_ids,
             query_vectors,
         )
+        clear_partial_checkpoint(args.cache_dir, f"queries-{query_cache_identity}.query")
         timings["encode_queries"] = time.perf_counter() - stage_started
     else:
         timings["encode_queries"] = 0.0
@@ -847,7 +1061,7 @@ def main() -> None:
                     seed=args.split_seed,
                     development_fraction=args.development_fraction,
                 )
-            else:
+            elif args.split_policy == "hash_all":
                 split_role = stable_split_role(
                     query.dataset,
                     query.qid,
@@ -855,6 +1069,13 @@ def main() -> None:
                     development_fraction=args.development_fraction,
                     calibration_fraction=args.calibration_fraction,
                 )
+            else:
+                split_role = query.assigned_split_role
+                if split_role not in role_counts:
+                    raise ValueError(
+                        f"bundle_roles requires development/calibration/test metadata for "
+                        f"{query.dataset}/{query.qid}; got {split_role!r}"
+                    )
             role_counts[split_role] += 1
             per_source_counts = source_split_role_counts.setdefault(
                 query.source_split,
@@ -934,6 +1155,16 @@ def main() -> None:
         "query_type_rule_id": query_type_rule_id,
         "non_support_label": args.non_support_label,
         "retrieval_policy": retrieval_policy,
+        "unavailable_official_image_fallback": {
+            "count": len(unavailable_image_ids),
+            "chunk_ids": unavailable_image_ids,
+            "method": (
+                "Jina-v4 text embedding of the official image caption; no synthetic image "
+                "was introduced"
+                if unavailable_image_ids
+                else None
+            ),
+        },
         "candidate_scope": candidate_scope,
         "candidate_pool": {
             "minimum": (

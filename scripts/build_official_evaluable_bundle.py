@@ -289,6 +289,12 @@ def build_mmqa(
             for item in row.get("supporting_context", [])
             if item.get("doc_id") is not None
         ]
+        # MMQA's official per-question candidate metadata omits one labelled
+        # support document for one dev example.  Preserve the official pool
+        # verbatim and record that exclusion explicitly so the loader can treat
+        # the query as unretrievable instead of silently injecting gold evidence.
+        candidate_set = set(candidates)
+        excluded_supports = sorted(set(support).difference(candidate_set))
         questions.append(
             {
                 "qid": str(row["qid"]),
@@ -303,6 +309,13 @@ def build_mmqa(
                     "split_role": "test",
                     "type": metadata.get("type"),
                     "modalities": metadata.get("modalities", []),
+                    **(
+                        {
+                            "support_ids_outside_candidate_set": excluded_supports
+                        }
+                        if excluded_supports
+                        else {}
+                    ),
                 },
             }
         )

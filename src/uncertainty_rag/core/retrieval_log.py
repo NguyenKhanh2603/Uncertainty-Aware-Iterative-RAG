@@ -47,6 +47,7 @@ class QueryRecord:
     support_ids: frozenset[str]
     source_split: str
     candidate_ids: tuple[str, ...] = ()
+    assigned_split_role: str | None = None
 
 
 def stable_json_hash(value: Any) -> str:
@@ -278,13 +279,26 @@ def load_bundle_records(
                 )
             if not candidate_ids:
                 raise ConformalDataError(f"Query {dataset}/{qid} has no candidates")
-            if not support_ids.issubset(candidate_ids):
-                missing_support = sorted(support_ids.difference(candidate_ids))[0]
-                raise ConformalDataError(
-                    f"Query {dataset}/{qid} support {missing_support} is not a candidate"
-                )
-
             metadata = row.get("metadata") or {}
+            missing_supports = support_ids.difference(candidate_ids)
+            recorded_frozen_exclusions = {
+                str(value)
+                for value in metadata.get(
+                    "support_ids_outside_candidate_set",
+                    metadata.get("official_support_ids_outside_zip_candidate_set", []),
+                )
+            }
+            if missing_supports:
+                # A frozen per-query candidate pool can omit labelled evidence
+                # from the source annotation. Permit this only when the bundle
+                # records the exact exclusions; the retrieval label universe is
+                # then the frozen candidate set.
+                if missing_supports != recorded_frozen_exclusions:
+                    missing_support = sorted(missing_supports)[0]
+                    raise ConformalDataError(
+                        f"Query {dataset}/{qid} support {missing_support} is not a candidate"
+                    )
+                support_ids.intersection_update(candidate_ids)
             queries.append(
                 QueryRecord(
                     dataset=dataset,
@@ -293,6 +307,9 @@ def load_bundle_records(
                     support_ids=frozenset(support_ids),
                     source_split=str(metadata.get("source_split", "unknown")),
                     candidate_ids=tuple(candidate_ids),
+                    assigned_split_role=(
+                        str(metadata.get("split_role", "")).strip() or None
+                    ),
                 )
             )
 
