@@ -1,0 +1,35 @@
+{
+  "protocol": "full_official_splits_with_public_answer_and_support_labels",
+  "created_date": "2026-09-30",
+  "total_queries": 16480,
+  "datasets": {
+    "hotpotqa": {
+      "count": 7405,
+      "source_split": "distractor/validation",
+      "qids_sha256": "fca76fdd9c605201472889b9567d5a92f61e3df71f3a55dd5637cbdc6387a769",
+      "test_manifest": "hotpotqa/test_manifest.json",
+      "test_qids": "hotpotqa/test_qids.txt"
+    },
+    "mmqa": {
+      "count": 2441,
+      "source_split": "dev",
+      "qids_sha256": "aba9c5397fa728c466c669b37439c5ca3f19785052120545d7575f2bf0f512c9",
+      "test_manifest": "mmqa/test_manifest.json",
+      "test_qids": "mmqa/test_qids.txt"
+    },
+    "tatqa": {
+      "count": 1668,
+      "source_split": "dev",
+      "qids_sha256": "90143aff3ee4dbe516853dfd9f4785c2c04b67dfee7b396ba0c72c568731c644",
+      "test_manifest": "tatqa/test_manifest.json",
+      "test_qids": "tatqa/test_qids.txt"
+    },
+    "webqa": {
+      "count": 4966,
+      "source_split": "validation",
+      "qids_sha256": "b13113972f392fb7fc26edf10575628be516f2cffc12ff3688abc4e4d7ab3072",
+      "test_manifest": "webqa/test_manifest.json",
+      "test_qids": "webqa/test_qids.txt"
+    }
+  }
+}
