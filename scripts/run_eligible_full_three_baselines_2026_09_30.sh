@@ -22,7 +22,8 @@ JINA_REVISION="853c867b65b749f3c3c72a06868140d842e04f06"
 
 mkdir -p "$RETRIEVAL_ROOT" "$CACHE_ROOT" "$OUTPUT_ROOT/logs"
 
-for dataset in tatqa hotpotqa mmqa webqa; do
+DATASET_ORDER="${DATASET_ORDER:-tatqa hotpotqa mmqa webqa}"
+for dataset in $DATASET_ORDER; do
   echo "===== MATERIALIZE $dataset ====="
   "$PYTHON_BIN" scripts/build_official_evaluable_bundle.py \
     --split-root "$SPLIT_ROOT" --output-dir "$BUNDLE_ROOT" --datasets "$dataset"
