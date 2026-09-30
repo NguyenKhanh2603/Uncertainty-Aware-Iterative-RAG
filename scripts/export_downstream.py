@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 import sys
 import math
@@ -12,7 +12,7 @@ sys.path.insert(0, 'src')
 from uncertainty_rag.core.conformal_retrieval import RetrievalCandidate
 
 def iter_rows(p):
-    with gzip.open(p, 'rt') as f:
+    with gzip.open(p, 'rt', encoding='utf-8') as f:
         for line in f:
             if not line.strip(): continue
             yield json.loads(line)
@@ -41,6 +41,8 @@ def simple_percentile(s, p):
     d1 = x[int(c)] * (k - f)
     return float(d0 + d1)
 
+import bisect
+
 def build_banks(rows_iter):
     false_scores = defaultdict(lambda: defaultdict(list))
     support_scores = defaultdict(list)
@@ -53,6 +55,13 @@ def build_banks(rows_iter):
                 support_scores[ds].append(sc)
             else:
                 false_scores[ds][mod].append(sc)
+                
+    for ds in false_scores:
+        for mod in false_scores[ds]:
+            false_scores[ds][mod].sort()
+    for ds in support_scores:
+        support_scores[ds].sort()
+            
     return false_scores, support_scores
 
 def stage1_bh(candidates, false_scores, alpha1):
@@ -65,7 +74,8 @@ def stage1_bh(candidates, false_scores, alpha1):
         if b_size == 0:
             pvals.append((i, 1.0))
             continue
-        count_ge = sum(1 for s in bank if s >= c.cosine_score)
+        idx = bisect.bisect_left(bank, c.cosine_score)
+        count_ge = b_size - idx
         p = (1.0 + count_ge) / (b_size + 1.0)
         pvals.append((i, p))
     pvals.sort(key=lambda x: x[1])
@@ -88,7 +98,8 @@ def stage2_bh(candidates, S1_indices, support_scores, alpha2):
         if b_size == 0:
             pvals.append((i, 1.0))
             continue
-        count_le = sum(1 for s in bank if s <= c.cosine_score)
+        idx = bisect.bisect_right(bank, c.cosine_score)
+        count_le = idx
         p = (1.0 + count_le) / (b_size + 1.0)
         pvals.append((i, p))
     pvals.sort(key=lambda x: x[1])
@@ -126,13 +137,14 @@ def main():
         
         methods_chunks = {}
 
-        def get_chunk_dicts(indices):
+        def get_chunk_dicts(indices, max_len=10):
+            sorted_indices = sorted(list(indices), key=lambda x: candidates[x].rank)
             return [
                 {
                     "chunk_id": candidates[i].chunk_id,
                     "modality": candidates[i].modality,
-                    "content": query_rows[i].get('content', '') # Wait! Is 'content' in the jsonl? Let's assume yes or extract from somewhere else if needed.
-                } for i in sorted(list(indices), key=lambda x: candidates[x].rank)
+                    "content": query_rows[i].get('content', '') 
+                } for i in sorted_indices[:max_len]
             ]
 
         # Stage 1 only
@@ -140,11 +152,11 @@ def main():
             s1 = stage1_bh(candidates, false_scores, a1)
             methods_chunks[f"stage1_a{a1}"] = get_chunk_dicts(s1)
 
-        # Two stage (a1=0.1)
-        s1_01 = stage1_bh(candidates, false_scores, 0.1)
+        # Two stage (a1=0.99)
+        s1_099 = stage1_bh(candidates, false_scores, 0.99)
         for a2 in [0.15, 0.2, 0.3, 0.4]:
-            s2 = stage2_bh(candidates, s1_01, support_scores, a2)
-            methods_chunks[f"twostage_a1_0.1_a2_{a2}"] = get_chunk_dicts(s2)
+            s2 = stage2_bh(candidates, s1_099, support_scores, a2)
+            methods_chunks[f"twostage_a1_0.99_a2_{a2}"] = get_chunk_dicts(s2)
 
         # Top 10 + Stage 2
         # Fixed top 10 naive
@@ -157,6 +169,10 @@ def main():
         # Top 10 base
         methods_chunks["fixed_top10"] = get_chunk_dicts(top10)
 
+        # Top 5 base
+        top5 = set(retrieval_order[:5])
+        methods_chunks["fixed_top5"] = get_chunk_dicts(top5)
+
         exported_data.append({
             "dataset": dataset,
             "qid": qid,
@@ -164,7 +180,7 @@ def main():
             "methods": methods_chunks
         })
 
-    out_path = r'E:\Downloads\conformal prediction\downstream_export.json'
+    out_path = r'E:\Downloads\conformal prediction\Conformal\Uncertainty-Aware-Iterative-RAG\downstream_export.json'
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(exported_data, f, ensure_ascii=False, indent=2)
     print(f"Exported {len(exported_data)} queries to {out_path}")

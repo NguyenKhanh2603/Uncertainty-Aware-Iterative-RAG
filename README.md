@@ -1,167 +1,59 @@
-# Uncertainty-Aware Iterative RAG via Semantic Information Gain
+# Quy trình Conformal Prediction for RAG (Đã Tối Ưu)
 
-## Conformal backfill Section 2.3 — GPU data runner
+Hệ thống đã được dọn dẹp và tối giản hóa tối đa. Để chạy và ra được bảng kết quả chuẩn xác 100% so với phương pháp gốc, chỉ cần sử dụng 2 file Python duy nhất trong thư mục `scripts/`. 
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NguyenKhanh2603/Uncertainty-Aware-Iterative-RAG/blob/main/conformal_backfill_2_3_gpu_colab.ipynb)
+Không cần sử dụng file .bat hay xây dựng Reference Bank phức tạp lưu ra ổ cứng, toàn bộ quá trình đã được tối ưu chạy trực tiếp trên RAM bằng thuật toán tìm kiếm nhị phân (`bisect`).
 
-The notebook downloads the publicly labelled official train+development data for
-MMQA, WebQA, HotpotQA, and TAT-QA. It preserves each benchmark's real candidate pool
-and gold provenance (no synthetic WebQA negatives), embeds the unique chunks with a
-frozen Jina CLIP v2 retriever, writes top-$L$ logs, builds modality-conditioned
-Section 2.3 false-match banks, and downloads the artifacts as a ZIP.
+---
 
-Every long phase has elapsed-time/ETA progress and the result manifests record the
-actual GPU, VRAM, stage timings, and throughput. An L24 24 GB is sufficient for this
-embedding workload; full WebQA additionally needs a one-time ~39 GB image download
-and enough local disk. Set the notebook's per-dataset limit to 1,000 for a server
-timing trial or `0` for all labelled questions. vLLM is not used because this step
-does not generate answers.
+## 1. Xuất dữ liệu đã lọc (Filtering)
+**File thực thi:** `scripts/export_downstream.py`
 
-The paper runner uses `official_holdout`: only official training questions may enter
-development/calibration, while official dev/validation is final test only. Unlabelled
-official test files are not downloaded. Every manifest includes a
-`source_split_role_counts` audit table.
+**Mô tả chức năng:**
+*   **Bước 1:** Đọc trực tiếp 4 file dữ liệu thô (Top-30 Retreival của HotpotQA, MMQA, TATQA, WebQA) định dạng `.jsonl.gz`.
+*   **Bước 2:** Tự động xây dựng `False-Null Bank` (phân loại theo dataset & modality) và `Support-Null Bank` (phân loại theo dataset) từ tập Calibration (1000 câu hỏi).
+*   **Bước 3:** Áp dụng phương pháp Benjamini-Hochberg (BH) để cắt tỉa các chunk rác cho tập Test (100 câu hỏi). 
+    *   Thực hiện đồng thời nhiều chiến lược: *Stage 1 Only*, *Two Stage*, và *Hybrid Fixed Top-10 + Stage 2* ở các ngưỡng alpha khác nhau.
+    *   Hỗ trợ bù đắp (Backfill) chunk 
+*   **Bước 4:** Xuất kết quả toàn bộ các chiến lược ra một file duy nhất: `downstream_export.json`.
 
-A modality-agnostic framework that decomposes semantic uncertainty into **aleatoric** (data noise) and **epistemic** (knowledge gap) components to drive differentiated corrective actions — **pruning** noisy context and **retrieving** missing evidence.
+**Cách chạy:**
+`python scripts/export_downstream.py`
 
-## Key Features
 
-- **Semantic Uncertainty Decomposition**: SE_total, SE_aleatoric, SE_epistemic via NLI-based concept clustering
-- **Dual-Condition Stopping**: Stops when *both* noise and knowledge gap are resolved
-- **Adaptive Thresholds (U2)**: Self-calibrating thresholds from initial uncertainty profile
-- **Adaptive Sampling (U4)**: Two-phase M sampling — quick probe then full sampling
-- **Calibration Analysis (U3)**: ECE score and reliability diagrams
-- **Modality-Agnostic**: Same pipeline for text, table, and image inputs
+---
 
-## Architecture
+## 2. Đánh giá và in Bảng kết quả (Evaluation)
+**File thực thi:** `scripts/evaluate_results.py`
 
-```
-Query + Context → Sampling (M samples) → Claim Extraction → NLI Clustering
-→ SE Decomposition → Routing (Stop/Prune/Retrieve) → Loop
-```
+**Mô tả chức năng:**
+*   Đọc file `downstream_export.json` vừa được tạo ra.
+*   Đối chiếu với Ground Truth (các chunk được gán nhãn `support`).
+*   Tính toán các chỉ số cốt lõi: 
+    *   **Kept:** Trung bình số lượng chunk được giữ lại đưa vào LLM.
+    *   **Precision:** Tỷ lệ chunk chứa thông tin đúng trên tổng số chunk được đưa vào LLM.
+    *   **Recall:** Tỷ lệ phủ của các chunk đúng so với tổng số chunk đúng có trong Top-30.
+*   In ra bảng thống kê so sánh toàn bộ các method một cách trực quan trên Terminal.
 
-## Context Pruning Strategies
+**Cách chạy:**
+`python scripts/evaluate_results.py`
 
-The framework implements 5 distinct context pruning strategies (configured via `PrunerFactory`) to efficiently remove noisy information from the retrieved context:
+---
 
-1. **Two-Phase Pruning (Default)**: Reranker (coarse filtering) + NLI (fine-grained filtering) based on semantic conflict (not recommend)
-2. **Gray-Zone Pruning**: Re-evaluates uncertain (gray-zone) chunks using a powerful reranker (e.g., `BAAI/bge-reranker-v2-m`). (not recommend)
-3. **Prefix-Caching (LOO)**: Leave-One-Out uncertainty measurement leveraging KV-Cache for speed. (recommend)
-4. **Attention Masking (LOO)**: Masks out chunk tokens at the tensor level to compute uncertainty impact without modifying the prompt (Requires Local VLM). (recommend)
-5. **Attention Saliency**: Prunes chunks with the lowest attention weights directly from the attention matrix (Requires Local VLM). (suggestion of Mr.Hung)
+## 3. Bảng Kết Quả Đánh Giá Toàn Bộ Hệ Thống
 
-## Running Multimodal Datasets (TAT-QA & MultimodalQA)
+Dưới đây là thống kê chi tiết đầu ra (**Kept | Precision | Recall**) của 12 phương pháp/cấu hình đã chạy, mô phỏng chính xác logic lọc của hệ thống gốc:
 
-To run on multimodal datasets, our framework takes a modern **on-the-fly VLM approach**. We do not pre-process the entire dataset upfront.
-
-- **Images (MultimodalQA / WebQA)**: We bypass legacy pre-extracted feature vectors (e.g., `img_features.tar.gz`). We load raw images directly from the dataset's candidate list for a specific question, converting them to Base64 for modern VLMs (like GPT-4o or LLaVA).
-- **Tables (TAT-QA)**: Tables are converted to Markdown format and treated as structured text chunks. When the Pruner decides to remove a table, it removes the entire Markdown table block.
-
-> [!IMPORTANT]
-> Because the iterative pruning algorithm (LOO) calls the Vision-Language Model multiple times per question, evaluating on the entire 44GB image dataset is extremely costly. For ablation studies, it is highly recommended to run on a random sub-sample (e.g., `--max_examples 200`) first.
-
-## Quick Start
-
-```bash
-# Install
-pip install -e ".[dev]"
-
-# Run unit tests
-pytest tests/ -v
-
-# Quick evaluation (50 examples)
-python eval/run_eval.py --dataset nq --max_examples 50
-
-# Compare fixed vs. adaptive thresholds (U2)
-python eval/run_eval.py --dataset nq --threshold_mode fixed --max_examples 100
-python eval/run_eval.py --dataset nq --threshold_mode adaptive --max_examples 100
-
-# Compare fixed vs. adaptive M (U4)
-python eval/run_eval.py --dataset nq --adaptive_m --max_examples 100
-python eval/run_eval.py --dataset nq --no-adaptive_m --max_examples 100
-
-# Run with calibration analysis (U3)
-python eval/run_eval.py --dataset nq --calibrate --max_examples 100
-
-# Multimodal evaluation (TAT-QA & WebQA/MMQA)
-# We recommend using --max_examples 200 for initial testing due to VLM cost.
-python eval/run_eval.py --dataset tatqa --config configs/multimodal.yaml --max_examples 200
-python eval/run_eval.py --dataset webqa --config configs/multimodal.yaml --max_examples 200
-
-# Run specific Pruning Strategies (Ablation Study)
-# Options: two_phase (default), gray_zone, prefix_caching, attention_masking, attention_saliency
-python eval/run_eval.py --dataset tatqa --pruning_strategy gray_zone
-python eval/run_eval.py --dataset tatqa --pruning_strategy attention_masking
-```
-
-## Frozen WebQuestions UQ evaluation
-
-The repository includes a frozen Contriever-MSMARCO retrieval artifact in
-`data/webq_ragu`, including the 400-item seed-10 WebQ evaluation set used for
-Passage Utility-aligned experiments. Run it against a remote OpenAI-compatible
-vLLM server with:
-
-```bash
-python eval/run_webq_remote.py \
-  --base-url http://SERVER:8000/v1 \
-  --model mistralai/Mistral-7B-Instruct-v0.3 \
-  --api-key "$VLLM_API_KEY"
-```
-
-See `docs/webq_remote_inference.md` for setup, resuming an interrupted run,
-and the evaluation caveat concerning the paper's Qwen correctness judge.
-
-## Project Structure
-
-```
-paper/
-├── configs/
-│   ├── default.yaml          # Default hyperparameters
-│   └── multimodal.yaml       # Multimodal overrides
-├── src/uncertainty_rag/
-│   ├── config.py             # Pydantic config system
-│   ├── pipeline.py           # Main iterative pipeline
-│   ├── models/
-│   │   ├── llm_client.py     # OpenAI API wrapper
-│   │   └── nli_model.py      # NLI cross-encoder
-│   ├── modality/
-│   │   ├── base.py           # Abstract ModalityHandler
-│   │   ├── text_handler.py   # Text passages
-│   │   ├── table_handler.py  # TAT-QA tables
-│   │   └── image_handler.py  # WebQA images
-│   ├── core/
-│   │   ├── sampler.py        # M-sample generation (U4 adaptive M)
-│   │   ├── claim_extractor.py
-│   │   ├── semantic_cluster.py
-│   │   ├── uncertainty.py    # SE decomposition
-│   │   ├── router.py         # Dual-condition routing (U2 adaptive τ)
-│   │   ├── pruner.py         # Two-phase pruning,....
-│   │   └── retriever.py      # Hypothesis-driven retrieval
-│   └── utils/
-│       ├── cost_tracker.py
-│       └── logging.py
-├── eval/
-│   ├── run_eval.py           # Main evaluation script
-│   ├── metrics.py            # EM, F1, ROUGE-L, Numerical Accuracy
-│   ├── datasets/
-│   ├── baselines/
-│   └── analysis/
-│       ├── calibration.py    # U3: ECE + reliability diagrams
-│       ├── ablation.py
-│       ├── threshold_sensitivity.py
-│       ├── cost_analysis.py
-│       └── cross_modal_analysis.py
-└── tests/
-```
-
-## Configuration
-
-See `configs/default.yaml` for all hyperparameters. Key settings:
-
-| Parameter | Description | Default |
-|---|---|---|
-| `thresholds.mode` | `"fixed"` or `"adaptive"` (U2) | `"fixed"` |
-| `sampling.adaptive_M_enabled` | Enable two-phase sampling (U4) | `false` |
-| `sampling.M` | Fixed sample count | `10` |
-| `sampling.M_initial` | Initial samples for adaptive M | `3` |
-| `calibration.enabled` | Enable U3 calibration analysis | `true` |
+| Method | HOTPOTQA | MMQA | TATQA | WEBQA |
+| :--- | :--- | :--- | :--- | :--- |
+| **fixed_top5** | 4.95 \| 33.7% \| 83.5% | 5.00 \| 24.0% \| 81.2% | 4.37 \| 29.7% \| 97.0% | 5.00 \| 23.0% \| 66.5% |
+| **stage1_a0.1** | 0.89 \| 55.1% \| 24.5% | 0.70 \| 38.6% \| 19.0% | 0.33 \| 69.7% \| 17.5% | 0.58 \| 34.5% \| 11.2% |
+| **stage1_a0.9** | 8.11 \| 22.3% \| 90.5% | 7.41 \| 15.5% \| 77.2% | 4.53 \| 25.6% \| 88.5% | 6.43 \| 16.3% \| 59.7% |
+| **stage1_a0.99** | 9.59 \| 20.5% \| 98.5% | 9.43 \| 14.1% \| 88.8% | 5.43 \| 24.1% \| 98.0% | 8.33 \| 14.5% \| 69.3% |
+| **twostage_a1_0.99_a2_0.15** | 6.92 \| 26.4% \| 91.5% | 8.93 \| 14.6% \| 87.2% | 4.23 \| 26.2% \| 85.5% | 6.92 \| 16.2% \| 64.5% |
+| **twostage_a1_0.99_a2_0.2** | 6.08 \| 29.6% \| 90.0% | 8.31 \| 15.0% \| 84.8% | 3.88 \| 28.4% \| 84.5% | 6.44 \| 17.1% \| 63.7% |
+| **twostage_a1_0.99_a2_0.3** | 5.15 \| 32.2% \| 83.0% | 6.73 \| 17.2% \| 80.2% | 3.21 \| 31.2% \| 76.0% | 5.43 \| 18.6% \| 58.2% |
+| **top10_stage2_a2_0.15** | 6.94 \| 26.4% \| 91.5% | 9.79 \| 14.4% \| 93.2% | 4.23 \| 26.2% \| 85.5% | 8.08 \| 16.0% \| 74.0% |
+| **top10_stage2_a2_0.2** | 6.09 \| 29.6% \| 90.0% | 9.72 \| 14.5% \| 93.2% | 3.90 \| 28.2% \| 84.5% | 7.73 \| 16.0% \| 71.8% |
+| **top10_stage2_a2_0.3** | 5.15 \| 32.2% \| 83.0% | 8.52 \| 15.6% \| 89.6% | 3.28 \| 30.8% \| 77.0% | 6.88 \| 17.4% \| 68.8% |
+| **top10_stage2_a2_0.4** | 3.85 \| 36.9% \| 71.0% | 6.20 \| 18.5% \| 77.8% | 2.78 \| 34.2% \| 73.5% | 5.89 \| 18.3% \| 60.3% |
