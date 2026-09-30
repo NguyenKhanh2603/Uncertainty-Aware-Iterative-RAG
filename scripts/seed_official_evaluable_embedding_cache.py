@@ -29,30 +29,41 @@ MODEL = "jinaai/jina-embeddings-v4"
 REVISION = "853c867b65b749f3c3c72a06868140d842e04f06"
 
 
-def old_vectors(cache_dir: Path, target_ids: set[str]) -> dict[str, np.ndarray]:
+def old_vectors(cache_dirs: list[Path], target_ids: set[str]) -> dict[str, np.ndarray]:
+    """Merge reusable vectors from the best matching cache in each directory."""
+
     candidates = []
-    for metadata_path in cache_dir.glob("corpus-*.json"):
-        vector_path = metadata_path.with_suffix(".npy")
-        if not vector_path.is_file():
-            continue
-        payload = json.loads(metadata_path.read_text(encoding="utf-8"))
-        ids = payload.get("ids")
-        if isinstance(ids, list):
-            overlap = sum(str(chunk_id) in target_ids for chunk_id in ids)
-            candidates.append((overlap, len(ids), metadata_path, vector_path, ids))
+    for cache_dir in cache_dirs:
+        per_directory = []
+        for metadata_path in cache_dir.glob("corpus-*.json"):
+            vector_path = metadata_path.with_suffix(".npy")
+            if not vector_path.is_file():
+                continue
+            payload = json.loads(metadata_path.read_text(encoding="utf-8"))
+            ids = payload.get("ids")
+            if isinstance(ids, list):
+                overlap = sum(str(chunk_id) in target_ids for chunk_id in ids)
+                per_directory.append((overlap, len(ids), metadata_path, vector_path, ids))
+        if per_directory:
+            candidates.append(max(per_directory, key=lambda item: (item[0], item[1])))
     if not candidates:
-        raise FileNotFoundError(f"No completed corpus cache in {cache_dir}")
-    # A dataset-specific cache directory may retain older partial experiments.
-    # The largest completed cache is the frozen 10k-query run used by the
-    # calibration report and contains every reusable vector from that run.
-    overlap, _, metadata_path, vector_path, ids = max(
-        candidates, key=lambda item: (item[0], item[1])
-    )
-    vectors = np.load(vector_path, mmap_mode="r")
-    if len(vectors) != len(ids):
-        raise ValueError(f"Cache metadata/array mismatch: {metadata_path}")
-    print(f"Reuse source: {vector_path} ({len(ids):,} chunks; overlap={overlap:,})", flush=True)
-    return {str(chunk_id): vectors[index] for index, chunk_id in enumerate(ids)}
+        raise FileNotFoundError(f"No completed corpus cache in: {cache_dirs}")
+
+    reusable: dict[str, np.ndarray] = {}
+    for overlap, _, metadata_path, vector_path, ids in candidates:
+        vectors = np.load(vector_path, mmap_mode="r")
+        if len(vectors) != len(ids):
+            raise ValueError(f"Cache metadata/array mismatch: {metadata_path}")
+        print(
+            f"Reuse source: {vector_path} ({len(ids):,} chunks; overlap={overlap:,})",
+            flush=True,
+        )
+        for index, chunk_id_value in enumerate(ids):
+            chunk_id = str(chunk_id_value)
+            if chunk_id not in target_ids or chunk_id in reusable:
+                continue
+            reusable[chunk_id] = np.asarray(vectors[index], dtype=np.float32)
+    return reusable
 
 
 def main() -> None:
@@ -62,7 +73,13 @@ def main() -> None:
         "--bundle-dir", type=Path, default=Path("data/official_evaluable_test_2026_09_30")
     )
     parser.add_argument("--cache-dir", type=Path, required=True)
-    parser.add_argument("--reuse-cache-dir", type=Path, required=True)
+    parser.add_argument(
+        "--reuse-cache-dir",
+        type=Path,
+        action="append",
+        required=True,
+        help="Completed compatible cache directory; repeat to merge disjoint corpus subsets.",
+    )
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--text-batch-size", type=int, default=8)
     parser.add_argument("--image-batch-size", type=int, default=4)

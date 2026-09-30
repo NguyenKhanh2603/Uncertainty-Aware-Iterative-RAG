@@ -277,12 +277,7 @@ def main() -> None:
         config.name: validate_downstream_inputs(config, test_qids, test)
         for config, test_qids, test, _ in pending
     }
-    generator = QwenDirectAnswerGenerator(
-        args.model,
-        min_pixels=args.min_pixels,
-        max_pixels=args.max_pixels,
-        revision=args.model_revision,
-    )
+    generator: QwenDirectAnswerGenerator | None = None
     for config, test_qids, test, masks in pending:
         questions, corpus = resolved[config.name]
         prediction_path = args.output_dir / f"{config.name}_downstream_predictions.jsonl"
@@ -292,19 +287,41 @@ def main() -> None:
             else {}
         )
         for index, (qid, rows) in enumerate(zip(test_qids, test, strict=True), start=1):
-            if qid in completed:
-                continue
             item = questions[qid]
             gold = [str(answer) for answer in item["gold_answers"]]
             prompt = (
                 "Answer using only the supplied context. Return only the short answer.\nQuestion: "
                 + str(item["question"])
             )
+            selected_by_method = {
+                method: chunks(rows, masks[method][index - 1], corpus, config.bundle_root)
+                for method in METHODS
+            }
+            expected_chunk_ids = {
+                method: tuple(chunk.id for chunk in selected_by_method[method])
+                for method in METHODS
+            }
+            existing = completed.get(qid)
+            if existing is not None and all(
+                tuple(existing.get("contexts", {}).get(method, {}).get("chunk_ids", ()))
+                == expected_chunk_ids[method]
+                for method in METHODS
+            ):
+                continue
+
+            if generator is None:
+                generator = QwenDirectAnswerGenerator(
+                    args.model,
+                    min_pixels=args.min_pixels,
+                    max_pixels=args.max_pixels,
+                    revision=args.model_revision,
+                )
             cache: dict[tuple[str, ...], str] = {}
-            predictions, contexts = {}, {}
+            predictions: dict[str, str] = {}
+            contexts: dict[str, dict[str, Any]] = {}
             for method in METHODS:
-                selected = chunks(rows, masks[method][index - 1], corpus, config.bundle_root)
-                key = tuple(chunk.id for chunk in selected)
+                selected = selected_by_method[method]
+                key = expected_chunk_ids[method]
                 answer = cache.get(key)
                 if answer is None:
                     answer = generator.generate(
