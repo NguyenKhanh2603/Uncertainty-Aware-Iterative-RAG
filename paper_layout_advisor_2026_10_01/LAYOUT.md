@@ -1,7 +1,9 @@
 # Dàn bài bài báo: Two-Stage Conformal Context Selection for RAG
 
-**Tác giả:** Hung Le  
-**Ngày cập nhật:** 01/10/2026  
+**Tác giả:** Hung Le
+
+**Ngày cập nhật:** 01/10/2026
+
 **Nội dung:** ý chính để phát triển bài báo, cách trình bày thí nghiệm, số hiện tại và hướng cải thiện.
 
 ## 1. Abstract
