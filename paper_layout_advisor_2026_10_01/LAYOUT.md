@@ -117,45 +117,113 @@
 
 Các số dưới đây lấy từ bảng thí nghiệm cập nhật ngày 01/10/2026, trình bày ngắn để định hướng phần Results.
 
-### 8.1. Downstream tốt nhất và chất lượng chunks của cùng cấu hình
+**Cách đọc bảng:** mỗi dataset có toàn bộ 15 method/configurations trong bảng số hiện tại. **In đậm: tốt nhất**; <ins>gạch chân: tốt nhì</ins>, xếp theo hai giá trị khác nhau của từng cột trong cùng dataset; các hàng bằng nhau được đánh dấu cùng hạng. ↑ là cao hơn tốt hơn; ↓ là thấp hơn về context/cost. Kept/cost cần đọc cùng recall và downstream. P/R/Selection F1 đo support chunks; EM/downstream F1 đo câu trả lời. **—** là số chưa có trong bảng nguồn.
 
-Chọn theo **Generation F1 cao nhất trong các cấu hình đã chạy**, riêng cho nhóm baselines và nhóm Stage 1/Two-Stage/hybrid ở từng dataset. Baselines gồm Fixed Top-5, CCE, CONFLARE và TRAQ. Các hàng có thể dùng cấu hình khác nhau; đây là tổng hợp các điểm tốt nhất đang có. Mỗi hàng ghi đồng thời chất lượng support chunks và downstream của **đúng cùng cấu hình**. Precision/recall/Selection F1 đo evidence; EM/downstream F1 đo câu trả lời, tất cả theo phần trăm.
+### 8.1. HotpotQA: toàn bộ kết quả hiện tại
 
-| Dataset | Method | Kept chunks | Support precision (%) | Support recall (%) | Selection F1 (%) | Downstream EM (%) | Downstream F1 (%) | Approx. TFLOPs |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| HotpotQA | TRAQ (α=.10) | 8.17 | 21.4 | 87.5 | 34.4 | 62.00 | 73.52 | 19.91 |
-| HotpotQA | Stage 1 (α₁=.99) | 9.59 | 20.5 | 98.5 | 33.9 | 71.00 | **82.52** | 23.34 |
-| MMQA | CCE (α=.10) | 18.40 | 7.7 | 91.0 | 14.2 | 49.00 | **54.08** | 47.45 |
-| MMQA | Stage 1 (α₁=.99) | 9.43 | 14.1 | 85.8 | 24.2 | 47.00 | 52.10 | 53.16 |
-| TAT-QA | Fixed Top-5 | 4.37 | 29.7 | 97.0 | 45.5 | 37.00 | 57.30 | 8.08 |
-| TAT-QA | Stage 1 (α₁=.99) | 5.43 | 24.1 | 97.8 | 38.7 | 39.00 | **58.84** | 9.86 |
-| WebQA | TRAQ (α=.10) | 24.68 | 6.3 | 88.6 | 11.8 | 13.00 | 29.29 | 54.66 |
-| WebQA | Top-10 + S2 (α₂=.15) | 8.08 | 16.0 | 73.7 | 26.2 | 12.00 | **30.02** | 13.83 |
+| Method | Kept ↓ | Support P (%) ↑ | Support R (%) ↑ | Selection F1 (%) ↑ | EM (%) ↑ | Downstream F1 (%) ↑ | Latency (s) ↓ | Approx. TFLOPs ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fixed Top-5 | 4.95 | 33.7 | 83.5 | <ins>48.1</ins> | 61.00 | 71.40 | <ins>0.22</ins> | 11.82 |
+| CCE (α=.10) | 8.61 | 21.0 | 90.5 | 34.1 | 62.00 | 73.02 | 0.24 | 21.03 |
+| CONFLARE (α=.10) | 7.05 | 21.0 | 74.0 | 32.7 | 57.00 | 68.78 | **0.21** | 17.35 |
+| TRAQ (α=.10) | 8.17 | 21.4 | 87.5 | 34.4 | 62.00 | 73.52 | 0.23 | 19.91 |
+| Stage 1 (α₁=.10) | **0.89** | **55.1** | 24.5 | 33.9 | 31.00 | 41.57 | 0.26 | **2.80** |
+| Stage 1 (α₁=.90) | 8.11 | 22.3 | 90.5 | 35.8 | — | — | — | — |
+| Stage 1 (α₁=.99) | 9.59 | 20.5 | **98.5** | 33.9 | **71.00** | **82.52** | 0.27 | 23.34 |
+| Two-Stage (α₁=.99, α₂=.15) | 6.92 | 26.4 | <ins>91.5</ins> | 41.0 | <ins>64.00</ins> | <ins>76.96</ins> | 0.24 | 16.43 |
+| Two-Stage (α₁=.99, α₂=.20) | 6.08 | 29.6 | 90.0 | 44.5 | 63.00 | 75.11 | 0.23 | 14.39 |
+| Two-Stage (α₁=.99, α₂=.30) | 5.15 | 32.2 | 83.0 | 46.4 | 60.00 | 71.84 | 0.23 | 12.36 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — | 58.00 | 68.67 | 0.23 | <ins>9.34</ins> |
+| Top-10 + S2 (α₂=.15) | 6.94 | 26.4 | <ins>91.5</ins> | 40.9 | 63.00 | 75.96 | 0.25 | 16.47 |
+| Top-10 + S2 (α₂=.20) | 6.09 | 29.6 | 90.0 | 44.5 | 63.00 | 75.11 | 0.23 | 14.40 |
+| Top-10 + S2 (α₂=.30) | 5.15 | 32.2 | 83.0 | 46.4 | 60.00 | 71.84 | 0.23 | 12.36 |
+| Top-10 + S2 (α₂=.40) | <ins>3.85</ins> | <ins>36.9</ins> | 71.0 | **48.5** | 58.00 | 68.67 | 0.23 | <ins>9.34</ins> |
 
-- So với baseline có F1 cao nhất, Stage 1 `.99` tăng **9.00 điểm F1 trên HotpotQA** và **1.54 điểm trên TAT-QA**; hybrid `.15` tăng **0.73 điểm trên WebQA**.
-- MMQA còn cần cải thiện: F1 cao nhất của nhóm đề xuất là **52.10%**, thấp hơn CCE **1.98 điểm**.
+### 8.2. MMQA: toàn bộ kết quả hiện tại
 
-### 8.2. Các cấu hình pruning nổi bật: chunks và downstream
+| Method | Kept ↓ | Support P (%) ↑ | Support R (%) ↑ | Selection F1 (%) ↑ | EM (%) ↑ | Downstream F1 (%) ↑ | Latency (s) ↓ | Approx. TFLOPs ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fixed Top-5 | <ins>5.00</ins> | <ins>24.0</ins> | 77.4 | **36.6** | <ins>48.00</ins> | <ins>52.40</ins> | **0.24** | <ins>14.38</ins> |
+| CCE (α=.10) | 18.40 | 7.7 | <ins>91.0</ins> | 14.2 | **49.00** | **54.08** | 0.44 | 47.45 |
+| CONFLARE (α=.10) | 18.05 | 7.8 | 90.3 | 14.4 | 47.00 | 52.08 | 0.42 | 46.45 |
+| TRAQ (α=.10) | 19.50 | 7.5 | **94.2** | 13.9 | <ins>48.00</ins> | 52.12 | 0.45 | 50.68 |
+| Stage 1 (α₁=.10) | **0.59** | **38.6** | 14.8 | 21.4 | 23.00 | 29.24 | 0.27 | **2.84** |
+| Stage 1 (α₁=.90) | 6.85 | 16.7 | 74.2 | 27.3 | — | — | — | — |
+| Stage 1 (α₁=.99) | 9.43 | 14.1 | 85.8 | 24.2 | 47.00 | 52.10 | 1.96 | 53.16 |
+| Two-Stage (α₁=.99, α₂=.15) | 9.26 | 14.4 | 85.8 | 24.7 | 47.00 | 52.03 | 0.95 | 34.06 |
+| Two-Stage (α₁=.99, α₂=.20) | 9.24 | 14.4 | 85.8 | 24.7 | 47.00 | 52.03 | 0.85 | 31.12 |
+| Two-Stage (α₁=.99, α₂=.30) | 8.30 | 15.3 | 81.9 | 25.8 | 47.00 | 51.93 | 0.64 | 24.45 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — | 42.00 | 47.29 | 0.34 | 15.82 |
+| Top-10 + S2 (α₂=.15) | 9.79 | 14.4 | <ins>91.0</ins> | 24.9 | 47.00 | 51.53 | 0.32 | 24.12 |
+| Top-10 + S2 (α₂=.20) | 9.72 | 14.5 | <ins>91.0</ins> | 25.0 | 47.00 | 51.53 | 0.32 | 23.99 |
+| Top-10 + S2 (α₂=.30) | 8.52 | 15.6 | 85.8 | 26.4 | 45.00 | 49.03 | 0.30 | 21.54 |
+| Top-10 + S2 (α₂=.40) | 6.20 | 18.5 | 74.2 | <ins>29.7</ins> | 47.00 | 51.75 | <ins>0.26</ins> | 16.42 |
 
-Chọn hai điểm tăng downstream F1 và giảm cost trên HotpotQA/WebQA, cùng hai điểm có Selection F1 cao nhất trong nhóm đề xuất trên MMQA/TAT-QA. Mỗi row giữ nguyên precision, recall và downstream của cùng method/alpha để thấy phần evidence được giữ hoặc mất.
+### 8.3. TAT-QA: toàn bộ kết quả hiện tại
 
-| Dataset | Method | Kept chunks | Support precision (%) | Support recall (%) | Selection F1 (%) | Downstream EM (%) | Downstream F1 (%) | Approx. TFLOPs |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| HotpotQA | CCE (α=.10) | 8.61 | 21.0 | 90.5 | 34.1 | 62.00 | 73.02 | 21.03 |
-| HotpotQA | Two-Stage (α₁=.99, α₂=.15) | 6.92 | 26.4 | 91.5 | 41.0 | 64.00 | 76.96 | 16.43 |
-| MMQA | CCE (α=.10) | 18.40 | 7.7 | 91.0 | 14.2 | 49.00 | 54.08 | 47.45 |
-| MMQA | Top-10 + S2 (α₂=.40) | 6.20 | 18.5 | 74.2 | 29.7 | 47.00 | 51.75 | 16.42 |
-| TAT-QA | Fixed Top-5 | 4.37 | 29.7 | 97.0 | 45.5 | 37.00 | 57.30 | 8.08 |
-| TAT-QA | Top-10 + S2 (α₂=.40) | 2.78 | 34.2 | 70.9 | 46.1 | 26.00 | 43.88 | 5.91 |
-| WebQA | TRAQ (α=.10) | 24.68 | 6.3 | 88.6 | 11.8 | 13.00 | 29.29 | 54.66 |
-| WebQA | Top-10 + S2 (α₂=.15) | 8.08 | 16.0 | 73.7 | 26.2 | 12.00 | 30.02 | 13.83 |
+| Method | Kept ↓ | Support P (%) ↑ | Support R (%) ↑ | Selection F1 (%) ↑ | EM (%) ↑ | Downstream F1 (%) ↑ | Latency (s) ↓ | Approx. TFLOPs ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fixed Top-5 | 4.37 | 29.7 | <ins>97.0</ins> | <ins>45.5</ins> | <ins>37.00</ins> | <ins>57.30</ins> | 0.42 | 8.08 |
+| CCE (α=.10) | 5.01 | 24.6 | 91.8 | 38.8 | 28.00 | 49.37 | <ins>0.36</ins> | 9.10 |
+| CONFLARE (α=.10) | 4.64 | 25.0 | 86.6 | 38.8 | 25.00 | 44.52 | **0.35** | 8.58 |
+| TRAQ (α=.10) | 5.09 | 24.6 | 93.3 | 38.9 | 28.00 | 47.95 | <ins>0.36</ins> | 9.26 |
+| Stage 1 (α₁=.10) | **0.33** | **69.7** | 17.2 | 27.6 | 9.00 | 18.19 | 0.46 | **1.63** |
+| Stage 1 (α₁=.90) | 4.53 | 25.6 | 86.6 | 39.5 | — | — | — | — |
+| Stage 1 (α₁=.99) | 5.43 | 24.1 | **97.8** | 38.7 | **39.00** | **58.84** | 0.42 | 9.86 |
+| Two-Stage (α₁=.99, α₂=.15) | 4.23 | 26.2 | 82.8 | 39.8 | <ins>37.00</ins> | 53.89 | 0.40 | 8.31 |
+| Two-Stage (α₁=.99, α₂=.20) | 3.90 | 28.2 | 82.1 | 42.0 | 34.00 | 51.56 | 0.40 | 7.88 |
+| Two-Stage (α₁=.99, α₂=.30) | 3.28 | 30.8 | 75.4 | 43.7 | 29.00 | 46.35 | 0.42 | 6.76 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — | 26.00 | 43.88 | 0.42 | 5.92 |
+| Top-10 + S2 (α₂=.15) | 4.23 | 26.2 | 82.8 | 39.9 | <ins>37.00</ins> | 53.89 | 0.40 | 7.90 |
+| Top-10 + S2 (α₂=.20) | 3.90 | 28.2 | 82.1 | 42.0 | 34.00 | 51.56 | 0.40 | 7.58 |
+| Top-10 + S2 (α₂=.30) | 3.28 | 30.8 | 75.4 | 43.7 | 29.00 | 46.35 | 0.41 | 6.73 |
+| Top-10 + S2 (α₂=.40) | <ins>2.78</ins> | <ins>34.2</ins> | 70.9 | **46.1** | 26.00 | 43.88 | 0.42 | <ins>5.91</ins> |
 
-- **HotpotQA:** Two-Stage tăng **3.94 điểm downstream F1**, precision tăng **5.4 điểm**, recall tăng **1.0 điểm** so với CCE; compute proxy giảm **21.9%**.
-- **MMQA:** hybrid `.40` tăng Selection F1 **14.2% → 29.7%** so với CCE, nhưng recall giảm **91.0% → 74.2%** và downstream F1 giảm **54.08% → 51.75%**. Fixed Top-5 còn có Selection F1 **36.6%**; tiếp tục ưu tiên bảo toàn evidence khi prune.
-- **TAT-QA:** hybrid `.40` tăng Selection F1 **45.5% → 46.1%** so với Fixed Top-5, nhưng recall giảm **97.0% → 70.9%** và downstream F1 giảm **57.30% → 43.88%**. Đây là trường hợp cần giữ lại evidence cho reasoning.
-- **WebQA:** hybrid `.15` tăng **0.73 điểm downstream F1**, precision tăng **9.7 điểm** và compute proxy giảm **74.7%** so với TRAQ; recall giảm **14.9 điểm**. Đây là điểm cần tiếp tục cải thiện evidence coverage.
+### 8.4. WebQA: toàn bộ kết quả hiện tại
 
-### 8.3. Diễn giải số hiện tại
+| Method | Kept ↓ | Support P (%) ↑ | Support R (%) ↑ | Selection F1 (%) ↑ | EM (%) ↑ | Downstream F1 (%) ↑ | Latency (s) ↓ | Approx. TFLOPs ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fixed Top-5 | <ins>5.00</ins> | <ins>23.0</ins> | 65.7 | **34.1** | 9.00 | 27.90 | **0.27** | <ins>8.86</ins> |
+| CCE (α=.10) | 23.36 | 6.5 | <ins>86.3</ins> | 12.1 | <ins>12.00</ins> | 28.89 | 0.47 | 50.99 |
+| CONFLARE (α=.10) | 21.60 | 6.8 | 83.4 | 12.6 | <ins>12.00</ins> | 28.35 | 0.43 | 46.36 |
+| TRAQ (α=.10) | 24.68 | 6.3 | **88.6** | 11.8 | **13.00** | 29.29 | 0.49 | 54.66 |
+| Stage 1 (α₁=.10) | **0.58** | **34.5** | 11.4 | 17.1 | 7.00 | 23.96 | **0.27** | **2.74** |
+| Stage 1 (α₁=.90) | 6.43 | 16.3 | 60.0 | 25.6 | — | — | — | — |
+| Stage 1 (α₁=.99) | 8.33 | 14.5 | 69.1 | 24.0 | 10.00 | 27.67 | 3.77 | 55.07 |
+| Two-Stage (α₁=.99, α₂=.15) | 7.38 | 15.6 | 65.7 | 25.2 | 10.00 | 26.84 | 1.46 | 27.16 |
+| Two-Stage (α₁=.99, α₂=.20) | 7.08 | 15.5 | 62.9 | 24.9 | 9.00 | 26.08 | 1.25 | 23.37 |
+| Two-Stage (α₁=.99, α₂=.30) | 6.47 | 16.7 | 61.7 | 26.3 | 9.00 | 25.71 | 0.79 | 16.88 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — | 9.00 | 27.93 | 0.68 | 13.69 |
+| Top-10 + S2 (α₂=.15) | 8.08 | 16.0 | 73.7 | 26.2 | <ins>12.00</ins> | **30.02** | 0.38 | 13.83 |
+| Top-10 + S2 (α₂=.20) | 7.73 | 16.0 | 70.9 | 26.2 | 9.00 | 28.09 | 0.38 | 13.23 |
+| Top-10 + S2 (α₂=.30) | 6.88 | 17.4 | 68.6 | 27.8 | 11.00 | <ins>29.88</ins> | 0.33 | 11.70 |
+| Top-10 + S2 (α₂=.40) | 5.89 | 18.3 | 61.7 | <ins>28.3</ins> | 9.00 | 27.88 | <ins>0.30</ins> | 9.70 |
+
+### 8.5. Overall downstream
+
+| Method | Overall EM (%) ↑ | Overall downstream F1 (%) ↑ |
+|---|---:|---:|
+| Fixed Top-5 | 38.75 | 52.25 |
+| CCE (α=.10) | 37.75 | 51.34 |
+| CONFLARE (α=.10) | 35.25 | 48.43 |
+| TRAQ (α=.10) | 37.75 | 50.72 |
+| Stage 1 (α₁=.10) | 17.50 | 28.24 |
+| Stage 1 (α₁=.90) | — | — |
+| Stage 1 (α₁=.99) | **41.75** | **55.28** |
+| Two-Stage (α₁=.99, α₂=.15) | 39.50 | 52.43 |
+| Two-Stage (α₁=.99, α₂=.20) | 38.25 | 51.20 |
+| Two-Stage (α₁=.99, α₂=.30) | 36.25 | 48.96 |
+| Two-Stage (α₁=.99, α₂=.40) | 33.75 | 46.95 |
+| Top-10 + S2 (α₂=.15) | <ins>39.75</ins> | <ins>52.85</ins> |
+| Top-10 + S2 (α₂=.20) | 38.25 | 51.57 |
+| Top-10 + S2 (α₂=.30) | 36.25 | 49.28 |
+| Top-10 + S2 (α₂=.40) | 35.00 | 48.05 |
+
+- Overall giữ số được báo trong bảng cung cấp. F1 của Two-Stage `α₂=.40` được báo là **46.95%**; trung bình bốn ô dataset đã làm tròn là 46.9425%. Số tổng hợp sẽ được đối chiếu với log chưa làm tròn.
+- Bảng còn thiếu downstream cho Stage 1 `.90` và selection cho Two-Stage `α₂=.40`; hai cấu hình vẫn được giữ đủ hàng, với các ô tương ứng là **—**.
+- Dữ liệu bảng: [các số từ bản LaTeX cập nhật](../paper_assets/layout_results_supplied_2026_10_01.json).
+
+### 8.6. Diễn giải số hiện tại
 
 - **HotpotQA:** Stage 1 `.99` đạt **71.00 EM / 82.52 F1**. Two-Stage `.99/.15` đạt **64.00/76.96**, cao hơn CCE **3.94 điểm F1**, đồng thời giảm compute proxy **21.03 → 16.43 TFLOPs**. So với Stage 1, pruning giảm **29.6%** proxy nhưng mất **5.56 điểm F1**.
 - **MMQA:** CCE đang có generation F1 cao nhất **54.08%**. Hybrid `α₂=.40` tăng Selection F1 từ CCE **14.2%** lên **29.7%**, nhưng generation F1 là **51.75%**. Fixed Top-5 đạt Selection F1 **36.6%** và generation F1 **52.40%**.
@@ -165,6 +233,8 @@ Chọn hai điểm tăng downstream F1 và giảm cost trên HotpotQA/WebQA, cù
 - Kết quả hiện tại cho thấy pruning có điểm hữu ích về chi phí, nhưng việc tăng Selection F1 chưa chuyển thành downstream gain đồng đều giữa datasets.
 
 ## 9. Đang hoàn thiện để cải thiện kết quả
+
+**Đang làm việc cùng anh Hưng để cải thiện phương pháp**, tập trung bảo toàn evidence khi prune và cải thiện đồng thời chất lượng chọn chunks, downstream và chi phí.
 
 - **Bảo toàn multi-support evidence:** điều chỉnh Stage 2 với recall/all-support constraint trên calibration, tập trung vào các query mất complementary support hoặc table operands.
 - **Conditioning theo modality/rank:** kiểm tra banks riêng cho text/table/image và rank bins để hạn chế trộn các nhóm có score distribution khác nhau; theo dõi bank size và mức ổn định.
