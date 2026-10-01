@@ -690,6 +690,14 @@ $$
   - decision;
   - generated answer.
 
+
+### 7.7. Kết quả mới từ bản LaTeX ngày 01-10-2026
+
+- Mục 16 giữ toàn bộ số downstream/resource mới, kèm bảng từng dataset và phân tích các operating points.
+- Khi phát triển mục 7.1–7.5, dùng kết quả mới cùng manifest/log của nó; các kết quả đã truy vết ở mục 7.2 tiếp tục giữ riêng.
+- Bổ sung so sánh Stage 1 permissive với Two-Stage: trên HotpotQA và TAT-QA, Stage 1 $.99$ có downstream cao nhất trong bảng mới, còn pruning chuyển điểm hoạt động về phía chi phí thấp hơn.
+
+
 ---
 
 ## 8. Ablation Studies
@@ -903,3 +911,253 @@ $$
 5. Viết Introduction và Abstract sau khi biết contribution nào thực sự đứng vững.
 6. Viết Limitations và formal scope song song với Methodology.
 7. Chuyển outline sang LaTeX/Overleaf sau khi headings và main tables ổn định.
+
+
+---
+
+## 16. Cập nhật layout từ bản LaTeX ngày 01-10-2026
+
+### 16.1. Thông tin mới và vị trí đưa vào paper
+
+- Bản LaTeX cung cấp thêm **downstream EM/F1 và latency/TFLOPs** cho Stage 1, Two-Stage và Top-10 + Stage 2 trên cả bốn datasets. Đây là dữ liệu đầu vào mới cho phần Results và quality–cost analysis.
+- Metadata bản thảo: title `Uncertainty-aware RAG`, author `Hung Le`, date `September 2026`; working titles tại mục 0.1 vẫn giữ để chọn khi hoàn thiện bài.
+- Dữ liệu hai bảng được lưu tại [layout_results_supplied_2026_10_01.json](paper_assets/layout_results_supplied_2026_10_01.json). Các số tại mục 16 được chép từ bản LaTeX vừa cung cấp; không thay các số đã truy vết theo run tại mục 3.7 và 7.2.
+- Các baseline downstream trong bản mới khác bản đang có: ví dụ HotpotQA CCE F1 **73.02%** so với **65.3%** tại mục 7.2. Khi viết Results, gắn bảng mới với split, selected chunk IDs, generator prompt, runtime và raw outputs tương ứng; không ghép hai bộ downstream vào cùng một bảng.
+- Thêm kết quả mới vào mục 7.1–7.5 và các Figure quality–cost, giữ tất cả configurations/ablations đã lên kế hoạch.
+- Giữ riêng **Selection F1** (chunk evidence) và **Generation F1** (answer tokens); hai metric phản ánh hai mục tiêu khác nhau.
+
+### 16.2. Experimental configurations từ bản mới
+
+- **Baselines:** Fixed Top-5; CCE, CONFLARE và TRAQ tại $\alpha=.10$. Retrieval allocation của TRAQ là $\alpha_R=.05$ theo code hiện tại.
+- **Stage 1 only:** $\alpha_1\in\{.10,.90,.99\}$. Bản mới có selection cho cả ba mức nhưng chỉ có downstream cho $.10$ và $.99$.
+- **Two-Stage:** $\alpha_1=.99$, $\alpha_2\in\{.15,.20,.30,.40\}$. Bản mới có downstream cho cả bốn mức, selection chỉ tới $.30$.
+- **Top-10 + Stage 2:** $\alpha_2\in\{.15,.20,.30,.40\}$, có cả selection và downstream.
+- Giữ các sweep rộng hơn trong mục 6.6 và 8.2. Phần thiếu dùng ký hiệu **—**, không suy ra từ variant khác.
+- Chốt rõ cap/rank-preserving backfill trong config: Stage 1 $.99$ còn 8.33 chunks/query trên WebQA, trong khi CCE/TRAQ còn 23.36/24.68; budget và pruning đều có thể đóng góp vào giảm cost. Thêm Fixed Top-10 và comparison cùng budget để tách hai tác động này.
+
+### 16.3. Bảng downstream mới theo từng dataset
+
+- EM/F1 theo phần trăm, latency theo giây/query, TFLOPs là compute proxy theo công thức của runner. Bảng giữ toàn bộ số từ LaTeX, không giữ các đánh dấu bold chọn best bị sai trong bản đó.
+
+#### 16.3.1. HotpotQA
+
+| Method | EM (%) | F1 (%) | Latency (s) | Approx. TFLOPs |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 61.00 | 71.40 | 0.22 | 11.82 |
+| CCE (α=.10) | 62.00 | 73.02 | 0.24 | 21.03 |
+| CONFLARE (α=.10) | 57.00 | 68.78 | 0.21 | 17.35 |
+| TRAQ (α=.10) | 62.00 | 73.52 | 0.23 | 19.91 |
+| Stage 1 (α₁=.10) | 31.00 | 41.57 | 0.26 | 2.80 |
+| Stage 1 (α₁=.90) | — | — | — | — |
+| Stage 1 (α₁=.99) | 71.00 | 82.52 | 0.27 | 23.34 |
+| Two-Stage (α₁=.99, α₂=.15) | 64.00 | 76.96 | 0.24 | 16.43 |
+| Two-Stage (α₁=.99, α₂=.20) | 63.00 | 75.11 | 0.23 | 14.39 |
+| Two-Stage (α₁=.99, α₂=.30) | 60.00 | 71.84 | 0.23 | 12.36 |
+| Two-Stage (α₁=.99, α₂=.40) | 58.00 | 68.67 | 0.23 | 9.34 |
+| Top-10 + S2 (α₂=.15) | 63.00 | 75.96 | 0.25 | 16.47 |
+| Top-10 + S2 (α₂=.20) | 63.00 | 75.11 | 0.23 | 14.40 |
+| Top-10 + S2 (α₂=.30) | 60.00 | 71.84 | 0.23 | 12.36 |
+| Top-10 + S2 (α₂=.40) | 58.00 | 68.67 | 0.23 | 9.34 |
+
+#### 16.3.2. MMQA
+
+| Method | EM (%) | F1 (%) | Latency (s) | Approx. TFLOPs |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 48.00 | 52.40 | 0.24 | 14.38 |
+| CCE (α=.10) | 49.00 | 54.08 | 0.44 | 47.45 |
+| CONFLARE (α=.10) | 47.00 | 52.08 | 0.42 | 46.45 |
+| TRAQ (α=.10) | 48.00 | 52.12 | 0.45 | 50.68 |
+| Stage 1 (α₁=.10) | 23.00 | 29.24 | 0.27 | 2.84 |
+| Stage 1 (α₁=.90) | — | — | — | — |
+| Stage 1 (α₁=.99) | 47.00 | 52.10 | 1.96 | 53.16 |
+| Two-Stage (α₁=.99, α₂=.15) | 47.00 | 52.03 | 0.95 | 34.06 |
+| Two-Stage (α₁=.99, α₂=.20) | 47.00 | 52.03 | 0.85 | 31.12 |
+| Two-Stage (α₁=.99, α₂=.30) | 47.00 | 51.93 | 0.64 | 24.45 |
+| Two-Stage (α₁=.99, α₂=.40) | 42.00 | 47.29 | 0.34 | 15.82 |
+| Top-10 + S2 (α₂=.15) | 47.00 | 51.53 | 0.32 | 24.12 |
+| Top-10 + S2 (α₂=.20) | 47.00 | 51.53 | 0.32 | 23.99 |
+| Top-10 + S2 (α₂=.30) | 45.00 | 49.03 | 0.30 | 21.54 |
+| Top-10 + S2 (α₂=.40) | 47.00 | 51.75 | 0.26 | 16.42 |
+
+#### 16.3.3. TAT-QA
+
+| Method | EM (%) | F1 (%) | Latency (s) | Approx. TFLOPs |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 37.00 | 57.30 | 0.42 | 8.08 |
+| CCE (α=.10) | 28.00 | 49.37 | 0.36 | 9.10 |
+| CONFLARE (α=.10) | 25.00 | 44.52 | 0.35 | 8.58 |
+| TRAQ (α=.10) | 28.00 | 47.95 | 0.36 | 9.26 |
+| Stage 1 (α₁=.10) | 9.00 | 18.19 | 0.46 | 1.63 |
+| Stage 1 (α₁=.90) | — | — | — | — |
+| Stage 1 (α₁=.99) | 39.00 | 58.84 | 0.42 | 9.86 |
+| Two-Stage (α₁=.99, α₂=.15) | 37.00 | 53.89 | 0.40 | 8.31 |
+| Two-Stage (α₁=.99, α₂=.20) | 34.00 | 51.56 | 0.40 | 7.88 |
+| Two-Stage (α₁=.99, α₂=.30) | 29.00 | 46.35 | 0.42 | 6.76 |
+| Two-Stage (α₁=.99, α₂=.40) | 26.00 | 43.88 | 0.42 | 5.92 |
+| Top-10 + S2 (α₂=.15) | 37.00 | 53.89 | 0.40 | 7.90 |
+| Top-10 + S2 (α₂=.20) | 34.00 | 51.56 | 0.40 | 7.58 |
+| Top-10 + S2 (α₂=.30) | 29.00 | 46.35 | 0.41 | 6.73 |
+| Top-10 + S2 (α₂=.40) | 26.00 | 43.88 | 0.42 | 5.91 |
+
+#### 16.3.4. WebQA
+
+| Method | EM (%) | F1 (%) | Latency (s) | Approx. TFLOPs |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 9.00 | 27.90 | 0.27 | 8.86 |
+| CCE (α=.10) | 12.00 | 28.89 | 0.47 | 50.99 |
+| CONFLARE (α=.10) | 12.00 | 28.35 | 0.43 | 46.36 |
+| TRAQ (α=.10) | 13.00 | 29.29 | 0.49 | 54.66 |
+| Stage 1 (α₁=.10) | 7.00 | 23.96 | 0.27 | 2.74 |
+| Stage 1 (α₁=.90) | — | — | — | — |
+| Stage 1 (α₁=.99) | 10.00 | 27.67 | 3.77 | 55.07 |
+| Two-Stage (α₁=.99, α₂=.15) | 10.00 | 26.84 | 1.46 | 27.16 |
+| Two-Stage (α₁=.99, α₂=.20) | 9.00 | 26.08 | 1.25 | 23.37 |
+| Two-Stage (α₁=.99, α₂=.30) | 9.00 | 25.71 | 0.79 | 16.88 |
+| Two-Stage (α₁=.99, α₂=.40) | 9.00 | 27.93 | 0.68 | 13.69 |
+| Top-10 + S2 (α₂=.15) | 12.00 | 30.02 | 0.38 | 13.83 |
+| Top-10 + S2 (α₂=.20) | 9.00 | 28.09 | 0.38 | 13.23 |
+| Top-10 + S2 (α₂=.30) | 11.00 | 29.88 | 0.33 | 11.70 |
+| Top-10 + S2 (α₂=.40) | 9.00 | 27.88 | 0.30 | 9.70 |
+
+#### 16.3.5. Overall downstream
+
+- Overall giữ số được báo trong bản cung cấp. Trung bình F1 từ bốn ô đã làm tròn của Two-Stage $.40$ là 46.9425%; bản cung cấp ghi 46.95%. Khi có log, tính lại Overall từ số chưa làm tròn.
+
+| Method | Overall EM (%) | Overall F1 (%) |
+|---|---:|---:|
+| Fixed Top-5 | 38.75 | 52.25 |
+| CCE (α=.10) | 37.75 | 51.34 |
+| CONFLARE (α=.10) | 35.25 | 48.43 |
+| TRAQ (α=.10) | 37.75 | 50.72 |
+| Stage 1 (α₁=.10) | 17.50 | 28.24 |
+| Stage 1 (α₁=.90) | — | — |
+| Stage 1 (α₁=.99) | 41.75 | 55.28 |
+| Two-Stage (α₁=.99, α₂=.15) | 39.50 | 52.43 |
+| Two-Stage (α₁=.99, α₂=.20) | 38.25 | 51.20 |
+| Two-Stage (α₁=.99, α₂=.30) | 36.25 | 48.96 |
+| Two-Stage (α₁=.99, α₂=.40) | 33.75 | 46.95 |
+| Top-10 + S2 (α₂=.15) | 39.75 | 52.85 |
+| Top-10 + S2 (α₂=.20) | 38.25 | 51.57 |
+| Top-10 + S2 (α₂=.30) | 36.25 | 49.28 |
+| Top-10 + S2 (α₂=.40) | 35.00 | 48.05 |
+
+### 16.4. Bảng context-selection mới theo từng dataset
+
+- Kept là số chunks trung bình/query; P/R/Selection F1 theo phần trăm. Các ô trống phản ánh số chưa có trong bản LaTeX.
+
+#### 16.4.1. HotpotQA
+
+| Method | Kept | Precision (%) | Recall (%) | Selection F1 (%) |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 4.95 | 33.7 | 83.5 | 48.1 |
+| CCE (α=.10) | 8.61 | 21.0 | 90.5 | 34.1 |
+| CONFLARE (α=.10) | 7.05 | 21.0 | 74.0 | 32.7 |
+| TRAQ (α=.10) | 8.17 | 21.4 | 87.5 | 34.4 |
+| Stage 1 (α₁=.10) | 0.89 | 55.1 | 24.5 | 33.9 |
+| Stage 1 (α₁=.90) | 8.11 | 22.3 | 90.5 | 35.8 |
+| Stage 1 (α₁=.99) | 9.59 | 20.5 | 98.5 | 33.9 |
+| Two-Stage (α₁=.99, α₂=.15) | 6.92 | 26.4 | 91.5 | 41.0 |
+| Two-Stage (α₁=.99, α₂=.20) | 6.08 | 29.6 | 90.0 | 44.5 |
+| Two-Stage (α₁=.99, α₂=.30) | 5.15 | 32.2 | 83.0 | 46.4 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — |
+| Top-10 + S2 (α₂=.15) | 6.94 | 26.4 | 91.5 | 40.9 |
+| Top-10 + S2 (α₂=.20) | 6.09 | 29.6 | 90.0 | 44.5 |
+| Top-10 + S2 (α₂=.30) | 5.15 | 32.2 | 83.0 | 46.4 |
+| Top-10 + S2 (α₂=.40) | 3.85 | 36.9 | 71.0 | 48.5 |
+
+#### 16.4.2. MMQA
+
+| Method | Kept | Precision (%) | Recall (%) | Selection F1 (%) |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 5.00 | 24.0 | 77.4 | 36.6 |
+| CCE (α=.10) | 18.40 | 7.7 | 91.0 | 14.2 |
+| CONFLARE (α=.10) | 18.05 | 7.8 | 90.3 | 14.4 |
+| TRAQ (α=.10) | 19.50 | 7.5 | 94.2 | 13.9 |
+| Stage 1 (α₁=.10) | 0.59 | 38.6 | 14.8 | 21.4 |
+| Stage 1 (α₁=.90) | 6.85 | 16.7 | 74.2 | 27.3 |
+| Stage 1 (α₁=.99) | 9.43 | 14.1 | 85.8 | 24.2 |
+| Two-Stage (α₁=.99, α₂=.15) | 9.26 | 14.4 | 85.8 | 24.7 |
+| Two-Stage (α₁=.99, α₂=.20) | 9.24 | 14.4 | 85.8 | 24.7 |
+| Two-Stage (α₁=.99, α₂=.30) | 8.30 | 15.3 | 81.9 | 25.8 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — |
+| Top-10 + S2 (α₂=.15) | 9.79 | 14.4 | 91.0 | 24.9 |
+| Top-10 + S2 (α₂=.20) | 9.72 | 14.5 | 91.0 | 25.0 |
+| Top-10 + S2 (α₂=.30) | 8.52 | 15.6 | 85.8 | 26.4 |
+| Top-10 + S2 (α₂=.40) | 6.20 | 18.5 | 74.2 | 29.7 |
+
+#### 16.4.3. TAT-QA
+
+| Method | Kept | Precision (%) | Recall (%) | Selection F1 (%) |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 4.37 | 29.7 | 97.0 | 45.5 |
+| CCE (α=.10) | 5.01 | 24.6 | 91.8 | 38.8 |
+| CONFLARE (α=.10) | 4.64 | 25.0 | 86.6 | 38.8 |
+| TRAQ (α=.10) | 5.09 | 24.6 | 93.3 | 38.9 |
+| Stage 1 (α₁=.10) | 0.33 | 69.7 | 17.2 | 27.6 |
+| Stage 1 (α₁=.90) | 4.53 | 25.6 | 86.6 | 39.5 |
+| Stage 1 (α₁=.99) | 5.43 | 24.1 | 97.8 | 38.7 |
+| Two-Stage (α₁=.99, α₂=.15) | 4.23 | 26.2 | 82.8 | 39.8 |
+| Two-Stage (α₁=.99, α₂=.20) | 3.90 | 28.2 | 82.1 | 42.0 |
+| Two-Stage (α₁=.99, α₂=.30) | 3.28 | 30.8 | 75.4 | 43.7 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — |
+| Top-10 + S2 (α₂=.15) | 4.23 | 26.2 | 82.8 | 39.9 |
+| Top-10 + S2 (α₂=.20) | 3.90 | 28.2 | 82.1 | 42.0 |
+| Top-10 + S2 (α₂=.30) | 3.28 | 30.8 | 75.4 | 43.7 |
+| Top-10 + S2 (α₂=.40) | 2.78 | 34.2 | 70.9 | 46.1 |
+
+#### 16.4.4. WebQA
+
+| Method | Kept | Precision (%) | Recall (%) | Selection F1 (%) |
+|---|---:|---:|---:|---:|
+| Fixed Top-5 | 5.00 | 23.0 | 65.7 | 34.1 |
+| CCE (α=.10) | 23.36 | 6.5 | 86.3 | 12.1 |
+| CONFLARE (α=.10) | 21.60 | 6.8 | 83.4 | 12.6 |
+| TRAQ (α=.10) | 24.68 | 6.3 | 88.6 | 11.8 |
+| Stage 1 (α₁=.10) | 0.58 | 34.5 | 11.4 | 17.1 |
+| Stage 1 (α₁=.90) | 6.43 | 16.3 | 60.0 | 25.6 |
+| Stage 1 (α₁=.99) | 8.33 | 14.5 | 69.1 | 24.0 |
+| Two-Stage (α₁=.99, α₂=.15) | 7.38 | 15.6 | 65.7 | 25.2 |
+| Two-Stage (α₁=.99, α₂=.20) | 7.08 | 15.5 | 62.9 | 24.9 |
+| Two-Stage (α₁=.99, α₂=.30) | 6.47 | 16.7 | 61.7 | 26.3 |
+| Two-Stage (α₁=.99, α₂=.40) | — | — | — | — |
+| Top-10 + S2 (α₂=.15) | 8.08 | 16.0 | 73.7 | 26.2 |
+| Top-10 + S2 (α₂=.20) | 7.73 | 16.0 | 70.9 | 26.2 |
+| Top-10 + S2 (α₂=.30) | 6.88 | 17.4 | 68.6 | 27.8 |
+| Top-10 + S2 (α₂=.40) | 5.89 | 18.3 | 61.7 | 28.3 |
+
+### 16.5. Phân tích mới để phát triển phần Results
+
+- **HotpotQA — pruning đổi quality lấy cost:** Stage 1 $.99$ có EM/F1 cao nhất trong bảng mới (**71.00/82.52**). Two-Stage $.15$ đạt **64.00/76.96**, giảm TFLOPs từ 23.34 xuống 16.43 (**29.6%**) nhưng mất **5.56 điểm F1**. So với CCE, cùng row Two-Stage tăng **3.94 điểm F1**, giảm **21.9%** compute proxy và giảm chunks từ 8.61 xuống 6.92. Figure quality–cost cần hiển thị cả Stage 1 để thấy hai operating points.
+- **MMQA — selection gain chưa chuyển thành downstream gain:** CCE vẫn có generation EM/F1 cao nhất (**49.00/54.08**). Top-10 + S2 $.40$ tăng Selection F1 từ CCE **14.2%** lên **29.7%**, nhưng generation F1 là **51.75%**, thấp hơn CCE **2.33 điểm**. Fixed Top-5 đạt Selection F1 **36.6%** và generation F1 **52.40%**; cần giữ baseline này trong phân tích.
+- **TAT-QA — permissive Stage 1 giữ evidence tốt nhất trong bảng:** Stage 1 $.99$ đạt **39.00 EM / 58.84 F1**; Fixed Top-5 đạt **37.00/57.30**. Two-Stage $.15$ và Top-10 + S2 $.15$ đạt **37.00/53.89**: cao hơn ba literature rows về EM, nhưng F1 thấp hơn Fixed Top-5 **3.41 điểm**. Selection F1 của Top-10 + S2 $.40$ là **46.1%**, chỉ hơn Fixed Top-5 **0.6 điểm**, trong khi generation F1 giảm còn **43.88%**. Phân tích errors nên tập trung vào mất table operands/complementary evidence.
+- **WebQA — hybrid có điểm quality–cost đáng chú ý:** Top-10 + S2 $.15$ đạt F1 **30.02%** so với TRAQ **29.29%**, tăng **0.73 điểm**; proxy giảm **54.66 → 13.83 TFLOPs (74.7%)**, latency **.49 → .38 s (22.4%)**, chunks **24.68 → 8.08**. Recall đồng thời giảm **88.6% → 73.7%**. Hai tỷ lệ giảm compute/latency khác nhau; không gọi proxy reduction là mức tăng tốc tương đương.
+- **Overall — best row tùy nhóm:** trong các Two-Stage/hybrid rows, Top-10 + S2 $.15$ có Overall EM/F1 cao nhất (**39.75/52.85**), hơn Fixed Top-5 **1.00 điểm EM / .60 điểm F1**. Xét cả Stage 1 only, Stage 1 $.99$ mới là best Overall (**41.75/55.28**). Main table cần thể hiện cả hai kết luận.
+- **Recall và Selection F1 là hai đánh đổi riêng:** trên WebQA, hybrid $.15$ đạt Selection F1 **26.2%**, cao hơn CCE/TRAQ **12.1/11.8%**, nhưng vẫn thấp hơn Fixed Top-5 **34.1%**. Trên MMQA cũng có pattern tương tự. Không dùng tăng Selection F1 so với literature rows để suy ra thắng tất cả baselines.
+- **Latency cần giải thích bằng log:** Stage 1 $.99$ trên MMQA/WebQA có latency **1.96/3.77 s**, cao hơn CCE **.44/.47 s**, dù kept chunks ít hơn. Đây là điểm cần kiểm tra runtime, image/token counts và cách timing giữa các runs; số chunks không đủ giải thích latency.
+
+### 16.6. Cập nhật Research Gap và narrative theo bảng mới
+
+- **CCE:** support-pair cutoff giữ recall cao nhưng trên MMQA/WebQA còn **18.40/23.36 chunks**, precision chỉ **7.7/6.5%**. Điều này đặt ra bài toán tăng evidence density và giảm context cost, đồng thời bảo toàn generation quality; MMQA CCE vẫn đạt F1 tốt nhất **54.08%** trong bảng mới.
+- **CONFLARE:** best-support cutoff giảm HotpotQA context **8.61 → 7.05** so với CCE, nhưng precision vẫn **21.0%** và recall giảm **90.5% → 74.0%**; generation F1 giảm **73.02% → 68.78%**. Đây là ví dụ giảm context mà chưa đổi thành evidence enrichment, và mất coverage đi kèm mất answer quality.
+- **TRAQ:** retrieval allocation $.05$ giữ nhiều context trên MMQA/WebQA (**19.50/24.68 chunks**) và recall **94.2/88.6%**, nhưng precision **7.5/6.3%**. Trên WebQA, hybrid $.15$ cho điểm cost–quality thấp chi phí hơn; trên MMQA, TRAQ recall cao hơn hybrid nhưng generation F1 **52.12%** cũng cao hơn hybrid $.15$ **51.53%**. Cần giải thích riêng từng dataset.
+- **Thiết kế đề xuất:** false-reference bank để kiểm tra admission; support-reference bank để prune score không tương thích với support. Hai stages tách việc mở rộng context và giảm noise thành hai tham số; kết quả có thể tạo các điểm quality–cost hữu ích nhưng vẫn phụ thuộc vào cosine separability và evidence cần cho reasoning.
+- **Ablation mới cần ưu tiên:** Stage 1 $.99$ versus Two-Stage $.15$; Fixed Top-10 versus Top-10 + S2; Two-Stage versus hybrid cùng $\alpha_2$. Báo any/all-support, empty rate và per-modality breakdown cùng downstream để xác định evidence nào mất.
+
+### 16.7. Viết Methodology từ bản LaTeX mới
+
+- Giữ hai công thức p-values trong mục 5.4–5.5; bổ sung sơ đồ cho mỗi phép reject: **Stage 1 reject false-null → admit**, **Stage 2 reject support-null → prune**.
+- Với $N=L_q$ ở Stage 1, BH tìm $k=\max\{j:p_{(j)}\le j\alpha_1/N\}$; nếu không có $j$ thỏa thì không admit chunk. Stage 2 dùng $M=|\mathcal S_1|$ và $\alpha_2$, prune các rejected candidates; nếu $M=0$ thì context cuối rỗng.
+- Thêm pseudocode build banks: đọc calibration qids → lấy frozen Top-L candidates và labels → bỏ unknown → gom false/support scores theo stratum → sort → lưu sizes/fingerprint → test lookup, tuyệt đối không thêm test scores vào bank.
+- Phân biệt **high-recall operating point** với guarantee: false-null BH kiểm soát false discoveries trong admitted set dưới assumptions phù hợp; không tự tạo FNR bound. Support-null BH gắn với false discoveries trong pruned set; không tự tạo retained-context FPR/FDR bound. Formal scope tiếp tục theo mục 5.8 và 10.1.
+- Hiệu chuẩn support bank cho candidates qua Stage 1 cần được thiết kế/kiểm chứng cho selective procedure. Ghi rõ bank xây từ tất cả support hay support sau screening, và strategy calibration độc lập nếu áp dụng.
+- Reference-bank sample là candidate score, không phải query count. Báo cả 1,000 calibration queries và số false/support records thực tế, theo pooled/conditional configuration.
+
+### 16.8. Tables, figures và việc hoàn thiện tiếp
+
+- **Table generation:** dùng bảng riêng từng dataset hoặc hai panels để đọc được EM/F1/latency/TFLOPs; giữ Overall EM/F1. Đánh dấu best của toàn bảng và best của nhóm proposed riêng biệt nếu cần.
+- **Table selection:** giữ Kept/P/R/Selection F1, thêm any/all-support và empty khi có logs. Ô thiếu của Stage 1 $.90$ downstream và Two-Stage $.40$ selection tiếp tục để **—** đến khi có output.
+- **Figure quality–cost:** plot generation F1 theo approximate TFLOPs, ghi Stage 1 $.99$, Two-Stage $.15$, hybrid $.15$ và Fixed Top-5 để thấy trade-off hiện có.
+- **Figure pruning:** plot precision/recall/all-support theo $\alpha_2$; đánh dấu downstream F1 trên panel riêng, không đồng nhất hai loại F1.
+- **Timing metadata:** giữ công thức proxy `2 × parameter_count × total_sequence_length`; lưu input/output tokens, image pixels/tokens, CUDA synchronization, GPU/runtime và phạm vi timing để giải thích các điểm latency khác biệt.
+- **Truy vết bảng mới:** attach raw per-query log và run config từ người chạy; làm paired bootstrap cho các chênh lệch nhỏ như Overall +.60 điểm F1 và WebQA +.73 điểm F1 trước khi diễn giải độ ổn định.
+- **Code dùng để tạo Word:** [export_paper_layout_word.py](scripts/export_paper_layout_word.py). Bản Word giữ heading đánh số, bullets, bảng, hyperlinks và công thức để chỉnh sửa.

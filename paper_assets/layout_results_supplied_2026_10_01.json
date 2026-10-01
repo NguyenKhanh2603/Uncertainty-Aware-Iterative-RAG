@@ -1,0 +1,936 @@
+{
+  "source": "User-supplied LaTeX tables in conversation, 2026-10-01",
+  "provenance_status": "transcribed; raw per-query outputs, hardware and run manifest not supplied with these tables",
+  "datasets": [
+    "HotpotQA",
+    "MMQA",
+    "TAT-QA",
+    "WebQA"
+  ],
+  "missing_cells": "not supplied, not imputed",
+  "records": [
+    {
+      "method": "Fixed Top-5",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 61,
+            "f1_percent": 71.4,
+            "latency_seconds": 0.22,
+            "approx_tflops": 11.82
+          },
+          "selection": {
+            "kept_chunks": 4.95,
+            "precision_percent": 33.7,
+            "recall_percent": 83.5,
+            "selection_f1_percent": 48.1
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 48,
+            "f1_percent": 52.4,
+            "latency_seconds": 0.24,
+            "approx_tflops": 14.38
+          },
+          "selection": {
+            "kept_chunks": 5,
+            "precision_percent": 24.0,
+            "recall_percent": 77.4,
+            "selection_f1_percent": 36.6
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 37,
+            "f1_percent": 57.3,
+            "latency_seconds": 0.42,
+            "approx_tflops": 8.08
+          },
+          "selection": {
+            "kept_chunks": 4.37,
+            "precision_percent": 29.7,
+            "recall_percent": 97.0,
+            "selection_f1_percent": 45.5
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 27.9,
+            "latency_seconds": 0.27,
+            "approx_tflops": 8.86
+          },
+          "selection": {
+            "kept_chunks": 5,
+            "precision_percent": 23.0,
+            "recall_percent": 65.7,
+            "selection_f1_percent": 34.1
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 38.75,
+        "f1_percent": 52.25
+      }
+    },
+    {
+      "method": "CCE (α=.10)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 62,
+            "f1_percent": 73.02,
+            "latency_seconds": 0.24,
+            "approx_tflops": 21.03
+          },
+          "selection": {
+            "kept_chunks": 8.61,
+            "precision_percent": 21.0,
+            "recall_percent": 90.5,
+            "selection_f1_percent": 34.1
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 49,
+            "f1_percent": 54.08,
+            "latency_seconds": 0.44,
+            "approx_tflops": 47.45
+          },
+          "selection": {
+            "kept_chunks": 18.4,
+            "precision_percent": 7.7,
+            "recall_percent": 91.0,
+            "selection_f1_percent": 14.2
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 28,
+            "f1_percent": 49.37,
+            "latency_seconds": 0.36,
+            "approx_tflops": 9.1
+          },
+          "selection": {
+            "kept_chunks": 5.01,
+            "precision_percent": 24.6,
+            "recall_percent": 91.8,
+            "selection_f1_percent": 38.8
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 12,
+            "f1_percent": 28.89,
+            "latency_seconds": 0.47,
+            "approx_tflops": 50.99
+          },
+          "selection": {
+            "kept_chunks": 23.36,
+            "precision_percent": 6.5,
+            "recall_percent": 86.3,
+            "selection_f1_percent": 12.1
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 37.75,
+        "f1_percent": 51.34
+      }
+    },
+    {
+      "method": "CONFLARE (α=.10)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 57,
+            "f1_percent": 68.78,
+            "latency_seconds": 0.21,
+            "approx_tflops": 17.35
+          },
+          "selection": {
+            "kept_chunks": 7.05,
+            "precision_percent": 21.0,
+            "recall_percent": 74.0,
+            "selection_f1_percent": 32.7
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 52.08,
+            "latency_seconds": 0.42,
+            "approx_tflops": 46.45
+          },
+          "selection": {
+            "kept_chunks": 18.05,
+            "precision_percent": 7.8,
+            "recall_percent": 90.3,
+            "selection_f1_percent": 14.4
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 25,
+            "f1_percent": 44.52,
+            "latency_seconds": 0.35,
+            "approx_tflops": 8.58
+          },
+          "selection": {
+            "kept_chunks": 4.64,
+            "precision_percent": 25.0,
+            "recall_percent": 86.6,
+            "selection_f1_percent": 38.8
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 12,
+            "f1_percent": 28.35,
+            "latency_seconds": 0.43,
+            "approx_tflops": 46.36
+          },
+          "selection": {
+            "kept_chunks": 21.6,
+            "precision_percent": 6.8,
+            "recall_percent": 83.4,
+            "selection_f1_percent": 12.6
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 35.25,
+        "f1_percent": 48.43
+      }
+    },
+    {
+      "method": "TRAQ (α=.10)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 62,
+            "f1_percent": 73.52,
+            "latency_seconds": 0.23,
+            "approx_tflops": 19.91
+          },
+          "selection": {
+            "kept_chunks": 8.17,
+            "precision_percent": 21.4,
+            "recall_percent": 87.5,
+            "selection_f1_percent": 34.4
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 48,
+            "f1_percent": 52.12,
+            "latency_seconds": 0.45,
+            "approx_tflops": 50.68
+          },
+          "selection": {
+            "kept_chunks": 19.5,
+            "precision_percent": 7.5,
+            "recall_percent": 94.2,
+            "selection_f1_percent": 13.9
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 28,
+            "f1_percent": 47.95,
+            "latency_seconds": 0.36,
+            "approx_tflops": 9.26
+          },
+          "selection": {
+            "kept_chunks": 5.09,
+            "precision_percent": 24.6,
+            "recall_percent": 93.3,
+            "selection_f1_percent": 38.9
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 13,
+            "f1_percent": 29.29,
+            "latency_seconds": 0.49,
+            "approx_tflops": 54.66
+          },
+          "selection": {
+            "kept_chunks": 24.68,
+            "precision_percent": 6.3,
+            "recall_percent": 88.6,
+            "selection_f1_percent": 11.8
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 37.75,
+        "f1_percent": 50.72
+      }
+    },
+    {
+      "method": "Stage 1 (α₁=.10)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 31,
+            "f1_percent": 41.57,
+            "latency_seconds": 0.26,
+            "approx_tflops": 2.8
+          },
+          "selection": {
+            "kept_chunks": 0.89,
+            "precision_percent": 55.1,
+            "recall_percent": 24.5,
+            "selection_f1_percent": 33.9
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 23,
+            "f1_percent": 29.24,
+            "latency_seconds": 0.27,
+            "approx_tflops": 2.84
+          },
+          "selection": {
+            "kept_chunks": 0.59,
+            "precision_percent": 38.6,
+            "recall_percent": 14.8,
+            "selection_f1_percent": 21.4
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 18.19,
+            "latency_seconds": 0.46,
+            "approx_tflops": 1.63
+          },
+          "selection": {
+            "kept_chunks": 0.33,
+            "precision_percent": 69.7,
+            "recall_percent": 17.2,
+            "selection_f1_percent": 27.6
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 7,
+            "f1_percent": 23.96,
+            "latency_seconds": 0.27,
+            "approx_tflops": 2.74
+          },
+          "selection": {
+            "kept_chunks": 0.58,
+            "precision_percent": 34.5,
+            "recall_percent": 11.4,
+            "selection_f1_percent": 17.1
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 17.5,
+        "f1_percent": 28.24
+      }
+    },
+    {
+      "method": "Stage 1 (α₁=.90)",
+      "datasets": {
+        "HotpotQA": {
+          "selection": {
+            "kept_chunks": 8.11,
+            "precision_percent": 22.3,
+            "recall_percent": 90.5,
+            "selection_f1_percent": 35.8
+          }
+        },
+        "MMQA": {
+          "selection": {
+            "kept_chunks": 6.85,
+            "precision_percent": 16.7,
+            "recall_percent": 74.2,
+            "selection_f1_percent": 27.3
+          }
+        },
+        "TAT-QA": {
+          "selection": {
+            "kept_chunks": 4.53,
+            "precision_percent": 25.6,
+            "recall_percent": 86.6,
+            "selection_f1_percent": 39.5
+          }
+        },
+        "WebQA": {
+          "selection": {
+            "kept_chunks": 6.43,
+            "precision_percent": 16.3,
+            "recall_percent": 60.0,
+            "selection_f1_percent": 25.6
+          }
+        }
+      }
+    },
+    {
+      "method": "Stage 1 (α₁=.99)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 71,
+            "f1_percent": 82.52,
+            "latency_seconds": 0.27,
+            "approx_tflops": 23.34
+          },
+          "selection": {
+            "kept_chunks": 9.59,
+            "precision_percent": 20.5,
+            "recall_percent": 98.5,
+            "selection_f1_percent": 33.9
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 52.1,
+            "latency_seconds": 1.96,
+            "approx_tflops": 53.16
+          },
+          "selection": {
+            "kept_chunks": 9.43,
+            "precision_percent": 14.1,
+            "recall_percent": 85.8,
+            "selection_f1_percent": 24.2
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 39,
+            "f1_percent": 58.84,
+            "latency_seconds": 0.42,
+            "approx_tflops": 9.86
+          },
+          "selection": {
+            "kept_chunks": 5.43,
+            "precision_percent": 24.1,
+            "recall_percent": 97.8,
+            "selection_f1_percent": 38.7
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 10,
+            "f1_percent": 27.67,
+            "latency_seconds": 3.77,
+            "approx_tflops": 55.07
+          },
+          "selection": {
+            "kept_chunks": 8.33,
+            "precision_percent": 14.5,
+            "recall_percent": 69.1,
+            "selection_f1_percent": 24.0
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 41.75,
+        "f1_percent": 55.28
+      }
+    },
+    {
+      "method": "Two-Stage (α₁=.99, α₂=.15)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 64,
+            "f1_percent": 76.96,
+            "latency_seconds": 0.24,
+            "approx_tflops": 16.43
+          },
+          "selection": {
+            "kept_chunks": 6.92,
+            "precision_percent": 26.4,
+            "recall_percent": 91.5,
+            "selection_f1_percent": 41.0
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 52.03,
+            "latency_seconds": 0.95,
+            "approx_tflops": 34.06
+          },
+          "selection": {
+            "kept_chunks": 9.26,
+            "precision_percent": 14.4,
+            "recall_percent": 85.8,
+            "selection_f1_percent": 24.7
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 37,
+            "f1_percent": 53.89,
+            "latency_seconds": 0.4,
+            "approx_tflops": 8.31
+          },
+          "selection": {
+            "kept_chunks": 4.23,
+            "precision_percent": 26.2,
+            "recall_percent": 82.8,
+            "selection_f1_percent": 39.8
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 10,
+            "f1_percent": 26.84,
+            "latency_seconds": 1.46,
+            "approx_tflops": 27.16
+          },
+          "selection": {
+            "kept_chunks": 7.38,
+            "precision_percent": 15.6,
+            "recall_percent": 65.7,
+            "selection_f1_percent": 25.2
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 39.5,
+        "f1_percent": 52.43
+      }
+    },
+    {
+      "method": "Two-Stage (α₁=.99, α₂=.20)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 63,
+            "f1_percent": 75.11,
+            "latency_seconds": 0.23,
+            "approx_tflops": 14.39
+          },
+          "selection": {
+            "kept_chunks": 6.08,
+            "precision_percent": 29.6,
+            "recall_percent": 90.0,
+            "selection_f1_percent": 44.5
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 52.03,
+            "latency_seconds": 0.85,
+            "approx_tflops": 31.12
+          },
+          "selection": {
+            "kept_chunks": 9.24,
+            "precision_percent": 14.4,
+            "recall_percent": 85.8,
+            "selection_f1_percent": 24.7
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 34,
+            "f1_percent": 51.56,
+            "latency_seconds": 0.4,
+            "approx_tflops": 7.88
+          },
+          "selection": {
+            "kept_chunks": 3.9,
+            "precision_percent": 28.2,
+            "recall_percent": 82.1,
+            "selection_f1_percent": 42.0
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 26.08,
+            "latency_seconds": 1.25,
+            "approx_tflops": 23.37
+          },
+          "selection": {
+            "kept_chunks": 7.08,
+            "precision_percent": 15.5,
+            "recall_percent": 62.9,
+            "selection_f1_percent": 24.9
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 38.25,
+        "f1_percent": 51.2
+      }
+    },
+    {
+      "method": "Two-Stage (α₁=.99, α₂=.30)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 60,
+            "f1_percent": 71.84,
+            "latency_seconds": 0.23,
+            "approx_tflops": 12.36
+          },
+          "selection": {
+            "kept_chunks": 5.15,
+            "precision_percent": 32.2,
+            "recall_percent": 83.0,
+            "selection_f1_percent": 46.4
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 51.93,
+            "latency_seconds": 0.64,
+            "approx_tflops": 24.45
+          },
+          "selection": {
+            "kept_chunks": 8.3,
+            "precision_percent": 15.3,
+            "recall_percent": 81.9,
+            "selection_f1_percent": 25.8
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 29,
+            "f1_percent": 46.35,
+            "latency_seconds": 0.42,
+            "approx_tflops": 6.76
+          },
+          "selection": {
+            "kept_chunks": 3.28,
+            "precision_percent": 30.8,
+            "recall_percent": 75.4,
+            "selection_f1_percent": 43.7
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 25.71,
+            "latency_seconds": 0.79,
+            "approx_tflops": 16.88
+          },
+          "selection": {
+            "kept_chunks": 6.47,
+            "precision_percent": 16.7,
+            "recall_percent": 61.7,
+            "selection_f1_percent": 26.3
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 36.25,
+        "f1_percent": 48.96
+      }
+    },
+    {
+      "method": "Two-Stage (α₁=.99, α₂=.40)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 58,
+            "f1_percent": 68.67,
+            "latency_seconds": 0.23,
+            "approx_tflops": 9.34
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 42,
+            "f1_percent": 47.29,
+            "latency_seconds": 0.34,
+            "approx_tflops": 15.82
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 26,
+            "f1_percent": 43.88,
+            "latency_seconds": 0.42,
+            "approx_tflops": 5.92
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 27.93,
+            "latency_seconds": 0.68,
+            "approx_tflops": 13.69
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 33.75,
+        "f1_percent": 46.95
+      }
+    },
+    {
+      "method": "Top-10 + S2 (α₂=.15)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 63,
+            "f1_percent": 75.96,
+            "latency_seconds": 0.25,
+            "approx_tflops": 16.47
+          },
+          "selection": {
+            "kept_chunks": 6.94,
+            "precision_percent": 26.4,
+            "recall_percent": 91.5,
+            "selection_f1_percent": 40.9
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 51.53,
+            "latency_seconds": 0.32,
+            "approx_tflops": 24.12
+          },
+          "selection": {
+            "kept_chunks": 9.79,
+            "precision_percent": 14.4,
+            "recall_percent": 91.0,
+            "selection_f1_percent": 24.9
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 37,
+            "f1_percent": 53.89,
+            "latency_seconds": 0.4,
+            "approx_tflops": 7.9
+          },
+          "selection": {
+            "kept_chunks": 4.23,
+            "precision_percent": 26.2,
+            "recall_percent": 82.8,
+            "selection_f1_percent": 39.9
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 12,
+            "f1_percent": 30.02,
+            "latency_seconds": 0.38,
+            "approx_tflops": 13.83
+          },
+          "selection": {
+            "kept_chunks": 8.08,
+            "precision_percent": 16.0,
+            "recall_percent": 73.7,
+            "selection_f1_percent": 26.2
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 39.75,
+        "f1_percent": 52.85
+      }
+    },
+    {
+      "method": "Top-10 + S2 (α₂=.20)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 63,
+            "f1_percent": 75.11,
+            "latency_seconds": 0.23,
+            "approx_tflops": 14.4
+          },
+          "selection": {
+            "kept_chunks": 6.09,
+            "precision_percent": 29.6,
+            "recall_percent": 90.0,
+            "selection_f1_percent": 44.5
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 51.53,
+            "latency_seconds": 0.32,
+            "approx_tflops": 23.99
+          },
+          "selection": {
+            "kept_chunks": 9.72,
+            "precision_percent": 14.5,
+            "recall_percent": 91.0,
+            "selection_f1_percent": 25.0
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 34,
+            "f1_percent": 51.56,
+            "latency_seconds": 0.4,
+            "approx_tflops": 7.58
+          },
+          "selection": {
+            "kept_chunks": 3.9,
+            "precision_percent": 28.2,
+            "recall_percent": 82.1,
+            "selection_f1_percent": 42.0
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 28.09,
+            "latency_seconds": 0.38,
+            "approx_tflops": 13.23
+          },
+          "selection": {
+            "kept_chunks": 7.73,
+            "precision_percent": 16.0,
+            "recall_percent": 70.9,
+            "selection_f1_percent": 26.2
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 38.25,
+        "f1_percent": 51.57
+      }
+    },
+    {
+      "method": "Top-10 + S2 (α₂=.30)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 60,
+            "f1_percent": 71.84,
+            "latency_seconds": 0.23,
+            "approx_tflops": 12.36
+          },
+          "selection": {
+            "kept_chunks": 5.15,
+            "precision_percent": 32.2,
+            "recall_percent": 83.0,
+            "selection_f1_percent": 46.4
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 45,
+            "f1_percent": 49.03,
+            "latency_seconds": 0.3,
+            "approx_tflops": 21.54
+          },
+          "selection": {
+            "kept_chunks": 8.52,
+            "precision_percent": 15.6,
+            "recall_percent": 85.8,
+            "selection_f1_percent": 26.4
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 29,
+            "f1_percent": 46.35,
+            "latency_seconds": 0.41,
+            "approx_tflops": 6.73
+          },
+          "selection": {
+            "kept_chunks": 3.28,
+            "precision_percent": 30.8,
+            "recall_percent": 75.4,
+            "selection_f1_percent": 43.7
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 11,
+            "f1_percent": 29.88,
+            "latency_seconds": 0.33,
+            "approx_tflops": 11.7
+          },
+          "selection": {
+            "kept_chunks": 6.88,
+            "precision_percent": 17.4,
+            "recall_percent": 68.6,
+            "selection_f1_percent": 27.8
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 36.25,
+        "f1_percent": 49.28
+      }
+    },
+    {
+      "method": "Top-10 + S2 (α₂=.40)",
+      "datasets": {
+        "HotpotQA": {
+          "generation": {
+            "em_percent": 58,
+            "f1_percent": 68.67,
+            "latency_seconds": 0.23,
+            "approx_tflops": 9.34
+          },
+          "selection": {
+            "kept_chunks": 3.85,
+            "precision_percent": 36.9,
+            "recall_percent": 71.0,
+            "selection_f1_percent": 48.5
+          }
+        },
+        "MMQA": {
+          "generation": {
+            "em_percent": 47,
+            "f1_percent": 51.75,
+            "latency_seconds": 0.26,
+            "approx_tflops": 16.42
+          },
+          "selection": {
+            "kept_chunks": 6.2,
+            "precision_percent": 18.5,
+            "recall_percent": 74.2,
+            "selection_f1_percent": 29.7
+          }
+        },
+        "TAT-QA": {
+          "generation": {
+            "em_percent": 26,
+            "f1_percent": 43.88,
+            "latency_seconds": 0.42,
+            "approx_tflops": 5.91
+          },
+          "selection": {
+            "kept_chunks": 2.78,
+            "precision_percent": 34.2,
+            "recall_percent": 70.9,
+            "selection_f1_percent": 46.1
+          }
+        },
+        "WebQA": {
+          "generation": {
+            "em_percent": 9,
+            "f1_percent": 27.88,
+            "latency_seconds": 0.3,
+            "approx_tflops": 9.7
+          },
+          "selection": {
+            "kept_chunks": 5.89,
+            "precision_percent": 18.3,
+            "recall_percent": 61.7,
+            "selection_f1_percent": 28.3
+          }
+        }
+      },
+      "overall": {
+        "em_percent": 35,
+        "f1_percent": 48.05
+      }
+    }
+  ]
+}
