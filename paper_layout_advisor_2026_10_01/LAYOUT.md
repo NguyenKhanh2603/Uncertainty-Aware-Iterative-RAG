@@ -117,6 +117,40 @@
 
 Các số dưới đây lấy từ bảng thí nghiệm cập nhật ngày 01/10/2026, trình bày ngắn để định hướng phần Results.
 
+### 8.1. Kết quả downstream tốt nhất hiện tại
+
+Chọn theo **Generation F1 cao nhất trong các cấu hình đã chạy**, riêng cho nhóm baselines và nhóm Stage 1/Two-Stage/hybrid ở từng dataset. Baselines gồm Fixed Top-5, CCE, CONFLARE và TRAQ. Các hàng có thể dùng cấu hình khác nhau; đây là tổng hợp các điểm tốt nhất đang có. EM/F1 theo phần trăm.
+
+| Dataset | Method | EM (%) | F1 (%) | Kept chunks | Approx. TFLOPs |
+|---|---|---:|---:|---:|---:|
+| HotpotQA | TRAQ (α=.10) | 62.00 | 73.52 | 8.17 | 19.91 |
+| HotpotQA | Stage 1 (α₁=.99) | 71.00 | **82.52** | 9.59 | 23.34 |
+| MMQA | CCE (α=.10) | 49.00 | **54.08** | 18.40 | 47.45 |
+| MMQA | Stage 1 (α₁=.99) | 47.00 | 52.10 | 9.43 | 53.16 |
+| TAT-QA | Fixed Top-5 | 37.00 | 57.30 | 4.37 | 8.08 |
+| TAT-QA | Stage 1 (α₁=.99) | 39.00 | **58.84** | 5.43 | 9.86 |
+| WebQA | TRAQ (α=.10) | 13.00 | 29.29 | 24.68 | 54.66 |
+| WebQA | Top-10 + S2 (α₂=.15) | 12.00 | **30.02** | 8.08 | 13.83 |
+
+- So với baseline có F1 cao nhất, Stage 1 `.99` tăng **9.00 điểm F1 trên HotpotQA** và **1.54 điểm trên TAT-QA**; hybrid `.15` tăng **0.73 điểm trên WebQA**.
+- MMQA còn cần cải thiện: F1 cao nhất của nhóm đề xuất là **52.10%**, thấp hơn CCE **1.98 điểm**.
+
+### 8.2. Hai kết quả nổi bật về chất lượng và chi phí
+
+Chọn các điểm vừa tăng Generation F1 vừa giảm compute proxy so với baseline được đối chiếu. Precision/recall là metrics của support chunks; F1 trong bảng là **Generation F1**.
+
+| Dataset | Method | Kept | Precision (%) | Recall (%) | Generation F1 (%) | Approx. TFLOPs |
+|---|---|---:|---:|---:|---:|---:|
+| HotpotQA | CCE (α=.10) | 8.61 | 21.0 | 90.5 | 73.02 | 21.03 |
+| HotpotQA | Two-Stage (α₁=.99, α₂=.15) | 6.92 | 26.4 | 91.5 | **76.96** | **16.43** |
+| WebQA | TRAQ (α=.10) | 24.68 | 6.3 | 88.6 | 29.29 | 54.66 |
+| WebQA | Top-10 + S2 (α₂=.15) | 8.08 | 16.0 | 73.7 | **30.02** | **13.83** |
+
+- **HotpotQA:** Two-Stage tăng **3.94 điểm F1**, precision tăng **5.4 điểm**, recall tăng **1.0 điểm** so với CCE; compute proxy giảm **21.9%**.
+- **WebQA:** hybrid tăng **0.73 điểm F1**, precision tăng **9.7 điểm** và compute proxy giảm **74.7%** so với TRAQ; recall giảm **14.9 điểm**. Đây là điểm cần tiếp tục cải thiện evidence coverage.
+
+### 8.3. Diễn giải số hiện tại
+
 - **HotpotQA:** Stage 1 `.99` đạt **71.00 EM / 82.52 F1**. Two-Stage `.99/.15` đạt **64.00/76.96**, cao hơn CCE **3.94 điểm F1**, đồng thời giảm compute proxy **21.03 → 16.43 TFLOPs**. So với Stage 1, pruning giảm **29.6%** proxy nhưng mất **5.56 điểm F1**.
 - **MMQA:** CCE đang có generation F1 cao nhất **54.08%**. Hybrid `α₂=.40` tăng Selection F1 từ CCE **14.2%** lên **29.7%**, nhưng generation F1 là **51.75%**. Fixed Top-5 đạt Selection F1 **36.6%** và generation F1 **52.40%**.
 - **TAT-QA:** Stage 1 `.99` đạt **39.00 EM / 58.84 F1**; Fixed Top-5 đạt **37.00/57.30**. Two-Stage `.99/.15` đạt **37.00/53.89**: hơn ba literature rows về EM, nhưng thấp hơn Top-5 về F1.
