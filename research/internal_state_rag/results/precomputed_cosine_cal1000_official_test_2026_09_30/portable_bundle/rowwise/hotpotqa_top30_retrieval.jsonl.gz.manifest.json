@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "hotpotqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/precomputed_cosine_cal1000_official_test_2026_09_30",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 8405,
+  "corpus_chunks": 74738,
+  "rows": 83668,
+  "top_l": 30,
+  "role_counts": {
+    "development": 0,
+    "calibration": 1000,
+    "test": 7405
+  },
+  "source_split_role_counts": {
+    "distractor/train": {
+      "development": 0,
+      "calibration": 1000,
+      "test": 0
+    },
+    "distractor/validation": {
+      "development": 0,
+      "calibration": 0,
+      "test": 7405
+    }
+  },
+  "split_policy": "bundle_roles",
+  "split_policy_detail": "hash all source splits into development/calibration/test",
+  "retrieved_support_rows": 16810,
+  "retriever_id": "jinaai/jina-embeddings-v4@853c867b65b749f3c3c72a06868140d842e04f06#dim=512#dtype=bfloat16#max_text_length=1024",
+  "corpus_revision": "sha256:9560d9c7fb324bad2f3d7450a65c168bd4a5d620ec7b3f5057a026cd0d465fc9",
+  "preprocess_hash": "sha256:3942d659ab87f26de750669ca7e0c39b887f0b370680c9160e204c0422aff0c4",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "dataset_provided_per_query",
+    "image_caption_fusion": true,
+    "max_image_pixels": 200704,
+    "max_text_length": 1024,
+    "embedding_checkpoint_every": 128,
+    "min_per_modality": null,
+    "available_modalities": [
+      "text"
+    ]
+  },
+  "unavailable_official_image_fallback": {
+    "count": 0,
+    "chunk_ids": [],
+    "method": null
+  },
+  "candidate_scope": "dataset_provided_per_query",
+  "candidate_pool": {
+    "minimum": 2,
+    "maximum": 10,
+    "mean": 9.954550862581797
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.0,
+    "load_records": 1.82,
+    "encode_corpus": 0.0,
+    "encode_queries": 425.841,
+    "rank_candidates": 2.055,
+    "write_log": 5.788,
+    "total": 436.18
+  },
+  "search_stats": {
+    "seconds": 0.2637477479875088,
+    "queries_per_second": 31867.570677411302,
+    "corpus_on_gpu": true,
+    "corpus_embedding_gib": 0.143,
+    "candidate_pairs": 83668
+  },
+  "output": "hotpotqa_top30_retrieval.jsonl.gz"
+}

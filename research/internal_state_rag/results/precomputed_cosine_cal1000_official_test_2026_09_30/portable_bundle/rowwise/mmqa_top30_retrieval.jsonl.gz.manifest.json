@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "mmqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/precomputed_cosine_cal1000_official_test_2026_09_30",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 3441,
+  "corpus_chunks": 52314,
+  "rows": 72791,
+  "top_l": 30,
+  "role_counts": {
+    "development": 0,
+    "calibration": 1000,
+    "test": 2441
+  },
+  "source_split_role_counts": {
+    "train": {
+      "development": 0,
+      "calibration": 1000,
+      "test": 0
+    },
+    "dev": {
+      "development": 0,
+      "calibration": 0,
+      "test": 2441
+    }
+  },
+  "split_policy": "bundle_roles",
+  "split_policy_detail": "hash all source splits into development/calibration/test",
+  "retrieved_support_rows": 5543,
+  "retriever_id": "jinaai/jina-embeddings-v4@853c867b65b749f3c3c72a06868140d842e04f06#dim=512#dtype=bfloat16#max_text_length=1024",
+  "corpus_revision": "sha256:b017ea9f685e9c4db8be2e56b23f2ff9af26a2b3de39697b9b7b22b6611b68c6",
+  "preprocess_hash": "sha256:4ae60e26284ba2ef6eda860298f52ba78fa7b2018334073ffc9e6b43a45931bc",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "dataset_provided_per_query",
+    "image_caption_fusion": true,
+    "max_image_pixels": 200704,
+    "max_text_length": 1024,
+    "embedding_checkpoint_every": 128,
+    "min_per_modality": null,
+    "available_modalities": [
+      "image",
+      "table",
+      "text"
+    ]
+  },
+  "unavailable_official_image_fallback": {
+    "count": 1,
+    "chunk_ids": [
+      "17ae0616ac745e70781203267f3a382d"
+    ],
+    "method": "Jina-v4 text embedding of the official image caption; no synthetic image was introduced"
+  },
+  "candidate_scope": "dataset_provided_per_query",
+  "candidate_pool": {
+    "minimum": 11,
+    "maximum": 26,
+    "mean": 21.15402499273467
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.001,
+    "load_records": 246.277,
+    "encode_corpus": 0.0,
+    "encode_queries": 287.485,
+    "rank_candidates": 1.399,
+    "write_log": 4.657,
+    "total": 549.207
+  },
+  "search_stats": {
+    "seconds": 0.19356714934110641,
+    "queries_per_second": 17776.776750151068,
+    "corpus_on_gpu": true,
+    "corpus_embedding_gib": 0.1,
+    "candidate_pairs": 72791
+  },
+  "output": "mmqa_top30_retrieval.jsonl.gz"
+}

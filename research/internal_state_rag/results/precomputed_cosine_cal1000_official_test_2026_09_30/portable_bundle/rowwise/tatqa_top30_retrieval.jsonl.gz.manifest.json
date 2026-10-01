@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "data_grade": "paper",
+  "warning": null,
+  "dataset": "tatqa",
+  "bundle": {
+    "local_path": "/workspace/hf_cache/test/my-project/Uncertainty-Aware-Iterative-RAG/data/precomputed_cosine_cal1000_official_test_2026_09_30",
+    "hf_repo": null,
+    "hf_revision": null
+  },
+  "queries": 2668,
+  "corpus_chunks": 5994,
+  "rows": 15449,
+  "top_l": 30,
+  "role_counts": {
+    "development": 0,
+    "calibration": 1000,
+    "test": 1668
+  },
+  "source_split_role_counts": {
+    "train": {
+      "development": 0,
+      "calibration": 1000,
+      "test": 0
+    },
+    "dev": {
+      "development": 0,
+      "calibration": 0,
+      "test": 1668
+    }
+  },
+  "split_policy": "bundle_roles",
+  "split_policy_detail": "hash all source splits into development/calibration/test",
+  "retrieved_support_rows": 3531,
+  "retriever_id": "jinaai/jina-embeddings-v4@853c867b65b749f3c3c72a06868140d842e04f06#dim=512#dtype=bfloat16#max_text_length=1024",
+  "corpus_revision": "sha256:abda19f0275e0194358b556340599e42c8cebcb1e8ff68817ca2574ffb002474",
+  "preprocess_hash": "sha256:649f51897aade42d1e460b23c2026574d5328b58def045b054b770f77e284d9d",
+  "query_type_rule_id": "pooled-v1",
+  "non_support_label": "false",
+  "retrieval_policy": {
+    "mode": "global",
+    "top_l": 30,
+    "candidate_scope": "dataset_provided_per_query",
+    "image_caption_fusion": true,
+    "max_image_pixels": 200704,
+    "max_text_length": 1024,
+    "embedding_checkpoint_every": 128,
+    "min_per_modality": null,
+    "available_modalities": [
+      "table",
+      "text"
+    ]
+  },
+  "unavailable_official_image_fallback": {
+    "count": 0,
+    "chunk_ids": [],
+    "method": null
+  },
+  "candidate_scope": "dataset_provided_per_query",
+  "candidate_pool": {
+    "minimum": 3,
+    "maximum": 27,
+    "mean": 5.79047976011994
+  },
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "cuda": true,
+    "name": "NVIDIA A100-PCIE-40GB",
+    "total_vram_gib": 39.39,
+    "torch_cuda": "11.8"
+  },
+  "model_dtype": "torch.bfloat16",
+  "timings_seconds": {
+    "resolve_bundle": 0.0,
+    "load_records": 0.182,
+    "encode_corpus": 0.0,
+    "encode_queries": 248.537,
+    "rank_candidates": 0.315,
+    "write_log": 0.837,
+    "total": 249.936
+  },
+  "search_stats": {
+    "seconds": 0.1619318313896656,
+    "queries_per_second": 16476.068831580385,
+    "corpus_on_gpu": true,
+    "corpus_embedding_gib": 0.011,
+    "candidate_pairs": 15449
+  },
+  "output": "tatqa_top30_retrieval.jsonl.gz"
+}

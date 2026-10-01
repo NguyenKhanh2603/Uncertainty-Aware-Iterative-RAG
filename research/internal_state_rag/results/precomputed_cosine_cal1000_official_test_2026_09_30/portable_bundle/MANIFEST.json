@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "protocol": "jina_v4_cosine_cal1000_official_test_full_top30",
+  "purpose": "precomputed cosine input for BY, CCE, CONFLARE, and TRAQ",
+  "datasets": {
+    "hotpotqa": {
+      "rowwise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/rowwise/hotpotqa_top30_retrieval.jsonl.gz",
+        "bytes": 4693494,
+        "sha256": "bf91a76e4f7b42b7bd61414873e54848877daf34b1511ac09527838f3c10786c"
+      },
+      "querywise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/querywise/hotpotqa_cosine_by_query.jsonl.gz",
+        "queries": 8405,
+        "candidates": 83668,
+        "queries_by_role": {
+          "calibration": 1000,
+          "test": 7405
+        },
+        "bytes": 3802997,
+        "sha256": "5b5dd797c668112722f40c012ea9a40996f52e084ecefaf657e9df0b1af3f56d"
+      }
+    },
+    "mmqa": {
+      "rowwise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/rowwise/mmqa_top30_retrieval.jsonl.gz",
+        "bytes": 3317321,
+        "sha256": "d650fbce741313fed024d881b0adfbe008f06191d1a3f38e8be767e6a010579d"
+      },
+      "querywise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/querywise/mmqa_cosine_by_query.jsonl.gz",
+        "queries": 3441,
+        "candidates": 72791,
+        "queries_by_role": {
+          "calibration": 1000,
+          "test": 2441
+        },
+        "bytes": 2548391,
+        "sha256": "be613420eb53656ea5e5b0aef5937cc39bc536c633e9227d9887665dd469497f"
+      }
+    },
+    "tatqa": {
+      "rowwise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/rowwise/tatqa_top30_retrieval.jsonl.gz",
+        "bytes": 614960,
+        "sha256": "57c0d4bfc9e4abad3324c5d71381b3673e7e0eb07c5be08fef6415b0501f75f8"
+      },
+      "querywise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/querywise/tatqa_cosine_by_query.jsonl.gz",
+        "queries": 2668,
+        "candidates": 15449,
+        "queries_by_role": {
+          "calibration": 1000,
+          "test": 1668
+        },
+        "bytes": 458837,
+        "sha256": "ef13a2785f9bd9424f4b1d2022e4e131b26426519bd0593bf3fda90f9fa2986f"
+      }
+    },
+    "webqa": {
+      "rowwise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/rowwise/webqa_top30_retrieval.jsonl.gz",
+        "bytes": 4976258,
+        "sha256": "0312082dec8b8f0997fc8a31d8f959eeb751012e11825a3ba3d35edaf63214db"
+      },
+      "querywise": {
+        "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/querywise/webqa_cosine_by_query.jsonl.gz",
+        "queries": 5966,
+        "candidates": 167799,
+        "queries_by_role": {
+          "calibration": 1000,
+          "test": 4966
+        },
+        "bytes": 3486990,
+        "sha256": "e2493fa0fe072f93683b4fe0c8acdee1929d8dc7ac20de70206d34509880feb3"
+      }
+    }
+  },
+  "reference_bank": {
+    "path": "research/internal_state_rag/results/precomputed_cosine_cal1000_official_test_2026_09_30/portable_bundle/combined_reference_banks.json.gz",
+    "bytes": 1435134,
+    "sha256": "448ea60692db5f49097b2b885e2b4bda0e7f10db501492283d0985404a228918"
+  }
+}
