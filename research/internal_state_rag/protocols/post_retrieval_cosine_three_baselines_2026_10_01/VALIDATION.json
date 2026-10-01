@@ -1,0 +1,40 @@
+{
+  "status": "passed",
+  "original_code_commit": "fa6dd68",
+  "queries_verified": 16480,
+  "contexts_verified": 49440,
+  "datasets": {
+    "tatqa": {
+      "calibration_queries": 1000,
+      "test_queries": 1668,
+      "contexts_verified": 5004,
+      "all_support_metrics_identical": true,
+      "recalibrated_kernels_match_original": true,
+      "selected_contexts_match_completed_downstream": true
+    },
+    "hotpotqa": {
+      "calibration_queries": 1000,
+      "test_queries": 7405,
+      "contexts_verified": 22215,
+      "all_support_metrics_identical": true,
+      "recalibrated_kernels_match_original": true,
+      "selected_contexts_match_completed_downstream": true
+    },
+    "mmqa": {
+      "calibration_queries": 1000,
+      "test_queries": 2441,
+      "contexts_verified": 7323,
+      "all_support_metrics_identical": true,
+      "recalibrated_kernels_match_original": true,
+      "selected_contexts_match_completed_downstream": true
+    },
+    "webqa": {
+      "calibration_queries": 1000,
+      "test_queries": 4966,
+      "contexts_verified": 14898,
+      "all_support_metrics_identical": true,
+      "recalibrated_kernels_match_original": true,
+      "selected_contexts_match_completed_downstream": true
+    }
+  }
+}

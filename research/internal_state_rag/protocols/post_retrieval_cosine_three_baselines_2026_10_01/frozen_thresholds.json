@@ -1,0 +1,102 @@
+{
+  "alpha": 0.1,
+  "source": "full_context_selection_splits_khanh_27_09_2026_09_27/summary.json",
+  "datasets": {
+    "hotpotqa": {
+      "cce_conformal_embedding_jina_alpha_0.10": {
+        "positive_pairs": 2000,
+        "nonconformity_threshold": 0.16979068517684937,
+        "similarity_threshold": 0.8302093148231506,
+        "calibration_unit": "labelled_relevant_question_chunk_pair"
+      },
+      "conflare_source_question_jina_alpha_0.10": {
+        "calibration_records": 1000,
+        "distance_threshold": 0.12789504528045653,
+        "similarity_threshold": 0.8721049547195434,
+        "calibration_unit": "one_first_known_relevant_chunk_per_question",
+        "question_source": "benchmark_human_question_with_labelled_support"
+      },
+      "traq_retrieval_bonferroni_jina_alpha_0.10": {
+        "retrievable_calibration_queries": 1000,
+        "similarity_threshold": 0.8452519774436951,
+        "total_alpha": 0.1,
+        "alpha_retrieval": 0.05,
+        "alpha_answer": 0.05,
+        "calibration_unit": "one_best_true_retrieval_score_per_question",
+        "scope": "retrieval_component_only; no_answer_prediction_set"
+      }
+    },
+    "mmqa": {
+      "cce_conformal_embedding_jina_alpha_0.10": {
+        "positive_pairs": 1508,
+        "nonconformity_threshold": 0.24294978380203247,
+        "similarity_threshold": 0.7570502161979675,
+        "calibration_unit": "labelled_relevant_question_chunk_pair"
+      },
+      "conflare_source_question_jina_alpha_0.10": {
+        "calibration_records": 1000,
+        "distance_threshold": 0.232902330160141,
+        "similarity_threshold": 0.767097669839859,
+        "calibration_unit": "one_first_known_relevant_chunk_per_question",
+        "question_source": "benchmark_human_question_with_labelled_support"
+      },
+      "traq_retrieval_bonferroni_jina_alpha_0.10": {
+        "retrievable_calibration_queries": 1000,
+        "similarity_threshold": 0.7203078269958496,
+        "total_alpha": 0.1,
+        "alpha_retrieval": 0.05,
+        "alpha_answer": 0.05,
+        "calibration_unit": "one_best_true_retrieval_score_per_question",
+        "scope": "retrieval_component_only; no_answer_prediction_set"
+      }
+    },
+    "tatqa": {
+      "cce_conformal_embedding_jina_alpha_0.10": {
+        "positive_pairs": 1326,
+        "nonconformity_threshold": 0.11452370882034302,
+        "similarity_threshold": 0.885476291179657,
+        "calibration_unit": "labelled_relevant_question_chunk_pair"
+      },
+      "conflare_source_question_jina_alpha_0.10": {
+        "calibration_records": 1000,
+        "distance_threshold": 0.10170071125030518,
+        "similarity_threshold": 0.8982992887496948,
+        "calibration_unit": "one_first_known_relevant_chunk_per_question",
+        "question_source": "benchmark_human_question_with_labelled_support"
+      },
+      "traq_retrieval_bonferroni_jina_alpha_0.10": {
+        "retrievable_calibration_queries": 1000,
+        "similarity_threshold": 0.8831853866577148,
+        "total_alpha": 0.1,
+        "alpha_retrieval": 0.05,
+        "alpha_answer": 0.05,
+        "calibration_unit": "one_best_true_retrieval_score_per_question",
+        "scope": "retrieval_component_only; no_answer_prediction_set"
+      }
+    },
+    "webqa": {
+      "cce_conformal_embedding_jina_alpha_0.10": {
+        "positive_pairs": 1737,
+        "nonconformity_threshold": 0.21080482006072998,
+        "similarity_threshold": 0.78919517993927,
+        "calibration_unit": "labelled_relevant_question_chunk_pair"
+      },
+      "conflare_source_question_jina_alpha_0.10": {
+        "calibration_records": 1000,
+        "distance_threshold": 0.18632029294967653,
+        "similarity_threshold": 0.8136797070503234,
+        "calibration_unit": "one_first_known_relevant_chunk_per_question",
+        "question_source": "benchmark_human_question_with_labelled_support"
+      },
+      "traq_retrieval_bonferroni_jina_alpha_0.10": {
+        "retrievable_calibration_queries": 1000,
+        "similarity_threshold": 0.7615507245063782,
+        "total_alpha": 0.1,
+        "alpha_retrieval": 0.05,
+        "alpha_answer": 0.05,
+        "calibration_unit": "one_best_true_retrieval_score_per_question",
+        "scope": "retrieval_component_only; no_answer_prediction_set"
+      }
+    }
+  }
+}

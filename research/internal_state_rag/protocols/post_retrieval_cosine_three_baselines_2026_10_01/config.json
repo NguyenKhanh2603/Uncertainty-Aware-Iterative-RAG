@@ -1,0 +1,28 @@
+{
+  "datasets": [
+    "hotpotqa",
+    "mmqa",
+    "tatqa",
+    "webqa"
+  ],
+  "alpha": 0.1,
+  "threshold_mode": "frozen",
+  "top_l": 30,
+  "retriever": "jinaai/jina-embeddings-v4",
+  "retriever_revision": "853c867b65b749f3c3c72a06868140d842e04f06",
+  "generation": {
+    "model": "Qwen/Qwen2-VL-7B-Instruct",
+    "revision": "eed13092ef92e448dd6875b2a00151bd3f7db0ac",
+    "max_new_tokens": 24,
+    "min_pixels": 3136,
+    "max_pixels": 200704,
+    "do_sample": false
+  },
+  "origin_code_commit": "fa6dd68",
+  "official_test_counts": {
+    "hotpotqa": 7405,
+    "mmqa": 2441,
+    "tatqa": 1668,
+    "webqa": 4966
+  }
+}

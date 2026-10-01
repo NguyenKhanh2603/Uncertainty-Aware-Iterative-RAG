@@ -1,0 +1,31 @@
+{
+  "local_code_commit": "fa6dd68",
+  "upstream_sources": {
+    "CCE": {
+      "repository": "https://github.com/hltcoe/conformal-context-engineering",
+      "revision": "91732d6058267f180ba9f47873d743288b2625af",
+      "inspected_files": [
+        "README.md"
+      ],
+      "local_adapter": "cce.py"
+    },
+    "CONFLARE": {
+      "repository": "https://github.com/Mayo-Radiology-Informatics-Lab/conflare",
+      "revision": "ce081a45fb452704daa87f3b37f601b4accc7a82",
+      "inspected_files": [
+        "conflare/conformal/calibration.py",
+        "conflare/augmented_retrieval/rag.py"
+      ],
+      "local_adapter": "conflare.py"
+    },
+    "TRAQ": {
+      "repository": "https://github.com/shuoli90/TRAQ",
+      "revision": "e9b66b5b7fd8fcd0b3c3dbfebc5a3391ca79aa55",
+      "inspected_files": [
+        "misc/utils.py",
+        "run/traq/traq_chatgpt_semantic.py"
+      ],
+      "local_adapter": "traq.py"
+    }
+  }
+}
