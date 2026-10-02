@@ -13,3 +13,6 @@ proposal
 
 # Locally built archives.
 **/dist/
+
+downstream_export.json
+downstream_export_1.json
