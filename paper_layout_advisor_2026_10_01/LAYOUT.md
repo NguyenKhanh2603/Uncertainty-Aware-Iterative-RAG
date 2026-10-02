@@ -1,7 +1,5 @@
 # Dàn bài bài báo: Two-Stage Conformal Context Selection for RAG
 
-**Tác giả:** Hung Le
-
 **Ngày cập nhật:** 02/10/2026
 
 **Nội dung:** ý chính để phát triển bài báo và hướng cải thiện cùng anh Hưng. Toàn bộ cấu hình, bảng số liệu và phân tích kết quả đã chạy được đặt trong mục [Thông tin chi tiết thí nghiệm đã chạy](#9-thông-tin-chi-tiết-thí-nghiệm-đã-chạy) ở cuối.
@@ -24,17 +22,23 @@
 
 ### 3.1. CCE
 
+**Bài báo:** [Principled Context Engineering for RAG: Statistical Guarantees via Conformal Prediction](https://link.springer.com/chapter/10.1007/978-3-032-21300-6_45). **Venue:** ECIR. **Năm:** 2026. **Nơi đăng:** *Advances in Information Retrieval*, LNCS 16484, Springer Nature. **Rank:** [A — ICORE2026](https://portal.core.edu.au/conf-ranks/483/).
+
 - **Đang làm gì:** trên tập calibration, lấy cosine score của tất cả chunks có nhãn chứa bằng chứng cho câu trả lời. Từ các scores này, xác định một ngưỡng cho mỗi dataset. Khi test, chunk nào đạt ngưỡng thì được đưa vào LLM.
 - **Điểm có ích:** đặt ngưỡng đủ thấp giúp giữ cả những chunks chứa bằng chứng nhưng có cosine không cao, nhờ đó hạn chế bỏ sót evidence.
 - **Chi phí có thể tăng ở đâu:** chunks không chứa bằng chứng cũng có thể đạt cùng ngưỡng. LLM phải nhận nhiều nội dung không hỗ trợ câu trả lời; văn bản làm dài input và ảnh làm tăng phần xử lý vision. Kết quả trên MMQA/WebQA cho thấy context còn dài và precision thấp. Giảm chi phí vẫn cần đi cùng kiểm tra evidence giữ lại.
 
 ### 3.2. CONFLARE
 
+**Bài báo:** [CONFLARE: CONFormal LArge language model REtrieval](https://arxiv.org/abs/2404.04287). **Venue / nơi đăng:** arXiv, bản preprint `arXiv:2404.04287`. **Năm:** 2024. **Rank:** unranked.
+
 - **Đang làm gì:** mỗi calibration query chỉ đóng góp score của chunk chứa bằng chứng có cosine cao nhất. Code chuyển score thành khoảng cách `1 − cosine`, xác định ngưỡng rồi giữ các test chunks có khoảng cách thấp hơn ngưỡng đó.
 - **Điểm có ích:** trong kết quả hiện tại, ngưỡng này giữ ít chunks hơn CCE, giúp giảm context và compute proxy trên HotpotQA.
 - **Hiệu quả có thể hụt ở đâu:** chunk có cosine cao nhất chưa chắc chứa đủ bằng chứng cho câu hỏi nhiều bước; các chunks bổ sung có score thấp hơn có thể bị bỏ. Trên HotpotQA, ít context hơn chưa làm precision tăng, trong khi recall và downstream F1 giảm. Trên WebQA, context vẫn còn dài nên bài toán chi phí chưa được giải quyết đồng đều.
 
 ### 3.3. TRAQ
+
+**Bài báo:** [TRAQ: Trustworthy Retrieval Augmented Question Answering via Conformal Prediction](https://aclanthology.org/2024.naacl-long.210/). **Venue:** NAACL-HLT. **Năm:** 2024. **Nơi đăng:** Proceedings of NAACL-HLT, Volume 1: Long Papers, Association for Computational Linguistics (ACL Anthology). **Rank:** [A — ICORE2026](https://portal.core.edu.au/conf-ranks/1648/).
 
 - **Đang làm gì:** giống CONFLARE ở việc lấy một score cho mỗi calibration query: cosine cao nhất trong các chunks chứa bằng chứng. Cách đặt ngưỡng của TRAQ ưu tiên hạn chế bỏ sót evidence; khi test, mọi chunk đạt ngưỡng đều được giữ.
 - **Điểm có ích:** trong cách tính hiện tại, ngưỡng thấp hơn CONFLARE giúp giữ được nhiều bằng chứng hơn, đặc biệt trên MMQA/WebQA.
