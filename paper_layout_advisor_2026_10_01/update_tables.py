@@ -76,17 +76,18 @@ def main():
     assert len(records) == 15
     path = FOLDER / "LAYOUT.md"
     markdown = path.read_text()
-    start = markdown.index("**Cách đọc bảng:**") if "**Cách đọc bảng:**" in markdown else markdown.index("### 8.1.")
-    end = markdown.index("### 8.6. Diễn giải số hiện tại") if "### 8.6." in markdown else markdown.index("### 8.3. Diễn giải số hiện tại")
+    details = markdown.index("## 9. Thông tin chi tiết thí nghiệm đã chạy")
+    start = markdown.index("**Cách đọc bảng:**", details)
+    end = markdown.index("### 9.7. Diễn giải số hiện tại", details)
     tables = (
         "**Cách đọc bảng:** mỗi dataset có toàn bộ 15 method/configurations trong bảng số hiện tại. "
         "**In đậm: tốt nhất**; <ins>gạch chân: tốt nhì</ins>, xếp theo hai giá trị khác nhau của từng cột trong cùng dataset; các hàng bằng nhau được đánh dấu cùng hạng. "
         "↑ là cao hơn tốt hơn; ↓ là thấp hơn về context/cost. Kept/cost cần đọc cùng recall và downstream. "
         "P/R/Selection F1 đo support chunks; EM/downstream F1 đo câu trả lời. **—** là số chưa có trong bảng nguồn.\n\n"
     )
-    for index, dataset in enumerate(data["datasets"], 1):
-        tables += f"### 8.{index}. {dataset}: toàn bộ kết quả hiện tại\n\n" + dataset_table(records, dataset) + "\n\n"
-    tables += "### 8.5. Overall downstream\n\n" + overall_table(records) + "\n\n"
+    for index, dataset in enumerate(data["datasets"], 2):
+        tables += f"### 9.{index}. {dataset}: toàn bộ kết quả hiện tại\n\n" + dataset_table(records, dataset) + "\n\n"
+    tables += "### 9.6. Overall downstream\n\n" + overall_table(records) + "\n\n"
     tables += (
         "- Overall giữ số được báo trong bảng cung cấp. F1 của Two-Stage `α₂=.40` được báo là **46.95%**; "
         "trung bình bốn ô dataset đã làm tròn là 46.9425%. Số tổng hợp sẽ được đối chiếu với log chưa làm tròn.\n"
@@ -95,12 +96,6 @@ def main():
         "- Dữ liệu bảng: [các số từ bản LaTeX cập nhật](../paper_assets/layout_results_supplied_2026_10_01.json).\n\n"
     )
     markdown = markdown[:start] + tables + markdown[end:]
-    markdown = markdown.replace("### 8.3. Diễn giải số hiện tại", "### 8.6. Diễn giải số hiện tại", 1)
-    heading = "## 9. Đang hoàn thiện để cải thiện kết quả\n\n"
-    note = "**Đang làm việc cùng anh Hưng để cải thiện phương pháp**, tập trung bảo toàn evidence khi prune và cải thiện đồng thời chất lượng chọn chunks, downstream và chi phí.\n\n"
-    if note not in markdown:
-        assert heading in markdown
-        markdown = markdown.replace(heading, heading + note, 1)
     path.write_text(markdown)
     print("Updated 4 × 15 dataset rows and 15 Overall rows; best/second-best ranked per metric.")
 
