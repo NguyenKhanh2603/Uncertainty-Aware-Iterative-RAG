@@ -2,7 +2,7 @@
 
 **Tác giả:** Hung Le
 
-**Ngày cập nhật:** 01/10/2026
+**Ngày cập nhật:** 02/10/2026
 
 **Nội dung:** ý chính để phát triển bài báo, cách trình bày thí nghiệm, số hiện tại và hướng cải thiện.
 
@@ -24,28 +24,28 @@
 
 ### 3.1. CCE
 
-- Trình bày xử lý sau retrieval trong code hiện tại: mỗi support query–chunk pair đóng góp nonconformity `1 − cosine`; lấy quantile từ calibration và giữ chunks vượt similarity cutoff.
-- Support là chunk có nhãn chứa bằng chứng cho câu trả lời. Cách hiệu chuẩn này hướng tới bảo toàn support coverage.
-- Liên hệ kết quả: MMQA/WebQA còn trung bình **18.40/23.36 chunks**, recall **91.0/86.3%**, nhưng precision chỉ **7.7/6.5%**.
+- **Đang làm gì:** trên tập calibration, lấy cosine score của tất cả chunks có nhãn chứa bằng chứng cho câu trả lời. Từ các scores này, xác định một ngưỡng cho mỗi dataset. Khi test, chunk nào đạt ngưỡng thì được đưa vào LLM.
+- **Điểm có ích:** đặt ngưỡng đủ thấp giúp giữ cả những chunks chứa bằng chứng nhưng có cosine không cao. Trên MMQA/WebQA, support recall đạt **91.0/86.3%**.
+- **Chi phí có thể tăng ở đâu:** chunks không chứa bằng chứng cũng có thể đạt cùng ngưỡng. CCE còn **18.40/23.36 chunks/query** trên MMQA/WebQA, nhưng precision chỉ **7.7/6.5%**. LLM phải nhận nhiều nội dung không hỗ trợ câu trả lời; văn bản làm dài input và ảnh làm tăng phần xử lý vision. Compute proxy hiện tại là **47.45/50.99 TFLOPs**, trong khi Fixed Top-5 là **14.38/8.86 TFLOPs**. Fixed Top-5 có recall thấp hơn, nên giảm chi phí vẫn cần đi cùng kiểm tra evidence giữ lại.
 
 ### 3.2. CONFLARE
 
-- Trình bày per-query calibration: lấy distance của support có cosine cao nhất trong mỗi calibration query; test giữ chunks dưới calibrated distance cutoff.
-- Việc lấy best support tạo một record cho mỗi query nhưng không đại diện toàn bộ evidence của câu hỏi nhiều bước.
-- Liên hệ kết quả HotpotQA: giảm context từ CCE **8.61** xuống **7.05 chunks**, precision vẫn **21.0%**, recall giảm **90.5% → 74.0%** và generation F1 giảm **73.02% → 68.78%**.
+- **Đang làm gì:** mỗi calibration query chỉ đóng góp score của chunk chứa bằng chứng có cosine cao nhất. Code chuyển score thành khoảng cách `1 − cosine`, xác định ngưỡng rồi giữ các test chunks có khoảng cách thấp hơn ngưỡng đó.
+- **Điểm có ích:** trong kết quả hiện tại, ngưỡng này giữ ít chunks hơn CCE. Trên HotpotQA, context giảm **8.61 → 7.05 chunks**, compute proxy giảm **21.03 → 17.35 TFLOPs**.
+- **Hiệu quả có thể hụt ở đâu:** chunk có cosine cao nhất chưa chắc chứa đủ bằng chứng cho câu hỏi nhiều bước; các chunks bổ sung có score thấp hơn có thể bị bỏ. Trên HotpotQA, precision vẫn **21.0%**, nhưng recall giảm **90.5% → 74.0%** và downstream F1 giảm **73.02% → 68.78%**. Ít context hơn chưa chuyển thành chọn bằng chứng tốt hơn. Trên WebQA, CONFLARE vẫn giữ **21.60 chunks/query** và precision chỉ **6.8%**, nên bài toán context dài vẫn còn.
 
 ### 3.3. TRAQ
 
-- Trình bày best-support retrieval score của từng calibration query; Bonferroni allocation dùng `α_R = α/2`, lấy lower quantile và giữ chunks đạt cutoff.
-- Với `α=.10`, retrieval allocation `.05` tạo điểm hoạt động thiên về coverage.
-- Liên hệ kết quả: MMQA/WebQA giữ **19.50/24.68 chunks**, recall **94.2/88.6%**, precision **7.5/6.3%**.
+- **Đang làm gì:** giống CONFLARE ở việc lấy một score cho mỗi calibration query: cosine cao nhất trong các chunks chứa bằng chứng. TRAQ dùng mức `α_R=α/2`; với `α=.10`, code lấy ngưỡng từ mức `.05` của các scores này. Khi test, mọi chunk đạt ngưỡng đều được giữ.
+- **Điểm có ích:** mức `.05` tạo ngưỡng thấp hơn CONFLARE trong cách tính hiện tại, giúp ít bỏ sót bằng chứng hơn. Trên MMQA/WebQA, recall đạt **94.2/88.6%**.
+- **Chi phí có thể tăng ở đâu:** nhiều chunks không chứa bằng chứng vẫn vượt ngưỡng. TRAQ giữ **19.50/24.68 chunks/query**, precision chỉ **7.5/6.3%**, với compute proxy **50.68/54.66 TFLOPs**. Trên WebQA, downstream F1 là **29.29%**, trong khi hybrid giữ **8.08 chunks** đạt **30.02%** với **13.83 TFLOPs**. Kết quả này cho thấy giữ thêm nhiều chunks chưa chắc giúp trả lời tốt hơn; hybrid đồng thời mất một phần recall cần tiếp tục cải thiện.
 
 ### 3.4. Research Gap
 
-- Một cutoff đủ thấp để giữ support cũng cho nhiều false chunks đi qua khi hai nhóm cosine scores chồng lấn. Trên MMQA/WebQA, ba selectors còn khoảng **18–25 chunks/query** nhưng precision chỉ **6–8%**: coverage cao đi kèm context chứa nhiều nhiễu.
-- Siết cutoff không tự động làm evidence tốt hơn. CONFLARE trên HotpotQA giảm số chunks nhưng không tăng precision, đồng thời mất recall và downstream F1.
-- Khoảng trống cần giải quyết là **tách admission và pruning**, để điều chỉnh độ rộng của context và mức loại nhiễu riêng, thay vì chỉ dịch một support-derived cutoff.
-- False bank cung cấp điểm so sánh với evidence không hỗ trợ; support bank kiểm tra score của candidate có phù hợp với evidence hỗ trợ hay không. Lợi ích được đánh giá bằng evidence giữ lại, câu trả lời và chi phí, theo từng dataset.
+- **Giữ đủ bằng chứng nhưng còn nhiều nội dung thừa:** CCE và TRAQ đặt ngưỡng từ scores của các chunks chứa bằng chứng. Khi chunks có và không có bằng chứng có cosine gần nhau, ngưỡng thấp để giữ bằng chứng cũng cho nhiều chunks không hữu ích đi qua. Trên MMQA/WebQA, hai methods giữ khoảng **18–25 chunks/query** nhưng precision chỉ **6–8%**. Phần context thừa có thể làm LLM tốn thêm xử lý mà không tăng tương ứng chất lượng câu trả lời.
+- **Giảm context nhưng có thể bỏ mất bằng chứng cần thiết:** CONFLARE dùng chunk có cosine cao nhất của mỗi calibration query để đặt ngưỡng. Cách này chưa phản ánh việc một câu hỏi có thể cần nhiều chunks phối hợp. HotpotQA cho thấy context giảm nhưng precision không tăng, còn recall và downstream F1 cùng giảm. Vì vậy, chỉ siết ngưỡng chưa giải quyết được cả chất lượng và chi phí.
+- **Khoảng trống:** cần một cách chọn context vừa giảm chunks không hỗ trợ câu trả lời, vừa giữ được các chunks bổ sung cần cho reasoning. Hiệu quả cần đo bằng **precision/recall, downstream EM/F1 và chi phí cùng nhau**, thay vì chỉ số chunks ít hơn hoặc recall cao hơn.
+- **Hướng đề xuất:** chia quyết định thành hai bước. Stage 1 so candidate với scores của chunks không chứa bằng chứng để quyết định giữ; Stage 2 so các chunks đã giữ với scores của chunks chứa bằng chứng để kiểm tra loại bớt. Hai reference banks và hai tham số cho phép điều chỉnh riêng mức giữ và mức loại. Công việc cùng anh Hưng tập trung cải thiện khả năng giữ đủ bằng chứng khi giảm context, nhất là trên MMQA và TAT-QA.
 
 ## 4. Methodology
 
